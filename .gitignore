@@ -1,0 +1,21 @@
+# Node / React
+node_modules/
+dist/
+.env
+.env.local
+
+# Python / FastAPI
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Local databases & uploads
+backend/storage/
+backend/chroma_db/
+backend/uploads/
+
+# IDE / OS
+.DS_Store
+.vscode/
+.idea/

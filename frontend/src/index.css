@@ -1,0 +1,321 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================
+   SPATIAL VISION GLASSMORPHISM THEME
+   (Nike Ambient Studio Inspired for Computer AI)
+   ========================================== */
+
+:root, .theme-normal, .theme-dark {
+  --bg-app: radial-gradient(circle at 85% 35%, rgba(65, 52, 42, 0.45) 0%, rgba(18, 16, 14, 0.95) 55%, #0B0A09 100%), #0D0C0B;
+  --bg-panel: rgba(26, 24, 22, 0.72);
+  --border-panel: 1px solid rgba(255, 255, 255, 0.12);
+  --text-main: #F5F3EF;
+  --text-muted: #9E988F;
+  --text-label: #E5E0D5;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --accent: #EC4899;
+  --accent-secondary: #3B82F6;
+  --font-family: 'Outfit', 'Inter', sans-serif;
+  --backdrop: blur(28px);
+  --btn-grad: #2E2A26;
+  --btn-text: #FFFFFF;
+}
+
+.app-wrapper {
+  background: var(--bg-app);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+.glass-spatial-card {
+  background: rgba(26, 24, 22, 0.78);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7), 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+.glass-dock {
+  background: rgba(38, 34, 30, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
+}
+
+.panel-card {
+  background: var(--bg-panel);
+  border: var(--border-panel);
+  backdrop-filter: var(--backdrop);
+  -webkit-backdrop-filter: var(--backdrop);
+  transition: all 0.3s ease;
+}
+
+.text-main {
+  color: var(--text-main);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-label {
+  color: var(--text-label);
+}
+
+.border-theme {
+  border-color: var(--border-color);
+}
+
+.btn-theme {
+  background: var(--btn-grad);
+  color: var(--btn-text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+.btn-theme:hover {
+  filter: brightness(1.2);
+}
+
+/* Custom noise overlays */
+.theme-carbon.bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+.theme-cyber.bg-grain {
+  background-size: 20px 20px;
+  background-image: linear-gradient(to right, rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  opacity: 0.3;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Onboarding slide-in translation */
+.slide-enter {
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Floating animation for icons */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Typing dot indicators */
+.dot-loading span {
+  width: 4px;
+  height: 4px;
+  margin: 0 1.5px;
+  background-color: currentColor;
+  border-radius: 50%;
+  display: inline-block;
+  animation: dotBlink 1.4s infinite both;
+}
+.dot-loading span:nth-child(2) {
+  animation-delay: .2s;
+}
+.dot-loading span:nth-child(3) {
+  animation-delay: .4s;
+}
+
+@keyframes dotBlink {
+  0% {
+    opacity: .2;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: .2;
+  }
+}
+
+/* BXCmuse Parallax Animation Framework */
+.parallax-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.parallax-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease;
+  pointer-events: none;
+}
+
+/* Layer 1: Stars / Sky */
+.parallax-sky {
+  z-index: 1;
+}
+
+/* Layer 2: Distance Mountain Ranges */
+.parallax-mountains {
+  z-index: 2;
+}
+
+/* Layer 3: Dynamic Cloud Layer */
+.parallax-clouds {
+  z-index: 3;
+}
+
+/* Layer 4: Exploration Text */
+.parallax-title {
+  z-index: 4;
+  position: absolute;
+  top: 28%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+}
+
+/* Layer 5: Explorer Silhouette */
+.parallax-explorer {
+  z-index: 5;
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  height: 95px;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease;
+}
+
+/* Layer 6: Foreground Cave Portal */
+.parallax-cave {
+  z-index: 6;
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease;
+}
+
+/* Keyframe States for the Parallax transitions */
+.state-0 .parallax-sky { transform: scale(1); opacity: 1; }
+.state-0 .parallax-mountains { transform: translateY(0) scale(1); opacity: 1; }
+.state-0 .parallax-clouds { transform: translateY(0) scale(1); opacity: 0.85; }
+.state-0 .parallax-title { transform: translateY(0) scale(1); opacity: 1; }
+.state-0 .parallax-explorer { transform: translate(-50%, 0) scale(1); opacity: 0; }
+.state-0 .parallax-cave { transform: scale(0.7); opacity: 0; }
+
+.state-1 .parallax-sky { transform: scale(1.05); }
+.state-1 .parallax-mountains { transform: translateY(-15px) scale(1.05); }
+.state-1 .parallax-clouds { transform: translateY(-30px) scale(1.1); opacity: 0.4; }
+.state-1 .parallax-title { transform: translateY(-70px) scale(0.85); opacity: 0; }
+.state-1 .parallax-explorer { transform: translate(-50%, 0) scale(1); opacity: 1; }
+.state-1 .parallax-cave { transform: scale(1); opacity: 1; }
+
+.state-2 .parallax-sky { transform: scale(1.15); opacity: 0.7; }
+.state-2 .parallax-mountains { transform: translateY(-40px) scale(1.15); opacity: 0.6; }
+.state-2 .parallax-clouds { transform: translateY(-60px) scale(1.25); opacity: 0; }
+.state-2 .parallax-title { transform: translateY(-100px) scale(0.7); opacity: 0; }
+.state-2 .parallax-explorer { transform: translate(-50%, 45px) scale(0.65); opacity: 0.35; }
+.state-2 .parallax-cave { transform: scale(1.7); opacity: 0; }
+
+/* Interactive Mouse Bubbles Particle Trail */
+.mouse-bubble {
+  position: fixed;
+  pointer-events: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  z-index: 9999;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+  animation: floatBubble 1s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes floatBubble {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(-80px) translateX(var(--tx)) scale(0.25);
+    opacity: 0;
+  }
+}
+
+/* Interactive Keypress Spark Explosion Particles */
+.typing-spark {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 9999;
+  box-shadow: 0 0 6px currentColor;
+  animation: burstSpark 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes burstSpark {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.1);
+    opacity: 0;
+  }
+}
+
+
