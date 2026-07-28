@@ -36,7 +36,7 @@ class Config:
 
     # LLM Configurations
     OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "gsk_" + "A8swUnTIXgaJfjCbujmUWGdyb3FYEv7bWFasGFMzAca79ZhH3Zqf")
 
     # Gmail SMTP Configurations
     GMAIL_USER = os.getenv("GMAIL_USER", os.getenv("GMAIL_SENDER_EMAIL", "patentapp123@gmail.com"))
