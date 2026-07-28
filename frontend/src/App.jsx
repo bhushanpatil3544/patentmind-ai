@@ -475,13 +475,10 @@ export default function App() {
 
     try {
       const response = await fetch(apiUrl(url), newOptions);
-      if (response.status === 401) {
-        handleLogout();
-        throw new Error("Session expired. Please log in again.");
-      }
       return response;
     } catch (err) {
-      throw err;
+      console.warn("API request warning:", err);
+      return null;
     }
   };
 
