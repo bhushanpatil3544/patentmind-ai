@@ -50,6 +50,13 @@ const themesList = [
   { id: 'theme-dark', name: 'DARK THEME', dotClass: 'bg-[#1A2018] border-[#4D5D44]' }
 ];
 
+// Dynamic API base URL: empty for local dev (Vite proxy), Railway backend domain for Vercel production
+const API_BASE = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? ''
+  : 'https://patentmind-ai-production.up.railway.app';
+
+const apiUrl = (path) => path.startsWith('http') ? path : `${API_BASE}${path}`;
+
 export default function App() {
   // Session & Auth state
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -467,7 +474,7 @@ export default function App() {
     const newOptions = { ...options, headers };
 
     try {
-      const response = await fetch(url, newOptions);
+      const response = await fetch(apiUrl(url), newOptions);
       if (response.status === 401) {
         handleLogout();
         throw new Error("Session expired. Please log in again.");
@@ -548,7 +555,7 @@ export default function App() {
     const url = authMode === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register';
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(apiUrl(url), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(authForm)
@@ -572,7 +579,7 @@ export default function App() {
         setAuthError(data.detail || 'Authentication operation failed.');
       }
     } catch (err) {
-      setAuthError('Connection connection error to authentication server.');
+      setAuthError('Connection error to authentication server.');
     } finally {
       setAuthLoading(false);
     }
@@ -587,7 +594,7 @@ export default function App() {
     setAuthError('');
     setOtpLocalDebug('');
     try {
-      const response = await fetch('/api/v1/auth/otp/request', {
+      const response = await fetch(apiUrl('/api/v1/auth/otp/request'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone_number: otpPhone })
@@ -613,7 +620,7 @@ export default function App() {
     setAuthLoading(true);
     setAuthError('');
     try {
-      const response = await fetch('/api/v1/auth/otp/verify', {
+      const response = await fetch(apiUrl('/api/v1/auth/otp/verify'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -644,7 +651,8 @@ export default function App() {
   };
 
   // Gmail OTP Registration handlers
-  const handleRequestGmailOTP = async () => {
+  const handleRequestGmailOTP = async (e) => {
+    e.preventDefault();
     if (!authForm.username.trim() || !authForm.email.trim()) {
       setAuthError('Please enter both your Username and Gmail Address.');
       return;
@@ -652,7 +660,7 @@ export default function App() {
     setAuthLoading(true);
     setAuthError('');
     try {
-      const response = await fetch('/api/v1/auth/gmail-otp/request', {
+      const response = await fetch(apiUrl('/api/v1/auth/gmail-otp/request'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: authForm.email, username: authForm.username })
@@ -677,7 +685,7 @@ export default function App() {
     setAuthLoading(true);
     setAuthError('');
     try {
-      const response = await fetch('/api/v1/auth/gmail-otp/verify', {
+      const response = await fetch(apiUrl('/api/v1/auth/gmail-otp/verify'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
