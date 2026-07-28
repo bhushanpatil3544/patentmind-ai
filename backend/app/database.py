@@ -15,9 +15,12 @@ from app.config import Config
 
 logger = logging.getLogger("DatabaseManager")
 
-# Local SQLite fallback path
-SQLITE_DB_PATH = os.path.join(os.path.dirname(__file__), "..", "storage", "users_and_metadata.db")
-os.makedirs(os.path.dirname(SQLITE_DB_PATH), exist_ok=True)
+# Local SQLite fallback path (Writable /tmp for Vercel serverless functions)
+if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    SQLITE_DB_PATH = "/tmp/users_and_metadata.db"
+else:
+    SQLITE_DB_PATH = os.path.join(os.path.dirname(__file__), "..", "storage", "users_and_metadata.db")
+    os.makedirs(os.path.dirname(SQLITE_DB_PATH), exist_ok=True)
 
 class DatabaseManager:
     def __init__(self):
@@ -32,7 +35,9 @@ class DatabaseManager:
         self._create_tables()
 
     def _init_connection(self):
-        if pymysql is None:
+        if os.environ.get("VERCEL") or pymysql is None:
+            self.is_mysql = False
+            return
             logger.warning("PyMySQL driver is not installed. Defaulting to local SQLite fallback database.")
             self.is_mysql = False
             return
