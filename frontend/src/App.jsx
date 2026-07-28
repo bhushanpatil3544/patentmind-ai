@@ -471,6 +471,8 @@ export default function App() {
     
     const headers = options.headers ? { ...options.headers } : {};
     headers['Authorization'] = `Bearer ${token}`;
+    headers['Bypass-Tunnel-Remainder'] = 'true';
+    headers['ngrok-skip-browser-warning'] = 'true';
     const newOptions = { ...options, headers };
 
     try {
