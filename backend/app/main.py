@@ -43,9 +43,19 @@ app.add_middleware(
 ingestion_engine = IngestionEngine()
 processing_engine = ProcessingEngine()
 chunker = PatentChunker()
-embedder = PatentEmbedder()
-db = DualVectorStore()
-rag_chain = IntelligentRAGChain(vector_store=db, embedder=embedder)
+
+_embedder = None
+_db = None
+_rag_chain = None
+
+def get_rag_components():
+    global _embedder, _db, _rag_chain
+    if _rag_chain is None:
+        logger.info("[LAZY INIT] Initializing PatentEmbedder, DualVectorStore, and RAGChain...")
+        _embedder = PatentEmbedder()
+        _db = DualVectorStore()
+        _rag_chain = IntelligentRAGChain(vector_store=_db, embedder=_embedder)
+    return _rag_chain, _embedder, _db
 
 # Relational Database Manager (MySQL primary with SQLite fallback)
 relational_db = DatabaseManager()
@@ -195,11 +205,6 @@ class IdeaChatRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     logger.info("PatentMind AI Backend initialized and online.")
-    try:
-        from app.ollama_helper import check_and_pull_model_async
-        check_and_pull_model_async(rag_chain.ollama_model)
-    except Exception as e:
-        logger.warning(f"Failed to start Ollama auto-pull task: {e}")
 
 @app.get("/")
 def read_root():
@@ -209,7 +214,7 @@ def read_root():
         "status": "online",
         "service": "PatentMind AI Enterprise Knowledge Platform",
         "device": Config.get_device(),
-        "vector_store_status": db.get_stats(),
+        "vector_store_status": _db.get_stats() if _db else {"status": "lazy_initialized"},
         "relational_store_status": relational_status
     }
 
@@ -700,6 +705,7 @@ def search_patents(search_query: SearchQuery, current_user: dict = Depends(get_c
         filters["section"] = search_query.section_filter
         
     try:
+        rag_chain, embedder, db = get_rag_components()
         result = rag_chain.execute_rag(
             query=search_query.query,
             filter_metadata=filters if filters else None,
@@ -743,6 +749,7 @@ def chat_with_agent(chat_request: ChatRequest, current_user: dict = Depends(get_
         filters["section"] = chat_request.section_filter
         
     try:
+        rag_chain, embedder, db = get_rag_components()
         start_time = time.time()
         
         # Retrieve context from vector store (Fast lookup top 3 chunks)
