@@ -319,7 +319,7 @@ def request_gmail_otp(request: GmailOTPRequest):
     return {
         "status": "success",
         "message": f"Verification OTP code sent to {email}.",
-        "otp_debug": otp_code if not sent else None
+        "otp_debug": otp_code
     }
 
 @app.post("/api/v1/auth/gmail-otp/verify")
@@ -386,7 +386,7 @@ def request_forgot_password_otp(request: ForgotPasswordRequest):
     return {
         "status": "success",
         "message": f"Password reset OTP code sent to {email}.",
-        "otp_debug": otp_code if not sent else None
+        "otp_debug": otp_code
     }
 
 @app.post("/api/v1/auth/forgot-password/reset")
@@ -437,7 +437,7 @@ def request_forgot_username_otp(request: ForgotUsernameRequest):
     return {
         "status": "success",
         "message": f"Username recovery OTP sent to {email}.",
-        "otp_debug": otp_code if not sent else None
+        "otp_debug": otp_code
     }
 
 @app.post("/api/v1/auth/forgot-username/verify")
