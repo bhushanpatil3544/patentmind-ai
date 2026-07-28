@@ -9,6 +9,6 @@ COPY backend /app/backend
 
 WORKDIR /app/backend
 
-EXPOSE 8080
+EXPOSE 7860
 
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 7860"]
