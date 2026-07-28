@@ -224,8 +224,8 @@ def send_email_smtp(to_email: str, subject: str, body: str) -> bool:
     """
     Sends email using Gmail SMTP with dual SSL (465) and STARTTLS (587) fallback.
     """
-    sender_email = (Config.GMAIL_USER or "patilbhushan3544@gmail.com").strip()
-    sender_password = (Config.GMAIL_APP_PASSWORD or "lptg uerw ofaz gkgv").replace(" ", "").strip()
+    sender_email = (Config.GMAIL_USER or "patentapp123@gmail.com").strip()
+    sender_password = (Config.GMAIL_APP_PASSWORD or "uuew chga resw sbdu").replace(" ", "").strip()
     
     if not sender_email or not sender_password:
         return False
