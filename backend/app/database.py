@@ -193,38 +193,30 @@ class DatabaseManager:
             except Exception:
                 pass # Column already exists
             
-            # Seed default users if they don't exist
-            cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s" if self.is_mysql else "SELECT COUNT(*) FROM users WHERE username = ?", ("admin",))
-            row = cursor.fetchone()
-            admin_exists = (row["COUNT(*)"] if self.is_mysql else row[0]) > 0
+            # Seed/Ensure BHUSHAN admin account exists with password '3544' and email 'bhushan3544@gmail.com'
+            import bcrypt
+            def hash_pwd(password: str) -> str:
+                return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
-            cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s" if self.is_mysql else "SELECT COUNT(*) FROM users WHERE username = ?", ("client",))
-            row = cursor.fetchone()
-            client_exists = (row["COUNT(*)"] if self.is_mysql else row[0]) > 0
+            bhushan_pw = hash_pwd("3544")
             
-            if not admin_exists or not client_exists:
-                import bcrypt
-                def hash_pwd(password: str) -> str:
-                    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-                
-                if not admin_exists:
-                    logger.info("Admin user missing. Seeding admin account...")
-                    admin_pw = hash_pwd("adminpassword")
-                    cursor.execute(
-                        "INSERT INTO users (username, password) VALUES (%s, %s)" if self.is_mysql else
-                        "INSERT INTO users (username, password) VALUES (?, ?)",
-                        ("admin", admin_pw)
-                    )
-                if not client_exists:
-                    logger.info("Client user missing. Seeding client account...")
-                    client_pw = hash_pwd("clientpassword")
-                    cursor.execute(
-                        "INSERT INTO users (username, password) VALUES (%s, %s)" if self.is_mysql else
-                        "INSERT INTO users (username, password) VALUES (?, ?)",
-                        ("client", client_pw)
-                    )
-                conn.commit()
-                logger.info("Default user accounts verified/seeded.")
+            # Check if BHUSHAN user exists
+            cursor.execute("SELECT id FROM users WHERE LOWER(username) = %s" if self.is_mysql else "SELECT id FROM users WHERE LOWER(username) = ?", ("bhushan",))
+            row = cursor.fetchone()
+            if row:
+                cursor.execute(
+                    "UPDATE users SET password = %s, email = %s WHERE LOWER(username) = %s" if self.is_mysql else
+                    "UPDATE users SET password = ?, email = ? WHERE LOWER(username) = ?",
+                    (bhushan_pw, "bhushan3544@gmail.com", "bhushan")
+                )
+            else:
+                cursor.execute(
+                    "INSERT INTO users (username, password, email) VALUES (%s, %s, %s)" if self.is_mysql else
+                    "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
+                    ("BHUSHAN", bhushan_pw, "bhushan3544@gmail.com")
+                )
+            conn.commit()
+            logger.info("Admin user 'BHUSHAN' (Password: 3544, Email: bhushan3544@gmail.com) verified/seeded.")
                 
             logger.info("Relational tables validated/created successfully.")
         except Exception as e:

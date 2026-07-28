@@ -2261,29 +2261,7 @@ export default function App() {
             </div>
           ) : (
             <form onSubmit={handleAuthSubmit} className="space-y-5">
-              {/* Quick 1-Click Presets for Zero Friction Testing */}
-              <div className="flex items-center gap-2 pb-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAuthForm({ username: 'client', password: 'clientpassword' });
-                    setAuthRole('client');
-                  }}
-                  className="flex-1 py-1.5 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/60 text-[10px] font-mono text-zinc-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>👤</span> <span>Fill Client Credentials</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAuthForm({ username: 'admin', password: 'adminpassword' });
-                    setAuthRole('admin');
-                  }}
-                  className="flex-1 py-1.5 px-3 rounded-lg bg-red-950/40 hover:bg-red-900/40 border border-red-900/60 text-[10px] font-mono text-red-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>👑</span> <span>Fill Admin Credentials</span>
-                </button>
-              </div>
+
 
               <div className={`border-b focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5 ${
                 authRole === 'admin' ? 'border-red-950/80 focus-within:border-red-550' : 'border-theme'
