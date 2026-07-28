@@ -15,12 +15,35 @@ from app.config import Config
 
 logger = logging.getLogger("DatabaseManager")
 
-# Local SQLite fallback path (Writable /tmp for Vercel serverless functions)
 if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
     SQLITE_DB_PATH = "/tmp/users_and_metadata.db"
 else:
     SQLITE_DB_PATH = os.path.join(os.path.dirname(__file__), "..", "storage", "users_and_metadata.db")
-    os.makedirs(os.path.dirname(SQLITE_DB_PATH), exist_ok=True)
+    try:
+        os.makedirs(os.path.dirname(SQLITE_DB_PATH), exist_ok=True)
+    except OSError:
+        pass
+
+class PooledConnectionWrapper:
+    def __init__(self, conn, pool):
+        self._conn = conn
+        self._pool = pool
+        
+    def cursor(self, *args, **kwargs):
+        return self._conn.cursor(*args, **kwargs)
+        
+    def commit(self):
+        return self._conn.commit()
+        
+    def rollback(self):
+        return self._conn.rollback()
+        
+    def close(self):
+        try:
+            self._conn.rollback()
+        except Exception:
+            pass
+        self._pool._release_connection(self._conn)
 
 class DatabaseManager:
     def __init__(self):
@@ -32,6 +55,14 @@ class DatabaseManager:
 
         self.is_mysql = False
         self._init_connection()
+        
+        # Connection Pool Initialization
+        import queue
+        import threading
+        self._pool_lock = threading.Lock()
+        self._pool_queue = queue.Queue(maxsize=15)
+        self._pool_active_count = 0
+        
         self._create_tables()
 
     def _init_connection(self):
@@ -64,13 +95,9 @@ class DatabaseManager:
             logger.warning(f"Failed to connect to MySQL: {e}. Falling back to SQLite database.")
             self.is_mysql = False
 
-    def _get_connection(self):
-        """
-        Returns a connection object and cursor context based on active database.
-        Usage: conn, cursor = self._get_connection()
-        """
+    def _create_raw_connection(self):
         if self.is_mysql:
-            conn = pymysql.connect(
+            return pymysql.connect(
                 host=self.host,
                 port=self.port,
                 user=self.user,
@@ -78,12 +105,48 @@ class DatabaseManager:
                 database=self.database,
                 cursorclass=pymysql.cursors.DictCursor
             )
-            return conn, conn.cursor()
         else:
-            conn = sqlite3.connect(SQLITE_DB_PATH)
-            # Make sqlite3 return dictionaries instead of tuples
+            conn = sqlite3.connect(SQLITE_DB_PATH, check_same_thread=False)
             conn.row_factory = sqlite3.Row
-            return conn, conn.cursor()
+            return conn
+
+    def _release_connection(self, raw_conn):
+        import queue
+        try:
+            self._pool_queue.put_nowait(raw_conn)
+        except queue.Full:
+            try:
+                raw_conn.close()
+            except Exception:
+                pass
+            with self._pool_lock:
+                self._pool_active_count -= 1
+
+    def _get_connection(self):
+        """
+        Returns a connection object and cursor context based on active database.
+        Usage: conn, cursor = self._get_connection()
+        """
+        import queue
+        raw_conn = None
+        try:
+            raw_conn = self._pool_queue.get_nowait()
+        except queue.Empty:
+            with self._pool_lock:
+                if self._pool_active_count < 15:
+                    raw_conn = self._create_raw_connection()
+                    self._pool_active_count += 1
+            if not raw_conn:
+                raw_conn = self._pool_queue.get(timeout=10.0)
+                
+        # Validate connection is alive
+        if self.is_mysql:
+            try:
+                raw_conn.ping(reconnect=True)
+            except Exception:
+                pass
+                
+        return PooledConnectionWrapper(raw_conn, self), raw_conn.cursor()
 
     def _create_tables(self):
         conn, cursor = self._get_connection()
@@ -485,6 +548,43 @@ class DatabaseManager:
             return results
         except Exception as e:
             logger.error(f"Failed to list patent metadata: {e}")
+            return []
+        finally:
+            conn.close()
+
+    def search_patents_by_keywords(self, keywords: List[str]) -> List[Dict[str, Any]]:
+        if not keywords:
+            return self.list_patents_meta()
+            
+        conn, cursor = self._get_connection()
+        try:
+            clauses = []
+            params = []
+            for kw in keywords:
+                clauses.append("(LOWER(title) LIKE %s OR LOWER(abstract) LIKE %s)" if self.is_mysql else "(LOWER(title) LIKE ? OR LOWER(abstract) LIKE ?)")
+                params.extend([f"%{kw.lower()}%", f"%{kw.lower()}%"])
+                
+            query = "SELECT * FROM patents WHERE " + " OR ".join(clauses) + " ORDER BY id DESC"
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            
+            results = []
+            for row in rows:
+                inventors = json.loads(row["inventors"])
+                ipc = json.loads(row["ipc_cpc_codes"])
+                results.append({
+                    "patent_number": row["patent_number"],
+                    "title": row["title"],
+                    "abstract": row["abstract"],
+                    "document_date": row["document_date"],
+                    "inventors": inventors,
+                    "ipc_cpc_codes": ipc,
+                    "source": row["source"],
+                    "s3_url": row["s3_url"]
+                })
+            return results
+        except Exception as e:
+            logger.error(f"Failed to search patent metadata: {e}")
             return []
         finally:
             conn.close()

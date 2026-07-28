@@ -8,7 +8,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 logger = logging.getLogger("Auth")
 
-SECRET_KEY = "patentmind_ai_super_secret_cryptography_jwt_signature_key_2026"
+import os
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "patentmind_ai_super_secret_cryptography_jwt_signature_key_2026")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
 

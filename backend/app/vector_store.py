@@ -286,11 +286,12 @@ class DualVectorStore:
             try:
                 from app.database import DatabaseManager
                 rel_db = DatabaseManager()
-                patents = rel_db.list_patents_meta()
                 
                 # Retrieve last query text or try to deduce it
                 query_text = getattr(self, "_last_query_text", "")
                 keywords = [k.lower().strip() for k in query_text.split() if len(k.strip()) > 2] if query_text else []
+                
+                patents = rel_db.search_patents_by_keywords(keywords)
                 
                 for p in patents:
                     match_score = 0.0
@@ -306,20 +307,19 @@ class DualVectorStore:
                     else:
                         match_score = 0.5 # Default score if no keywords
                         
-                    if match_score > 0:
-                        results.append({
-                            "text": p["abstract"],
-                            "score": min(0.5 + match_score, 0.99),
-                            "metadata": {
-                                "patent_number": p["patent_number"],
-                                "title": p["title"],
-                                "source": p["source"],
-                                "section": "Abstract",
-                                "ipc_cpc_codes": p["ipc_cpc_codes"],
-                                "inventors": p["inventors"],
-                                "claim_number": 1
-                            }
-                        })
+                    results.append({
+                        "text": p["abstract"],
+                        "score": min(0.5 + match_score, 0.99),
+                        "metadata": {
+                            "patent_number": p["patent_number"],
+                            "title": p["title"],
+                            "source": p["source"],
+                            "section": "Abstract",
+                            "ipc_cpc_codes": p["ipc_cpc_codes"],
+                            "inventors": p["inventors"],
+                            "claim_number": 1
+                        }
+                    })
                 results.sort(key=lambda x: x["score"], reverse=True)
             except Exception as e:
                 logger.error(f"Relational database search fallback failed: {e}")
