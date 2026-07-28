@@ -215,6 +215,50 @@ def read_root():
 
 # --- AUTHENTICATION ROUTES ---
 
+def send_email_smtp(to_email: str, subject: str, body: str) -> bool:
+    """
+    Sends email using Gmail SMTP with dual SSL (465) and STARTTLS (587) fallback.
+    """
+    sender_email = (Config.GMAIL_USER or "patilbhushan3544@gmail.com").strip()
+    sender_password = (Config.GMAIL_APP_PASSWORD or "lptg uerw ofaz gkgv").replace(" ", "").strip()
+    
+    if not sender_email or not sender_password:
+        return False
+
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    # Method 1: SSL Port 465 (Preferred for cloud containers)
+    try:
+        server = smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10.0)
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+        server.quit()
+        logger.info(f"[GMAIL SMTP SSL SUCCESS] Email delivered to {to_email}")
+        return True
+    except Exception as err1:
+        logger.warning(f"[GMAIL SMTP SSL WARN] SSL port 465 failed ({err1}). Trying STARTTLS on port 587...")
+
+    # Method 2: STARTTLS Port 587
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=10.0)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+        server.quit()
+        logger.info(f"[GMAIL SMTP STARTTLS SUCCESS] Email delivered to {to_email}")
+        return True
+    except Exception as err2:
+        logger.error(f"[GMAIL SMTP ERROR] Port 587 also failed: {err2}")
+        return False
+
 def send_account_email(email: str, username: str, password_plain: str) -> bool:
     """
     Dispatches account credentials to user's registered Gmail / Email address via Gmail SMTP.
@@ -232,35 +276,7 @@ def send_account_email(email: str, username: str, password_plain: str) -> bool:
         f"Best regards,\n"
         f"Team No 3 (BHUSHAN SHREYA OMKAR SOHAM ASTA TAWARI JI)"
     )
-    
-    sender_email = (Config.GMAIL_USER or "").strip()
-    sender_password = (Config.GMAIL_APP_PASSWORD or "").replace(" ", "").strip()
-    
-    logger.info(f"[GMAIL DISPATCH] Preparing email send from '{sender_email}' to destination '{email}'...")
-    
-    # Attempt Gmail SMTP sending
-    if sender_email and sender_password:
-        try:
-            import smtplib
-            from email.mime.text import MIMEText
-            from email.mime.multipart import MIMEMultipart
-            
-            msg = MIMEMultipart()
-            msg['From'] = sender_email
-            msg['To'] = email
-            msg['Subject'] = subject
-            msg.attach(MIMEText(body, 'plain'))
-            
-            server = smtplib.SMTP(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=12.0)
-            server.starttls()
-            server.login(sender_email, sender_password)
-            server.send_message(msg)
-            server.quit()
-            logger.info(f"[GMAIL SMTP SUCCESS] Credentials email delivered directly from {sender_email} to {email} via Gmail SMTP!")
-            return True
-        except Exception as smtp_err:
-            logger.error(f"[GMAIL SMTP ERROR] Failed to send email via Gmail SMTP: {smtp_err}")
-            return False
+    return send_email_smtp(email, subject, body)
             
 def send_otp_email(email: str, otp_code: str, purpose: str = "Registration") -> bool:
     """
@@ -275,36 +291,8 @@ def send_otp_email(email: str, otp_code: str, purpose: str = "Registration") -> 
         f"Best regards,\n"
         f"Team No 3 (BHUSHAN SHREYA OMKAR SOHAM ASTA TAWARI JI)"
     )
-    
-    sender_email = (Config.GMAIL_USER or "").strip()
-    sender_password = (Config.GMAIL_APP_PASSWORD or "").replace(" ", "").strip()
-    
     logger.info(f"[GMAIL DISPATCH] Dispatching OTP {otp_code} to: {email}")
-    
-    if sender_email and sender_password:
-        try:
-            import smtplib
-            from email.mime.text import MIMEText
-            from email.mime.multipart import MIMEMultipart
-            
-            msg = MIMEMultipart()
-            msg['From'] = sender_email
-            msg['To'] = email
-            msg['Subject'] = subject
-            msg.attach(MIMEText(body, 'plain'))
-            
-            server = smtplib.SMTP(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=12.0)
-            server.starttls()
-            server.login(sender_email, sender_password)
-            server.send_message(msg)
-            server.quit()
-            logger.info(f"[GMAIL SMTP SUCCESS] OTP email delivered to {email}")
-            return True
-        except Exception as smtp_err:
-            logger.error(f"[GMAIL SMTP ERROR] Failed to send OTP: {smtp_err}")
-            
-    logger.info(f"[GMAIL LOG] OTP for {email}: {otp_code}")
-    return True
+    return send_email_smtp(email, subject, body)
 
 @app.post("/api/v1/auth/gmail-otp/request")
 def request_gmail_otp(request: GmailOTPRequest):
