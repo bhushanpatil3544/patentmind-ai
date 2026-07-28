@@ -39,8 +39,8 @@ class Config:
     GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
     # Gmail SMTP Configurations
-    GMAIL_USER = os.getenv("GMAIL_USER", "")
-    GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
+    GMAIL_USER = os.getenv("GMAIL_USER", os.getenv("GMAIL_SENDER_EMAIL", "patilbhushan3544@gmail.com"))
+    GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "lptg uerw ofaz gkgv")
     SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
     SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
 
