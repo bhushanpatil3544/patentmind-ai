@@ -2614,8 +2614,24 @@ export default function App() {
         </div>
       </aside>
 
-      {/* RIGHT SCROLLABLE PANEL (CONTENT WORKSPACE) */}
       <main className="flex-1 md:ml-[360px] p-8 md:p-16 max-w-5xl overflow-y-auto flex flex-col min-h-screen">
+
+        {/* Top Ticker Slider Banner */}
+        <div className="w-full bg-zinc-950/80 border border-theme/60 backdrop-blur-md rounded-none py-2.5 px-4 mb-8 overflow-hidden relative flex items-center gap-4 select-none">
+          <div className="flex items-center gap-1.5 flex-shrink-0 text-emerald-500 font-mono text-[9px] font-bold uppercase tracking-widest border-r border-theme pr-4">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>SYSTEM MONITOR</span>
+          </div>
+          <div className="flex-1 overflow-hidden relative h-4">
+            <div className="animate-marquee whitespace-nowrap text-[9px] font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-12 absolute">
+              <span>💡 PATENT INDEX STATUS: <strong className="text-white">ONLINE</strong></span>
+              <span>⚡ ACTIVE AI ENGINE: <strong className="text-white">GROQ LLM (HYBRID CLOUD)</strong></span>
+              <span>🔐 NETWORK LINK: <strong className="text-white">SECURED SSL ACTIVE</strong></span>
+              <span>📊 TOTAL PATENTS INDEXED: <strong className="text-white">DEFAULT SEED COMPLETED</strong></span>
+              <span>🤖 COMPILER STATUS: <strong className="text-white">SUCCESS (v2.1.0-CLEAN)</strong></span>
+            </div>
+          </div>
+        </div>
 
         {/* SEMANTIC SEARCH & RAG TAB */}
         {activeTab === 'search' && (
@@ -2706,8 +2722,8 @@ export default function App() {
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <h3 className="text-serif-editorial text-xl text-main tracking-wide">
-                      SYNTHESIZED INSIGHTS
+                    <h3 className="text-serif-editorial text-xl text-main tracking-wide flex items-center gap-2">
+                      <span>🧠 ✨</span> <span>SYNTHESIZED INSIGHTS</span>
                     </h3>
                     <button
                       onClick={() => handleSpeakText(searchResults.answer)}
@@ -3152,8 +3168,8 @@ export default function App() {
                     >
                       {/* Role Label */}
                       <div className="flex items-center justify-between gap-2 w-full px-1">
-                        <span className="text-[9px] font-mono text-zinc-550 uppercase tracking-widest">
-                          {msg.role === 'user' ? username : 'AI ANALYST'}
+                        <span className="text-[9px] font-mono text-zinc-550 uppercase tracking-widest flex items-center gap-1">
+                          {msg.role === 'user' ? `👤 ${username}` : '🤖 ✨ AI ANALYST'}
                         </span>
                         {msg.role === 'assistant' && (
                           <button
@@ -3539,9 +3555,9 @@ export default function App() {
                           className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} space-y-1.5`}
                         >
                           <div className="flex items-center justify-between gap-2 w-full px-1">
-                            <span className="text-[9px] font-mono text-zinc-550 uppercase tracking-widest">
-                              {msg.role === 'user' ? username : 'STRATEGY ADVISOR'}
-                            </span>
+                             <span className="text-[9px] font-mono text-zinc-550 uppercase tracking-widest flex items-center gap-1">
+                               {msg.role === 'user' ? `👤 ${username}` : '💡 ✨ STRATEGY ADVISOR'}
+                             </span>
                             {msg.role === 'assistant' && (
                               <button
                                 type="button"
@@ -4012,6 +4028,16 @@ export default function App() {
             </div>
           </div>
         )}
+        {/* Developer Credit Footer */}
+        <footer className="mt-auto pt-16 border-t border-theme/35 flex flex-col md:flex-row items-center justify-between gap-4 pb-8 w-full">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">PatentMind System v2.1.0 Cloud</span>
+          </div>
+          <div className="text-[10px] font-mono text-zinc-400 hover:text-white transition-colors duration-200 text-right uppercase tracking-wider">
+            Developer: <span className="text-main font-semibold">Bhushan</span> // Contact: <span className="text-main font-semibold">+91 93590 83546</span>
+          </div>
+        </footer>
 
       </main>
 

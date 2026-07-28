@@ -318,4 +318,20 @@
   }
 }
 
+/* Ticker Marquee Slider Animation */
+.animate-marquee {
+  display: flex;
+  gap: 3rem;
+  animation: marquee 25s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
 
