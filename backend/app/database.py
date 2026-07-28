@@ -251,12 +251,13 @@ class DatabaseManager:
             conn.close()
 
     def get_user_password_hash(self, username: str) -> Optional[str]:
+        username_clean = (username or "").strip().lower()
         conn, cursor = self._get_connection()
         try:
             cursor.execute(
-                "SELECT password FROM users WHERE username = %s" if self.is_mysql else
-                "SELECT password FROM users WHERE username = ?",
-                (username,)
+                "SELECT password FROM users WHERE LOWER(username) = %s" if self.is_mysql else
+                "SELECT password FROM users WHERE LOWER(username) = ?",
+                (username_clean,)
             )
             row = cursor.fetchone()
             if row:

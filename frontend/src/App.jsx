@@ -549,13 +549,18 @@ export default function App() {
     setAuthLoading(true);
     setAuthError('');
 
+    const cleanUsername = authForm.username.trim().toLowerCase();
     const url = authMode === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register';
 
     try {
       const response = await fetch(apiUrl(url), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(authForm)
+        body: JSON.stringify({
+          username: cleanUsername,
+          password: authForm.password,
+          email: authForm.email ? authForm.email.trim() : undefined
+        })
       });
 
       const data = await response.json();
@@ -2263,7 +2268,7 @@ export default function App() {
                   onKeyDown={handleTypingKeydown}
                   placeholder="USERNAME"
                   required
-                  className={`w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 uppercase ${
+                  className={`w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 ${
                     authRole === 'admin' ? 'text-red-400' : 'text-main'
                   }`}
                 />
