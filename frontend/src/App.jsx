@@ -50,10 +50,10 @@ const themesList = [
   { id: 'theme-dark', name: 'DARK THEME', dotClass: 'bg-[#1A2018] border-[#4D5D44]' }
 ];
 
-// Dynamic API base URL: empty for local dev (Vite proxy), localtunnel domain for Vercel production
+// Dynamic API base URL: empty for local dev (Vite proxy), Serveo HTTPS tunnel for Vercel production
 const API_BASE = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? ''
-  : 'https://patentmind-live-backend.loca.lt';
+  : 'https://909dd73aae52ee5e-14-139-112-69.serveousercontent.com';
 
 const apiUrl = (path) => path.startsWith('http') ? path : `${API_BASE}${path}`;
 
