@@ -50,8 +50,10 @@ const themesList = [
   { id: 'theme-dark', name: 'DARK THEME', dotClass: 'bg-[#1A2018] border-[#4D5D44]' }
 ];
 
-// Dynamic API base URL: empty for relative proxying (Vite proxy locally, Vercel rewrite in production)
-const API_BASE = '';
+// Dynamic API base URL: empty for local dev (Vite proxy), Railway backend domain for Vercel production
+const API_BASE = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? ''
+  : 'https://patentmind-ai-production.up.railway.app';
 
 const apiUrl = (path) => path.startsWith('http') ? path : `${API_BASE}${path}`;
 
