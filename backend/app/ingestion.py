@@ -10,9 +10,17 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Ingestion")
 
-# Registry path for deduplication
-MANIFEST_PATH = os.path.join(os.path.dirname(__file__), "..", "storage", "ingestion_manifest.json")
-os.makedirs(os.path.dirname(MANIFEST_PATH), exist_ok=True)
+# Registry path for deduplication (using /tmp on Vercel)
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+if IS_VERCEL:
+    MANIFEST_PATH = "/tmp/ingestion_manifest.json"
+else:
+    MANIFEST_PATH = os.path.join(os.path.dirname(__file__), "..", "storage", "ingestion_manifest.json")
+
+try:
+    os.makedirs(os.path.dirname(MANIFEST_PATH), exist_ok=True)
+except OSError:
+    pass
 
 class PatentModel(BaseModel):
     patent_number: str = Field(..., description="Unique patent identifier, e.g., US-11234567-B2")

@@ -89,8 +89,10 @@ class IntelligentRAGChain:
                     "num_ctx": 2048
                 }
             }
-            # Give local model loading sufficient time (45 seconds)
-            response = requests.post(url, json=payload, timeout=45.0)
+            # Give local model loading time locally, but fail fast on Vercel serverless to prevent 504
+            import os
+            timeout_val = 1.0 if os.environ.get("VERCEL") else 15.0
+            response = requests.post(url, json=payload, timeout=timeout_val)
             if response.status_code == 200:
                 answer = response.json().get("response", "").strip()
                 logger.info("Ollama inference succeeded.")

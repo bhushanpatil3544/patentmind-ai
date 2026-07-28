@@ -795,8 +795,9 @@ def chat_with_agent(chat_request: ChatRequest, current_user: dict = Depends(get_
                     "num_ctx": 2048
                 }
             }
-            # Allow up to 15 seconds for local execution
-            response = requests.post(url, json=payload, timeout=15.0)
+            # Allow up to 15 seconds for local execution, fail fast on Vercel
+            timeout_val = 1.0 if os.environ.get("VERCEL") else 10.0
+            response = requests.post(url, json=payload, timeout=timeout_val)
             if response.status_code == 200:
                 answer = response.json().get("message", {}).get("content", "").strip()
                 logger.info("Ollama chat inference succeeded.")
