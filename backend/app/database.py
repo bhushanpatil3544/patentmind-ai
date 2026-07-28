@@ -215,8 +215,10 @@ class DatabaseManager:
                     "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
                     ("BHUSHAN", bhushan_pw, "bhushan3544@gmail.com")
                 )
+            # Remove legacy default 'client' and 'admin' accounts
+            cursor.execute("DELETE FROM users WHERE LOWER(username) IN ('client', 'admin')" if self.is_mysql else "DELETE FROM users WHERE LOWER(username) IN ('client', 'admin')")
             conn.commit()
-            logger.info("Admin user 'BHUSHAN' (Password: 3544, Email: bhushan3544@gmail.com) verified/seeded.")
+            logger.info("Admin user 'BHUSHAN' (Password: 3544, Email: bhushan3544@gmail.com) verified/seeded. Legacy demo accounts purged.")
                 
             logger.info("Relational tables validated/created successfully.")
         except Exception as e:
