@@ -90,7 +90,7 @@ export default function App() {
   const [changePasswordMsg, setChangePasswordMsg] = useState('');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
 
-  const [showOnboarding, setShowOnboarding] = useState(localStorage.getItem('onboarding_done') !== 'true');
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingSlide, setOnboardingSlide] = useState(0);
   const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem('token'));
   const [welcomeLayout, setWelcomeLayout] = useState('claymation'); // claymation / brutalist / cyber / aurora
@@ -571,9 +571,11 @@ export default function App() {
         if (authMode === 'login') {
           localStorage.setItem('token', data.access_token);
           localStorage.setItem('username', data.username);
+          localStorage.setItem('onboarding_done', 'true');
           setToken(data.access_token);
           setUsername(data.username);
           setShowWelcome(false);
+          setShowOnboarding(false);
           setAuthForm({ username: '', password: '', email: '' });
         } else {
           setAuthMode('login');
