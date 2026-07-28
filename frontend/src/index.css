@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,19 +9,23 @@
    (Nike Ambient Studio Inspired for Computer AI)
    ========================================== */
 
-:root, .theme-normal, .theme-dark {
-  --bg-app: radial-gradient(circle at 85% 35%, rgba(65, 52, 42, 0.45) 0%, rgba(18, 16, 14, 0.95) 55%, #0B0A09 100%), #0D0C0B;
-  --bg-panel: rgba(26, 24, 22, 0.72);
-  --border-panel: 1px solid rgba(255, 255, 255, 0.12);
-  --text-main: #F5F3EF;
-  --text-muted: #9E988F;
-  --text-label: #E5E0D5;
-  --border-color: rgba(255, 255, 255, 0.1);
-  --accent: #EC4899;
-  --accent-secondary: #3B82F6;
-  --font-family: 'Outfit', 'Inter', sans-serif;
-  --backdrop: blur(28px);
-  --btn-grad: #2E2A26;
+:root, .theme-normal, .theme-dark, .theme-carbon, .theme-cyber, .theme-brutalist {
+  --bg-app: #0A0A0A;
+  --bg-panel: #111111;
+  --bg-sidebar: #121212;
+  --bg-card: #18181B;
+  --bg-hover: #242428;
+  --border-panel: 1px solid rgba(255, 255, 255, 0.08);
+  --text-main: #FFFFFF;
+  --text-muted: #A1A1AA;
+  --text-label: #71717A;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --accent: #7C3AED;
+  --accent-secondary: #8B5CF6;
+  --highlight: #22D3EE;
+  --font-family: 'Inter', 'Outfit', sans-serif;
+  --backdrop: blur(32px);
+  --btn-grad: #7C3AED;
   --btn-text: #FFFFFF;
 }
 

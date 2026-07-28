@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
   Database, 
@@ -2356,11 +2357,18 @@ export default function App() {
 
   // CORE APPLICATION DASHBOARD (LOGGED IN)
   return (
-    <div className={`app-wrapper bg-grain ${theme} flex flex-col md:flex-row transition-all duration-300`}>
+    <div className={`app-wrapper bg-[#0A0A0A] ${theme} flex flex-col md:flex-row transition-all duration-300 min-h-screen relative overflow-hidden font-sans`}>
       
-      {/* LEFT FIXED PANEL (HERO & NAVIGATION & LOGOUT) */}
-      <aside className="w-full md:w-[360px] md:fixed md:top-0 md:bottom-0 md:left-0 panel-card border-r border-theme p-8 md:p-12 flex flex-col justify-between overflow-y-auto z-20">
-        <div className="space-y-8">
+      {/* Dynamic Ambient Background Grid & Blur Circles */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] rounded-full bg-[#7C3AED]/10 blur-[130px] animate-pulse duration-[8000ms]" />
+        <div className="absolute bottom-[-10%] right-[10%] w-[450px] h-[450px] rounded-full bg-[#22D3EE]/5 blur-[110px] animate-pulse duration-[6000ms]" />
+      </div>
+
+      {/* LEFT FIXED FLOATING SIDE PANEL */}
+      <aside className="w-full md:w-[290px] md:fixed md:top-4 md:bottom-4 md:left-4 bg-[#121212]/80 backdrop-blur-xl border border-white/5 md:rounded-2xl p-6 md:p-8 flex flex-col justify-between overflow-y-auto z-20 shadow-2xl">
+        <div className="space-y-7">
           
           {/* Brand Header */}
           <div>
@@ -2499,98 +2507,36 @@ export default function App() {
           </div>
 
           {/* Navigation Menu */}
-          <nav className="flex flex-col gap-4 text-left">
-            <button
-              onClick={() => setActiveTab('search')}
-              className={`group flex items-baseline gap-4 text-xs font-mono tracking-widest uppercase transition-all duration-150 ${
-                activeTab === 'search' ? 'text-main font-semibold' : 'text-muted hover:text-main'
-              }`}
-            >
-              <span className="text-[10px] text-zinc-500 group-hover:text-zinc-400">01</span>
-              <span>RAG SEARCH</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`group flex items-baseline gap-4 text-xs font-mono tracking-widest uppercase transition-all duration-150 ${
-                activeTab === 'dashboard' ? 'text-main font-semibold' : 'text-muted hover:text-main'
-              }`}
-            >
-              <span className="text-[10px] text-zinc-500 group-hover:text-zinc-400">02</span>
-              <span>DASHBOARD</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('upload')}
-              className={`group flex items-baseline gap-4 text-xs font-mono tracking-widest uppercase transition-all duration-150 ${
-                activeTab === 'upload' ? 'text-main font-semibold' : 'text-muted hover:text-main'
-              }`}
-            >
-              <span className="text-[10px] text-zinc-500 group-hover:text-zinc-400">03</span>
-              <span>DOCUMENT UPLOAD</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('dataset')}
-              className={`group flex items-baseline gap-4 text-xs font-mono tracking-widest uppercase transition-all duration-150 ${
-                activeTab === 'dataset' ? 'text-main font-semibold' : 'text-muted hover:text-main'
-              }`}
-            >
-              <span className="text-[10px] text-zinc-500 group-hover:text-zinc-400">04</span>
-              <span>DATASET IMPORT</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('chat')}
-              className={`group flex items-baseline gap-4 text-xs font-mono tracking-widest uppercase transition-all duration-150 ${
-                activeTab === 'chat' ? 'text-main font-semibold' : 'text-muted hover:text-main'
-              }`}
-            >
-              <span className="text-[10px] text-zinc-500 group-hover:text-zinc-400">05</span>
-              <span>CHATBOT</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('idea')}
-              className={`group flex items-baseline gap-4 text-xs font-mono tracking-widest uppercase transition-all duration-150 ${
-                activeTab === 'idea' ? 'text-main font-semibold' : 'text-muted hover:text-main'
-              }`}
-            >
-              <span className="text-[10px] text-zinc-500 group-hover:text-zinc-400">06</span>
-              <span>IDEA ANALYZER</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('help')}
-              className={`group flex items-baseline gap-4 text-xs font-mono tracking-widest uppercase transition-all duration-150 ${
-                activeTab === 'help' ? 'text-main font-semibold' : 'text-muted hover:text-main'
-              }`}
-            >
-              <span className="text-[10px] text-zinc-500 group-hover:text-zinc-400">07</span>
-              <span>HELP & FEEDBACK</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('settings')}
-              className={`group flex items-baseline gap-4 text-xs font-mono tracking-widest uppercase transition-all duration-150 ${
-                activeTab === 'settings' ? 'text-main font-semibold' : 'text-muted hover:text-main'
-              }`}
-            >
-              <span className="text-[10px] text-zinc-500 group-hover:text-zinc-400">08</span>
-              <span>SETTINGS</span>
-            </button>
-
-            {username === 'admin' && (
-              <button
-                onClick={() => setActiveTab('admin')}
-                className={`group flex items-baseline gap-4 text-xs font-mono tracking-widest uppercase transition-all duration-150 ${
-                  activeTab === 'admin' ? 'text-main font-semibold' : 'text-muted hover:text-main'
-                }`}
-              >
-                <span className="text-[10px] text-zinc-500 group-hover:text-zinc-400">09</span>
-                <span>ADMIN CONTROL</span>
-              </button>
-            )}
+          <nav className="flex flex-col gap-1.5 text-left">
+            {[
+              { id: 'search', label: 'PATENT SEARCH', icon: Search },
+              { id: 'dashboard', label: 'ANALYTICS & METRICS', icon: BarChart3 },
+              { id: 'upload', label: 'DOCUMENT UPLOAD', icon: UploadCloud },
+              { id: 'dataset', label: 'DATASET IMPORT', icon: Database },
+              { id: 'chat', label: 'PATENT CHATBOT', icon: MessageSquare },
+              { id: 'idea', label: 'IDEA ANALYZER', icon: Sparkles },
+              { id: 'help', label: 'HELP & FEEDBACK', icon: HelpCircle },
+              { id: 'settings', label: 'SYSTEM SETTINGS', icon: Settings },
+              ...(username === 'admin' ? [{ id: 'admin', label: 'ADMIN CONTROL', icon: Cpu }] : [])
+            ].map((tab) => {
+              const TabIcon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <motion.button
+                  key={tab.id}
+                  whileHover={{ x: 4, backgroundColor: 'rgba(255,255,255,0.03)' }}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-[10px] font-mono tracking-widest uppercase transition-all ${
+                    isActive 
+                      ? 'bg-purple-950/20 text-[#22D3EE] border-l-2 border-[#7C3AED] font-semibold shadow-[0_0_15px_rgba(124,58,237,0.1)]' 
+                      : 'text-[#A1A1AA] hover:text-white'
+                  }`}
+                >
+                  <TabIcon className={`w-3.5 h-3.5 ${isActive ? 'text-[#22D3EE]' : 'text-zinc-500'}`} />
+                  <span>{tab.label}</span>
+                </motion.button>
+              );
+            })}
           </nav>
         </div>
 
@@ -2614,7 +2560,7 @@ export default function App() {
         </div>
       </aside>
 
-      <main className="flex-1 md:ml-[360px] p-8 md:p-16 max-w-5xl overflow-y-auto flex flex-col min-h-screen">
+      <main className="flex-1 md:ml-[320px] p-8 md:p-12 max-w-5xl overflow-y-auto flex flex-col min-h-screen relative z-10">
 
         {/* Top Ticker Slider Banner */}
         <div className="w-full bg-zinc-950/80 border border-theme/60 backdrop-blur-md rounded-none py-2.5 px-4 mb-8 overflow-hidden relative flex items-center gap-4 select-none">
