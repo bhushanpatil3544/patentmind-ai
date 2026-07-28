@@ -758,6 +758,7 @@ def chat_with_agent(chat_request: ChatRequest, current_user: dict = Depends(get_
         
         # Retrieve context from vector store (Fast lookup top 3 chunks)
         query_vector = rag_chain.embedder.embed_query(last_user_msg)
+        rag_chain.db._last_query_text = last_user_msg
         retrieved_chunks = rag_chain.db.search(query_vector, filter_metadata=filters if filters else None, limit=3)
         
         # Format chunks to compact context

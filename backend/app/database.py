@@ -219,6 +219,59 @@ class DatabaseManager:
             cursor.execute("DELETE FROM users WHERE LOWER(username) IN ('client', 'admin')" if self.is_mysql else "DELETE FROM users WHERE LOWER(username) IN ('client', 'admin')")
             conn.commit()
             logger.info("Admin user 'BHUSHAN' (Password: 3544, Email: bhushan3544@gmail.com) verified/seeded. Legacy demo accounts purged.")
+            
+            # Seed default patents if they don't exist
+            cursor.execute("SELECT COUNT(*) FROM patents")
+            row = cursor.fetchone()
+            patents_count = row["COUNT(*)"] if self.is_mysql else row[0]
+            if patents_count == 0:
+                logger.info("Seeding default patent records for RAG search fallback...")
+                default_patents = [
+                    (
+                        "LD-260715330V1",
+                        "Xiaomi-Robotics-1: Scaling Vision-Language-Action Models with over 100K Hours of Real-World Trajectories",
+                        "We present Xiaomi-Robotics-1, a foundational vision-language-action (VLA) model capable of (1) following diverse language instructions to perform a wide range of mobile manipulation tasks in unseen environments out-of-the-box, and (2) efficiently adapting to novel downstream tasks.",
+                        "2026-07-26",
+                        '["Xiaomi Robotics Team", "Jun Guo", "Piaopiao Jin", "Jason Li"]',
+                        '["G06F 17/30"]',
+                        "USPTO",
+                        "s3://patentmind-vault/pdfs/LD-260715330V1.pdf"
+                    ),
+                    (
+                        "LD-260710151V1",
+                        "MC-RAG System: A Structure-Driven RAG System for Multi-Constraint Queries",
+                        "MC-RAG System: A Structure-Driven RAG System for Multi-Constraint Queries. We propose a structure-driven Retrieval-Augmented Generation system that efficiently formats and optimizes multi-constraint database queries using structural parsing.",
+                        "2026-07-26",
+                        '["Xiao Zhang", "Yang Wan", "Yi Li", "Miao Xie", "Chunli Lv"]',
+                        '["G06F 17/30"]',
+                        "USPTO",
+                        "s3://patentmind-vault/pdfs/LD-260710151V1.pdf"
+                    ),
+                    (
+                        "LD-260707612V1",
+                        "Towards Agentic AI Governance: A Preliminary Assessment",
+                        "Artificial intelligence is rapidly evolving from generative systems to agentic AI capable of autonomously planning and executing complex, multi-step actions. This patent outlines preliminary compliance and governance metrics for autonomous agents.",
+                        "2026-06-02",
+                        '["Mr Mubarak Raji", "Masooda Bashir"]',
+                        '["G06F 17/30"]',
+                        "USPTO",
+                        "s3://patentmind-vault/pdfs/LD-260707612V1.pdf"
+                    )
+                ]
+                for p in default_patents:
+                    cursor.execute(
+                        """
+                        INSERT INTO patents (patent_number, title, abstract, document_date, inventors, ipc_cpc_codes, source, s3_url)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        """ if self.is_mysql else
+                        """
+                        INSERT INTO patents (patent_number, title, abstract, document_date, inventors, ipc_cpc_codes, source, s3_url)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        p
+                    )
+                conn.commit()
+                logger.info("Default patents seeded successfully.")
                 
             logger.info("Relational tables validated/created successfully.")
         except Exception as e:

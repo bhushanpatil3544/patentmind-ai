@@ -53,6 +53,7 @@ class IntelligentRAGChain:
             }
 
         # 2. Search Database
+        self.db._last_query_text = query
         retrieved_chunks = self.db.search(query_vector, filter_metadata=filter_metadata, limit=limit)
         db_stats = self.db.get_stats()
         active_db = db_stats["active_database"]

@@ -279,6 +279,51 @@ class DualVectorStore:
 
         # Sort by score descending
         results.sort(key=lambda x: x["score"], reverse=True)
+        
+        # Relational database keyword search fallback if vector store is empty
+        if not results:
+            logger.info("Local In-Memory Store empty. Performing relational database keyword fallback...")
+            try:
+                from app.database import DatabaseManager
+                rel_db = DatabaseManager()
+                patents = rel_db.list_patents_meta()
+                
+                # Retrieve last query text or try to deduce it
+                query_text = getattr(self, "_last_query_text", "")
+                keywords = [k.lower().strip() for k in query_text.split() if len(k.strip()) > 2] if query_text else []
+                
+                for p in patents:
+                    match_score = 0.0
+                    title_lower = p["title"].lower()
+                    abs_lower = p["abstract"].lower()
+                    
+                    if keywords:
+                        for kw in keywords:
+                            if kw in title_lower:
+                                match_score += 0.5
+                            if kw in abs_lower:
+                                match_score += 0.3
+                    else:
+                        match_score = 0.5 # Default score if no keywords
+                        
+                    if match_score > 0:
+                        results.append({
+                            "text": p["abstract"],
+                            "score": min(0.5 + match_score, 0.99),
+                            "metadata": {
+                                "patent_number": p["patent_number"],
+                                "title": p["title"],
+                                "source": p["source"],
+                                "section": "Abstract",
+                                "ipc_cpc_codes": p["ipc_cpc_codes"],
+                                "inventors": p["inventors"],
+                                "claim_number": 1
+                            }
+                        })
+                results.sort(key=lambda x: x["score"], reverse=True)
+            except Exception as e:
+                logger.error(f"Relational database search fallback failed: {e}")
+                
         return results[:limit]
 
     def _search_chroma(self, query_vector: List[float], filter_metadata: Optional[Dict[str, Any]] = None, limit: int = 5) -> List[Dict[str, Any]]:
