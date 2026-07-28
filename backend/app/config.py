@@ -1,6 +1,12 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+
+# Try importing dotenv, safe fallback
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv(**kwargs):
+        pass
 
 # Try importing torch, fallback to None if not present
 try:
@@ -14,6 +20,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from backend/.env explicitly
 env_path = BASE_DIR / ".env"
 load_dotenv(dotenv_path=env_path)
+
+IS_VERCEL = bool(os.environ.get("VERCEL"))
 
 class Config:
     # Vector Database Settings
@@ -46,7 +54,9 @@ class Config:
 
     # Resolve S3_MOCK_DIR relative to BASE_DIR if it is relative
     raw_s3_dir = os.getenv("S3_MOCK_DIR", "./storage/s3_mock")
-    if not os.path.isabs(raw_s3_dir):
+    if IS_VERCEL:
+        S3_MOCK_DIR = "/tmp/s3_mock"
+    elif not os.path.isabs(raw_s3_dir):
         S3_MOCK_DIR = str((BASE_DIR / raw_s3_dir).resolve())
     else:
         S3_MOCK_DIR = raw_s3_dir
@@ -67,6 +77,12 @@ class Config:
             return "mps"
         return "cpu"
 
-# Ensure directories exist
-os.makedirs(Config.S3_MOCK_DIR, exist_ok=True)
-os.makedirs(Config.CHROMADB_DIR, exist_ok=True)
+# Ensure directories exist (safe for serverless)
+try:
+    os.makedirs(Config.S3_MOCK_DIR, exist_ok=True)
+except OSError:
+    pass
+try:
+    os.makedirs(Config.CHROMADB_DIR, exist_ok=True)
+except OSError:
+    pass

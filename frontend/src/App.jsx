@@ -50,10 +50,9 @@ const themesList = [
   { id: 'theme-dark', name: 'DARK THEME', dotClass: 'bg-[#1A2018] border-[#4D5D44]' }
 ];
 
-// Dynamic API base URL: empty for local dev (Vite proxy), Serveo HTTPS tunnel for Vercel production
-const API_BASE = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? ''
-  : 'https://909dd73aae52ee5e-14-139-112-69.serveousercontent.com';
+// API base URL: always empty — on Vercel the Python serverless function runs on same domain,
+// on localhost the Vite proxy forwards to the local backend
+const API_BASE = '';
 
 const apiUrl = (path) => path.startsWith('http') ? path : `${API_BASE}${path}`;
 
