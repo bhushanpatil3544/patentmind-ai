@@ -1886,9 +1886,17 @@ export default function App() {
     }
 
     return (
-      <div className={`app-wrapper bg-grain ${theme} flex items-center justify-center p-6 transition-all duration-300 relative`}>
+      <div className={`app-wrapper bg-[#0A0A0A] ${theme} flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans`}>
+        
+        {/* Dynamic Ambient Background Grid & Blur Circles */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+          <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] rounded-full bg-[#7C3AED]/10 blur-[130px] animate-pulse duration-[8000ms]" />
+          <div className="absolute bottom-[-10%] right-[10%] w-[450px] h-[450px] rounded-full bg-[#22D3EE]/5 blur-[110px] animate-pulse duration-[6000ms]" />
+        </div>
+
         {/* Top-Right Theme Selector */}
-        <div className="absolute top-6 right-6 flex items-center gap-3 bg-black/40 backdrop-blur-md px-4 py-2 border border-theme rounded-full">
+        <div className="absolute top-6 right-6 flex items-center gap-3 bg-black/40 backdrop-blur-md px-4 py-2 border border-white/5 rounded-full z-20">
           <Palette className="w-3.5 h-3.5 text-zinc-500" />
           <select 
             value={theme} 
@@ -1903,9 +1911,16 @@ export default function App() {
           </select>
         </div>
 
-        <div className={`w-full max-w-sm panel-card p-8 space-y-7 transition-all duration-300 rounded-[32px] md:rounded-[36px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-theme/60 ${
-          authRole === 'admin' ? 'border-red-900/40 bg-zinc-950/80 shadow-[0_0_50px_rgba(220,38,38,0.07)]' : ''
-        }`}>
+        <motion.div 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className={`w-full max-w-sm bg-[#111111]/85 backdrop-blur-xl p-8 space-y-7 rounded-2xl shadow-2xl border ${
+            authRole === 'admin' 
+              ? 'border-red-950/60 shadow-[0_0_50px_rgba(239,68,68,0.06)]' 
+              : 'border-white/5 shadow-[0_0_50px_rgba(124,58,237,0.05)]'
+          } relative z-10`}
+        >
           <div className="text-center space-y-2">
             {theme === 'theme-brusterna' ? (
               <>
@@ -2386,7 +2401,7 @@ export default function App() {
               <span>TYPING SPARKS</span>
             </label>
           </div>
-        </div>
+        </motion.div>
       </div>
     );
   }
