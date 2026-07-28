@@ -585,7 +585,7 @@ export default function App() {
         setAuthError(data.detail || 'Authentication operation failed.');
       }
     } catch (err) {
-      setAuthError(`Connection error: Unable to reach backend server. Please open http://localhost:5173 or http://192.168.6.119:5173 on your laptop/Wi-Fi.`);
+      setAuthError(`Connection notice: ${err.message || 'Unable to reach backend server'}. Please refresh or tap login again.`);
     } finally {
       setAuthLoading(false);
     }
