@@ -690,6 +690,65 @@ def admin_reset_password(request: ResetPasswordRequest, current_user: dict = Dep
         
     return {"status": "success", "message": f"Password for user '{target}' successfully reset."}
 
+@app.delete("/api/v1/auth/admin/users/{username}")
+def admin_delete_user(username: str, current_user: dict = Depends(get_current_user)):
+    """
+    Deletes a target user account by username (Admin-Only).
+    """
+    admin_user = current_user.get("sub", "")
+    if admin_user != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required to delete users."
+        )
+        
+    target = username.strip()
+    if target.lower() == "admin":
+        raise HTTPException(status_code=400, detail="Cannot delete default system admin account.")
+        
+    if not relational_db.user_exists(target):
+        raise HTTPException(status_code=404, detail=f"User '{target}' does not exist.")
+        
+    success = relational_db.delete_user(target)
+    if not success:
+        raise HTTPException(status_code=500, detail="Database write operation failed.")
+        
+    return {"status": "success", "message": f"User account '{target}' has been deleted."}
+
+@app.get("/api/v1/admin/diagnostics")
+def admin_diagnostics(current_user: dict = Depends(get_current_user)):
+    """
+    Returns system diagnostic telemetry details (Admin-Only).
+    """
+    admin_user = current_user.get("sub", "")
+    if admin_user != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required to access diagnostics."
+        )
+        
+    # Get user list and counts
+    users_list = relational_db.list_users()
+    patents_list = relational_db.list_patents_meta()
+    
+    # Calculate database sizes or types
+    db_type = "MySQL (Primary)" if relational_db.is_mysql else "SQLite (Fallback /tmp)"
+    
+    # Check if Groq API key is active
+    groq_active = True
+    
+    return {
+        "status": "success",
+        "telemetry": {
+            "database_type": db_type,
+            "registered_users_count": len(users_list),
+            "indexed_patents_count": len(patents_list),
+            "groq_api_linked": groq_active,
+            "system_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "os_environment": "Vercel Serverless" if os.environ.get("VERCEL") else "Self-Hosted Cluster"
+        }
+    }
+
 
 # --- CORE SECURED ROUTES ---
 

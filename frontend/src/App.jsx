@@ -303,6 +303,7 @@ export default function App() {
 
   // Administrative Control states
   const [adminUsers, setAdminUsers] = useState([]);
+  const [adminDiagnostics, setAdminDiagnostics] = useState(null);
   const [resetForm, setResetForm] = useState({ target_username: '', new_password: '' });
   const [resetLoading, setResetLoading] = useState(false);
   const [resetResult, setResetResult] = useState(null);
@@ -513,6 +514,40 @@ export default function App() {
     }
   };
 
+  const fetchAdminDiagnostics = async () => {
+    if (username !== 'admin') return;
+    try {
+      const response = await authenticatedFetch('/api/v1/admin/diagnostics');
+      if (response && response.ok) {
+        const data = await response.json();
+        setAdminDiagnostics(data.telemetry);
+      }
+    } catch (err) {
+      console.error("Failed to list system telemetry stats:", err);
+    }
+  };
+
+  const handleUserDelete = async (targetUsername) => {
+    if (targetUsername === 'admin') return;
+    if (!window.confirm(`Are you sure you want to permanently delete user account "${targetUsername.toUpperCase()}"?`)) {
+      return;
+    }
+    try {
+      const response = await authenticatedFetch(`/api/v1/auth/admin/users/${targetUsername}`, {
+        method: 'DELETE'
+      });
+      if (response && response.ok) {
+        fetchAdminUsers();
+        fetchAdminDiagnostics();
+      } else {
+        const data = await response.json();
+        alert(`Failed to delete user: ${data.detail || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error("Delete user error:", err);
+    }
+  };
+
   useEffect(() => {
     if (token) {
       fetchAnalytics();
@@ -522,6 +557,7 @@ export default function App() {
   useEffect(() => {
     if (token && username === 'admin' && activeTab === 'admin') {
       fetchAdminUsers();
+      fetchAdminDiagnostics();
     }
   }, [activeTab, token, username]);
 
@@ -3866,8 +3902,25 @@ export default function App() {
           <div className="space-y-12 fade-in">
             <div>
               <span className="text-[11px] text-muted font-mono tracking-widest uppercase">08. ADMINISTRATIVE CONTROLS</span>
-              <h2 className="text-serif-editorial text-4xl text-main tracking-wide mt-2">USER MANAGEMENT</h2>
+              <h2 className="text-serif-editorial text-4xl text-main tracking-wide mt-2">SYSTEM CONSOLE</h2>
             </div>
+
+            {/* Diagnostics Stats Telemetry Banner */}
+            {adminDiagnostics && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  { label: "Active Engine", value: adminDiagnostics.database_type, desc: "Primary relational database routing layer" },
+                  { label: "Registered Accounts", value: `${adminDiagnostics.registered_users_count} Active`, desc: "Total user records verified in auth tables" },
+                  { label: "Indexed Patents", value: `${adminDiagnostics.indexed_patents_count} Records`, desc: "Indexed metadata references seeded in database" }
+                ].map((stat, idx) => (
+                  <div key={idx} className="panel-card p-5 space-y-2 border border-white/5">
+                    <span className="text-[10px] font-mono text-zinc-550 uppercase tracking-widest block">{stat.label}</span>
+                    <h4 className="text-lg font-mono text-[#22D3EE] font-bold">{stat.value}</h4>
+                    <p className="text-[9px] font-mono text-zinc-650 uppercase">{stat.desc}</p>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               
@@ -3946,23 +3999,44 @@ export default function App() {
               <div className="panel-card p-6 rounded-none space-y-4">
                 <div className="flex justify-between items-center pb-2 border-b border-theme">
                   <h4 className="text-xs font-mono tracking-wider text-zinc-500 uppercase">SYSTEM USERS</h4>
-                  <button 
-                    onClick={fetchAdminUsers}
-                    className="text-zinc-500 hover:text-white transition-colors"
-                    title="Refresh list"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={fetchAdminDiagnostics}
+                      className="text-zinc-500 hover:text-white transition-colors"
+                      title="Refresh statistics"
+                    >
+                      <Activity className="w-3.5 h-3.5" />
+                    </button>
+                    <button 
+                      onClick={fetchAdminUsers}
+                      className="text-zinc-500 hover:text-white transition-colors"
+                      title="Refresh list"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="divide-y divide-theme text-xs font-mono">
                   {adminUsers.length > 0 ? (
                     adminUsers.map((user) => (
-                      <div key={user} className="py-2.5 flex justify-between items-center">
-                        <span className="text-main uppercase">{user}</span>
-                        <span className="text-[10px] text-zinc-555">
-                          {user === 'admin' ? 'ADMINISTRATOR' : 'CLIENT'}
-                        </span>
+                      <div key={user} className="py-2.5 flex justify-between items-center group">
+                        <div className="flex flex-col">
+                          <span className="text-main uppercase font-semibold">{user}</span>
+                          <span className="text-[9px] text-zinc-650">
+                            {user === 'admin' ? 'SYSTEM ADMINISTRATOR' : 'CLIENT SUBSCRIBER'}
+                          </span>
+                        </div>
+                        
+                        {user !== 'admin' && (
+                          <button
+                            onClick={() => handleUserDelete(user)}
+                            className="text-zinc-650 hover:text-red-500 transition-colors p-1"
+                            title={`Delete user account ${user}`}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </div>
                     ))
                   ) : (

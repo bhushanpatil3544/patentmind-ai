@@ -360,6 +360,26 @@ class DatabaseManager:
         finally:
             conn.close()
 
+    def delete_user(self, username: str) -> bool:
+        username_clean = (username or "").strip().lower()
+        if username_clean == "admin":
+            return False  # Protect the default admin account
+            
+        conn, cursor = self._get_connection()
+        try:
+            cursor.execute(
+                "DELETE FROM users WHERE LOWER(username) = %s" if self.is_mysql else
+                "DELETE FROM users WHERE LOWER(username) = ?",
+                (username_clean,)
+            )
+            conn.commit()
+            return True
+        except Exception as e:
+            logger.error(f"Failed to delete user {username}: {e}")
+            return False
+        finally:
+            conn.close()
+
     def get_user_password_hash(self, username: str) -> Optional[str]:
         username_clean = (username or "").strip().lower()
         conn, cursor = self._get_connection()
