@@ -51,7 +51,7 @@ const themesList = [
 ];
 
 // API base URL: always empty — on Vercel the Python serverless function runs on same domain,
-// on localhost the Vite proxy forwards to the local backend
+// on localhost the Vite proxy forwards to the local backend (v1.0.5 cache-bust)
 const API_BASE = '';
 
 const apiUrl = (path) => path.startsWith('http') ? path : `${API_BASE}${path}`;
