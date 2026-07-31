@@ -504,7 +504,7 @@ export default function App() {
   };
 
   const fetchAdminUsers = async () => {
-    if (username !== 'admin') return;
+    if (username.toLowerCase() !== 'bhushan') return;
     try {
       const response = await authenticatedFetch('/api/v1/auth/admin/users');
       if (response && response.ok) {
@@ -517,7 +517,7 @@ export default function App() {
   };
 
   const fetchAdminDiagnostics = async () => {
-    if (username !== 'admin') return;
+    if (username.toLowerCase() !== 'bhushan') return;
     try {
       const response = await authenticatedFetch('/api/v1/admin/diagnostics');
       if (response && response.ok) {
@@ -530,7 +530,7 @@ export default function App() {
   };
 
   const handleUserDelete = async (targetUsername) => {
-    if (targetUsername === 'admin') return;
+    if (targetUsername.toLowerCase() === 'bhushan') return;
     if (!window.confirm(`Are you sure you want to permanently delete user account "${targetUsername.toUpperCase()}"?`)) {
       return;
     }
@@ -557,7 +557,7 @@ export default function App() {
   }, [activeTab, token]);
 
   useEffect(() => {
-    if (token && username === 'admin' && activeTab === 'admin') {
+    if (token && username.toLowerCase() === 'bhushan' && activeTab === 'admin') {
       fetchAdminUsers();
       fetchAdminDiagnostics();
     }
@@ -2570,7 +2570,7 @@ export default function App() {
               { id: 'idea', label: 'IDEA ANALYZER', icon: Sparkles },
               { id: 'help', label: 'HELP & FEEDBACK', icon: HelpCircle },
               { id: 'settings', label: 'SYSTEM SETTINGS', icon: Settings },
-              ...(username === 'admin' ? [{ id: 'admin', label: 'ADMIN CONTROL', icon: Cpu }] : [])
+              ...(username.toLowerCase() === 'bhushan' ? [{ id: 'admin', label: 'ADMIN CONTROL', icon: Cpu }] : [])
             ].map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -3915,7 +3915,7 @@ export default function App() {
         )}
 
         {/* ADMIN CONTROL TAB (ONLY ACCESSIBLE TO ADMIN) */}
-        {username === 'admin' && activeTab === 'admin' && (
+        {username.toLowerCase() === 'bhushan' && activeTab === 'admin' && (
           <div className="space-y-12 fade-in">
             <div>
               <span className="text-[11px] text-muted font-mono tracking-widest uppercase">08. ADMINISTRATIVE CONTROLS</span>
@@ -4110,11 +4110,11 @@ export default function App() {
                         <div className="flex flex-col">
                           <span className="text-main uppercase font-semibold">{user}</span>
                           <span className="text-[9px] text-zinc-650">
-                            {user === 'admin' ? 'SYSTEM ADMINISTRATOR' : 'CLIENT SUBSCRIBER'}
+                            {user.toLowerCase() === 'bhushan' ? 'SYSTEM ADMINISTRATOR' : 'CLIENT SUBSCRIBER'}
                           </span>
                         </div>
                         
-                        {user !== 'admin' && (
+                        {user.toLowerCase() !== 'bhushan' && (
                           <button
                             onClick={() => handleUserDelete(user)}
                             className="text-zinc-650 hover:text-red-500 transition-colors p-1"
