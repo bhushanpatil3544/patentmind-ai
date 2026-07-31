@@ -657,7 +657,7 @@ def get_all_users(current_user: dict = Depends(get_current_user)):
     Lists all registered usernames (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() != "bhushan":
+    if admin_user.lower() not in ["bhushan", "admin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to access user list."
@@ -671,7 +671,7 @@ def admin_reset_password(request: ResetPasswordRequest, current_user: dict = Dep
     Resets the password for a target username (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() != "bhushan":
+    if admin_user.lower() not in ["bhushan", "admin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to execute password resets."
@@ -698,7 +698,7 @@ def admin_delete_user(username: str, current_user: dict = Depends(get_current_us
     Deletes a target user account by username (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() != "bhushan":
+    if admin_user.lower() not in ["bhushan", "admin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to delete users."
@@ -723,7 +723,7 @@ def admin_diagnostics(current_user: dict = Depends(get_current_user)):
     Returns system diagnostic telemetry details (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() != "bhushan":
+    if admin_user.lower() not in ["bhushan", "admin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to access diagnostics."
@@ -759,7 +759,7 @@ def admin_export_metadata(format: str = Query("json"), current_user: dict = Depe
     Supported formats: 'json' or 'csv'. Admin-Only.
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() != "bhushan":
+    if admin_user.lower() not in ["bhushan", "admin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to export metadata."

@@ -69,6 +69,11 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(false);
   const [authRole, setAuthRole] = useState('client'); // client / admin
 
+  const isAdminUser = () => {
+    const u = (username || '').toLowerCase();
+    return u === 'bhushan' || u === 'admin' || authRole === 'admin';
+  };
+
   // Gmail OTP Registration states
   const [gmailOtpSent, setGmailOtpSent] = useState(false);
   const [gmailOtpCode, setGmailOtpCode] = useState('');
@@ -504,7 +509,7 @@ export default function App() {
   };
 
   const fetchAdminUsers = async () => {
-    if (username.toLowerCase() !== 'bhushan') return;
+    if (!isAdminUser()) return;
     try {
       const response = await authenticatedFetch('/api/v1/auth/admin/users');
       if (response && response.ok) {
@@ -517,7 +522,7 @@ export default function App() {
   };
 
   const fetchAdminDiagnostics = async () => {
-    if (username.toLowerCase() !== 'bhushan') return;
+    if (!isAdminUser()) return;
     try {
       const response = await authenticatedFetch('/api/v1/admin/diagnostics');
       if (response && response.ok) {
@@ -530,7 +535,7 @@ export default function App() {
   };
 
   const handleUserDelete = async (targetUsername) => {
-    if (targetUsername.toLowerCase() === 'bhushan') return;
+    if (targetUsername.toLowerCase() === 'bhushan' || targetUsername.toLowerCase() === 'admin') return;
     if (!window.confirm(`Are you sure you want to permanently delete user account "${targetUsername.toUpperCase()}"?`)) {
       return;
     }
@@ -557,11 +562,11 @@ export default function App() {
   }, [activeTab, token]);
 
   useEffect(() => {
-    if (token && username.toLowerCase() === 'bhushan' && activeTab === 'admin') {
+    if (token && isAdminUser() && activeTab === 'admin') {
       fetchAdminUsers();
       fetchAdminDiagnostics();
     }
-  }, [activeTab, token, username]);
+  }, [activeTab, token, username, authRole]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -2570,7 +2575,7 @@ export default function App() {
               { id: 'idea', label: 'IDEA ANALYZER', icon: Sparkles },
               { id: 'help', label: 'HELP & FEEDBACK', icon: HelpCircle },
               { id: 'settings', label: 'SYSTEM SETTINGS', icon: Settings },
-              ...(username.toLowerCase() === 'bhushan' ? [{ id: 'admin', label: 'ADMIN CONTROL', icon: Cpu }] : [])
+              ...(isAdminUser() ? [{ id: 'admin', label: 'ADMIN CONTROL', icon: Cpu }] : [])
             ].map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -3915,7 +3920,7 @@ export default function App() {
         )}
 
         {/* ADMIN CONTROL TAB (ONLY ACCESSIBLE TO ADMIN) */}
-        {username.toLowerCase() === 'bhushan' && activeTab === 'admin' && (
+        {isAdminUser() && activeTab === 'admin' && (
           <div className="space-y-12 fade-in">
             <div>
               <span className="text-[11px] text-muted font-mono tracking-widest uppercase">08. ADMINISTRATIVE CONTROLS</span>
