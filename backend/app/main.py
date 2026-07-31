@@ -184,6 +184,19 @@ class ResetPasswordRequest(BaseModel):
     target_username: str
     new_password: str
 
+class ResetAllPasswordsRequest(BaseModel):
+    new_password: str
+    send_email: bool = False
+
+class AdminCustomEmailRequest(BaseModel):
+    target_username: str
+    subject: str
+    body: str
+
+class SendCredentialsRequest(BaseModel):
+    target_username: str
+    new_password: str
+
 class OTPRequest(BaseModel):
     phone_number: str
 
@@ -655,7 +668,7 @@ def get_user_profile(current_user: dict = Depends(get_current_user)):
 @app.get("/api/v1/auth/admin/users")
 def get_all_users(current_user: dict = Depends(get_current_user)):
     """
-    Lists all registered usernames (Admin-Only).
+    Lists all registered users with detailed profiles (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
     if admin_user.lower() not in ["bhushan", "admin"]:
@@ -664,7 +677,8 @@ def get_all_users(current_user: dict = Depends(get_current_user)):
             detail="Administrative privileges required to access user list."
         )
     users = relational_db.list_users()
-    return {"users": users}
+    users_detailed = relational_db.list_users_detailed()
+    return {"users": users, "users_detailed": users_detailed}
 
 @app.post("/api/v1/auth/admin/reset")
 def admin_reset_password(request: ResetPasswordRequest, current_user: dict = Depends(get_current_user)):
@@ -692,6 +706,119 @@ def admin_reset_password(request: ResetPasswordRequest, current_user: dict = Dep
         raise HTTPException(status_code=500, detail="Database write operation failed.")
         
     return {"status": "success", "message": f"Password for user '{target}' successfully reset."}
+
+@app.post("/api/v1/auth/admin/reset-all")
+def admin_reset_all_passwords(request: ResetAllPasswordsRequest, current_user: dict = Depends(get_current_user)):
+    """
+    Resets passwords for ALL non-admin users in one click (Admin-Only).
+    Optionally dispatches credentials emails to users with registered emails.
+    """
+    admin_user = current_user.get("sub", "")
+    if admin_user.lower() not in ["bhushan", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required to execute bulk password resets."
+        )
+        
+    new_pw = request.new_password.strip()
+    if not new_pw:
+        raise HTTPException(status_code=400, detail="New password cannot be empty.")
+        
+    hashed = hash_password(new_pw)
+    updated_count = relational_db.update_all_non_admin_passwords(hashed)
+    
+    emails_sent = 0
+    if request.send_email:
+        detailed_users = relational_db.list_users_detailed()
+        for u in detailed_users:
+            if u["username"].lower() not in ["bhushan", "admin"] and u.get("email"):
+                if send_account_email(u["email"], u["username"], new_pw):
+                    emails_sent += 1
+                    
+    return {
+        "status": "success",
+        "message": f"Successfully updated passwords for {updated_count} user account(s).",
+        "updated_count": updated_count,
+        "emails_dispatched": emails_sent
+    }
+
+@app.post("/api/v1/admin/send-email")
+def admin_send_custom_email(request: AdminCustomEmailRequest, current_user: dict = Depends(get_current_user)):
+    """
+    Dispatches a custom Gmail message to a target user (Admin-Only).
+    """
+    admin_user = current_user.get("sub", "")
+    if admin_user.lower() not in ["bhushan", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required to dispatch custom emails."
+        )
+        
+    target = request.target_username.strip()
+    user_info = None
+    
+    # Try finding email by username
+    detailed_users = relational_db.list_users_detailed()
+    for u in detailed_users:
+        if u["username"].lower() == target.lower():
+            user_info = u
+            break
+            
+    recipient_email = user_info.get("email") if user_info else None
+    if not recipient_email and "@" in target:
+        recipient_email = target
+        
+    if not recipient_email:
+        raise HTTPException(status_code=404, detail=f"No registered Gmail address found for user '{target}'.")
+        
+    success = send_email_smtp(recipient_email, request.subject, request.body)
+    if not success:
+        raise HTTPException(status_code=500, detail="Gmail SMTP dispatch failed. Check SMTP environment variables.")
+        
+    return {"status": "success", "message": f"Custom email successfully sent to {recipient_email}!"}
+
+@app.post("/api/v1/admin/send-credentials-email")
+def admin_send_credentials_email(request: SendCredentialsRequest, current_user: dict = Depends(get_current_user)):
+    """
+    Dispatches login credentials email to target user's registered Gmail (Admin-Only).
+    """
+    admin_user = current_user.get("sub", "")
+    if admin_user.lower() not in ["bhushan", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required."
+        )
+        
+    target = request.target_username.strip()
+    detailed_users = relational_db.list_users_detailed()
+    recipient_email = None
+    for u in detailed_users:
+        if u["username"].lower() == target.lower():
+            recipient_email = u.get("email")
+            break
+            
+    if not recipient_email:
+        raise HTTPException(status_code=404, detail=f"No registered email found for '{target}'.")
+        
+    success = send_account_email(recipient_email, target, request.new_password)
+    if not success:
+        raise HTTPException(status_code=500, detail="Gmail SMTP dispatch failed.")
+        
+    return {"status": "success", "message": f"Credentials email sent to {recipient_email}."}
+
+@app.get("/api/v1/admin/feedback")
+def admin_get_all_feedback(current_user: dict = Depends(get_current_user)):
+    """
+    Retrieves all user feedback records (Admin-Only).
+    """
+    admin_user = current_user.get("sub", "")
+    if admin_user.lower() not in ["bhushan", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required to view user feedback."
+        )
+    feedback_records = relational_db.list_all_feedback()
+    return {"status": "success", "feedback": feedback_records}
 
 @app.delete("/api/v1/auth/admin/users/{username}")
 def admin_delete_user(username: str, current_user: dict = Depends(get_current_user)):

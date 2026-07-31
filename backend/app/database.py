@@ -433,6 +433,46 @@ class DatabaseManager:
         finally:
             conn.close()
 
+    def list_users_detailed(self) -> List[Dict[str, Any]]:
+        """
+        Lists detailed user records including email and id.
+        """
+        conn, cursor = self._get_connection()
+        try:
+            cursor.execute("SELECT id, username, email FROM users ORDER BY username ASC")
+            rows = cursor.fetchall()
+            results = []
+            for r in rows:
+                if self.is_mysql:
+                    results.append({"id": r["id"], "username": r["username"], "email": r.get("email") or ""})
+                else:
+                    results.append({"id": r[0], "username": r[1], "email": r[2] if len(r) > 2 and r[2] else ""})
+            return results
+        except Exception as e:
+            logger.error(f"Failed to list detailed users: {e}")
+            return []
+        finally:
+            conn.close()
+
+    def update_all_non_admin_passwords(self, hashed_pw: str) -> int:
+        """
+        Updates passwords for all non-admin users in bulk.
+        """
+        conn, cursor = self._get_connection()
+        try:
+            cursor.execute(
+                "UPDATE users SET password = %s WHERE LOWER(username) NOT IN ('bhushan', 'admin')" if self.is_mysql else
+                "UPDATE users SET password = ? WHERE LOWER(username) NOT IN ('bhushan', 'admin')",
+                (hashed_pw,)
+            )
+            conn.commit()
+            return cursor.rowcount
+        except Exception as e:
+            logger.error(f"Failed bulk password update: {e}")
+            return 0
+        finally:
+            conn.close()
+
     def update_user_password(self, username: str, hashed_pw: str) -> bool:
         """
         Updates target user password hash.
@@ -672,6 +712,39 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Failed to log user feedback to DB: {e}")
             return False
+        finally:
+            conn.close()
+
+    def list_all_feedback(self) -> List[Dict[str, Any]]:
+        """
+        Retrieves all user feedback entries for admin review.
+        """
+        conn, cursor = self._get_connection()
+        try:
+            cursor.execute("SELECT id, username, rating, comments, created_at FROM user_feedback ORDER BY id DESC")
+            rows = cursor.fetchall()
+            results = []
+            for r in rows:
+                if self.is_mysql:
+                    results.append({
+                        "id": r["id"],
+                        "username": r["username"],
+                        "rating": r["rating"],
+                        "comments": r["comments"],
+                        "created_at": str(r["created_at"]) if r.get("created_at") else ""
+                    })
+                else:
+                    results.append({
+                        "id": r[0],
+                        "username": r[1],
+                        "rating": r[2],
+                        "comments": r[3],
+                        "created_at": str(r[4]) if len(r) > 4 and r[4] else ""
+                    })
+            return results
+        except Exception as e:
+            logger.error(f"Failed to list user feedback: {e}")
+            return []
         finally:
             conn.close()
 

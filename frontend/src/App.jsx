@@ -310,11 +310,18 @@ export default function App() {
 
   // Administrative Control states
   const [adminUsers, setAdminUsers] = useState([]);
+  const [adminUsersDetailed, setAdminUsersDetailed] = useState([]);
+  const [adminFeedback, setAdminFeedback] = useState([]);
   const [adminDiagnostics, setAdminDiagnostics] = useState(null);
   const [resetForm, setResetForm] = useState({ target_username: '', new_password: '' });
   const [resetLoading, setResetLoading] = useState(false);
   const [resetResult, setResetResult] = useState(null);
   const [resetError, setResetError] = useState(null);
+
+  const [bulkResetForm, setBulkResetForm] = useState({ new_password: '', send_email: false });
+  const [bulkResetLoading, setBulkResetLoading] = useState(false);
+  const [customEmailForm, setCustomEmailForm] = useState({ target_username: '', subject: '', body: '' });
+  const [customEmailLoading, setCustomEmailLoading] = useState(false);
 
   // Chatbot states
   const [chatMessages, setChatMessages] = useState([]);
@@ -515,6 +522,9 @@ export default function App() {
       if (response && response.ok) {
         const data = await response.json();
         setAdminUsers(data.users);
+        if (data.users_detailed) {
+          setAdminUsersDetailed(data.users_detailed);
+        }
       }
     } catch (err) {
       console.error("Failed to list user accounts:", err);
@@ -531,6 +541,19 @@ export default function App() {
       }
     } catch (err) {
       console.error("Failed to list system telemetry stats:", err);
+    }
+  };
+
+  const fetchAdminFeedback = async () => {
+    if (!isAdminUser()) return;
+    try {
+      const response = await authenticatedFetch('/api/v1/admin/feedback');
+      if (response && response.ok) {
+        const data = await response.json();
+        setAdminFeedback(data.feedback);
+      }
+    } catch (err) {
+      console.error("Failed to fetch user feedback:", err);
     }
   };
 
@@ -555,6 +578,81 @@ export default function App() {
     }
   };
 
+  const handleBulkResetSubmit = async (e) => {
+    e.preventDefault();
+    if (!bulkResetForm.new_password) return;
+    if (!window.confirm(`Are you sure you want to reset passwords for ALL non-admin users to "${bulkResetForm.new_password}" in one click?`)) {
+      return;
+    }
+    setBulkResetLoading(true);
+    try {
+      const response = await authenticatedFetch('/api/v1/auth/admin/reset-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bulkResetForm)
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert(`Bulk Reset Success! ${data.message} ${data.emails_dispatched ? `Sent ${data.emails_dispatched} Gmail notification(s).` : ''}`);
+        setBulkResetForm({ new_password: '', send_email: false });
+        fetchAdminUsers();
+      } else {
+        alert(`Bulk reset failed: ${data.detail || 'Error'}`);
+      }
+    } catch (err) {
+      console.error("Bulk reset error:", err);
+      alert("Failed to execute bulk password reset.");
+    } finally {
+      setBulkResetLoading(false);
+    }
+  };
+
+  const handleCustomEmailSubmit = async (e) => {
+    e.preventDefault();
+    if (!customEmailForm.target_username || !customEmailForm.subject || !customEmailForm.body) return;
+    setCustomEmailLoading(true);
+    try {
+      const response = await authenticatedFetch('/api/v1/admin/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(customEmailForm)
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+        setCustomEmailForm({ target_username: '', subject: '', body: '' });
+      } else {
+        alert(`Failed to send email: ${data.detail || 'Error'}`);
+      }
+    } catch (err) {
+      console.error("Custom email dispatch error:", err);
+      alert("Failed to send Gmail message.");
+    } finally {
+      setCustomEmailLoading(false);
+    }
+  };
+
+  const handleSendCredentialsEmail = async (targetUsername) => {
+    const rawPw = prompt(`Enter password to send to user "${targetUsername.toUpperCase()}" via Gmail:`, "password123");
+    if (!rawPw) return;
+    try {
+      const response = await authenticatedFetch('/api/v1/admin/send-credentials-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_username: targetUsername, new_password: rawPw })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+      } else {
+        alert(`Failed to send credentials: ${data.detail || 'Error'}`);
+      }
+    } catch (err) {
+      console.error("Send credentials error:", err);
+      alert("Failed to send credentials via Gmail.");
+    }
+  };
+
   useEffect(() => {
     if (token) {
       fetchAnalytics();
@@ -565,6 +663,7 @@ export default function App() {
     if (token && isAdminUser() && activeTab === 'admin') {
       fetchAdminUsers();
       fetchAdminDiagnostics();
+      fetchAdminFeedback();
     }
   }, [activeTab, token, username, authRole]);
 
@@ -4086,7 +4185,7 @@ export default function App() {
                 )}
               </div>
 
-              {/* Registered Users Listing */}
+              {/* Registered Users Listing with Email Credentials Action */}
               <div className="panel-card p-6 rounded-none space-y-4">
                 <div className="flex justify-between items-center pb-2 border-b border-theme">
                   <h4 className="text-xs font-mono tracking-wider text-zinc-500 uppercase">SYSTEM USERS</h4>
@@ -4109,25 +4208,35 @@ export default function App() {
                 </div>
 
                 <div className="divide-y divide-theme text-xs font-mono">
-                  {adminUsers.length > 0 ? (
-                    adminUsers.map((user) => (
-                      <div key={user} className="py-2.5 flex justify-between items-center group">
+                  {adminUsersDetailed.length > 0 ? (
+                    adminUsersDetailed.map((u) => (
+                      <div key={u.username} className="py-2.5 flex justify-between items-center group">
                         <div className="flex flex-col">
-                          <span className="text-main uppercase font-semibold">{user}</span>
-                          <span className="text-[9px] text-zinc-650">
-                            {user.toLowerCase() === 'bhushan' ? 'SYSTEM ADMINISTRATOR' : 'CLIENT SUBSCRIBER'}
-                          </span>
+                          <span className="text-main uppercase font-semibold">{u.username}</span>
+                          <span className="text-[9px] text-zinc-500">{u.email || 'NO GMAIL REGISTERED'}</span>
                         </div>
                         
-                        {user.toLowerCase() !== 'bhushan' && (
-                          <button
-                            onClick={() => handleUserDelete(user)}
-                            className="text-zinc-650 hover:text-red-500 transition-colors p-1"
-                            title={`Delete user account ${user}`}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {u.username.toLowerCase() !== 'bhushan' && u.email && (
+                            <button
+                              onClick={() => handleSendCredentialsEmail(u.username)}
+                              className="text-zinc-500 hover:text-[#22D3EE] transition-colors p-1"
+                              title={`Send account credentials to ${u.email}`}
+                            >
+                              <Mail className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+
+                          {u.username.toLowerCase() !== 'bhushan' && (
+                            <button
+                              onClick={() => handleUserDelete(u.username)}
+                              className="text-zinc-650 hover:text-red-500 transition-colors p-1"
+                              title={`Delete user account ${u.username}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))
                   ) : (
@@ -4136,6 +4245,143 @@ export default function App() {
                 </div>
               </div>
 
+            </div>
+
+            {/* Bulk Password Reset & Custom Gmail Message Dispatcher */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              
+              {/* Bulk Reset All Passwords Form */}
+              <div className="panel-card p-8 rounded-none space-y-6">
+                <h3 className="text-xs font-mono tracking-wider text-main uppercase flex items-center gap-2">
+                  <KeyRound className="w-4 h-4 text-purple-400" />
+                  BULK RESET ALL PASSWORDS
+                </h3>
+                <p className="text-[10px] font-mono text-zinc-400 uppercase">Change passwords for ALL non-admin users in one single click.</p>
+
+                <form onSubmit={handleBulkResetSubmit} className="space-y-6">
+                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1">
+                    <label className="text-zinc-550 text-[10px] font-mono tracking-wider block mb-1">NEW MASTER PASSWORD FOR ALL USERS</label>
+                    <input
+                      type="text"
+                      value={bulkResetForm.new_password}
+                      onChange={(e) => setBulkResetForm({ ...bulkResetForm, new_password: e.target.value })}
+                      placeholder="ENTER MASTER PASSWORD"
+                      required
+                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-800 text-main"
+                    />
+                  </div>
+
+                  <label className="flex items-center gap-2 text-[10px] font-mono text-zinc-400 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={bulkResetForm.send_email}
+                      onChange={(e) => setBulkResetForm({ ...bulkResetForm, send_email: e.target.checked })}
+                      className="w-3.5 h-3.5 accent-purple-600 rounded"
+                    />
+                    <span>SEND NEW PASSWORD TO USERS VIA GMAIL</span>
+                  </label>
+
+                  <button
+                    type="submit"
+                    disabled={bulkResetLoading}
+                    className="w-full py-3.5 bg-purple-900/40 hover:bg-purple-900/60 border border-purple-500/50 text-purple-200 text-xs font-mono tracking-widest uppercase transition-all disabled:opacity-40"
+                  >
+                    {bulkResetLoading ? 'EXECUTING BULK RESET...' : 'RESET ALL PASSWORDS'}
+                  </button>
+                </form>
+              </div>
+
+              {/* Custom Gmail Dispatcher */}
+              <div className="panel-card p-8 rounded-none space-y-6">
+                <h3 className="text-xs font-mono tracking-wider text-main uppercase flex items-center gap-2">
+                  <Send className="w-4 h-4 text-cyan-400" />
+                  DISPATCH CUSTOM GMAIL MESSAGE
+                </h3>
+                <p className="text-[10px] font-mono text-zinc-400 uppercase">Send a direct custom Gmail message to any registered user.</p>
+
+                <form onSubmit={handleCustomEmailSubmit} className="space-y-4">
+                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1">
+                    <label className="text-zinc-550 text-[10px] font-mono tracking-wider block mb-1">RECIPIENT USERNAME OR GMAIL</label>
+                    <input
+                      type="text"
+                      value={customEmailForm.target_username}
+                      onChange={(e) => setCustomEmailForm({ ...customEmailForm, target_username: e.target.value })}
+                      placeholder="USERNAME OR EMAIL@GMAIL.COM"
+                      required
+                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-800 text-main"
+                    />
+                  </div>
+
+                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1">
+                    <label className="text-zinc-550 text-[10px] font-mono tracking-wider block mb-1">EMAIL SUBJECT</label>
+                    <input
+                      type="text"
+                      value={customEmailForm.subject}
+                      onChange={(e) => setCustomEmailForm({ ...customEmailForm, subject: e.target.value })}
+                      placeholder="ENTER SUBJECT"
+                      required
+                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-800 text-main"
+                    />
+                  </div>
+
+                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1">
+                    <label className="text-zinc-550 text-[10px] font-mono tracking-wider block mb-1">MESSAGE BODY</label>
+                    <textarea
+                      rows={3}
+                      value={customEmailForm.body}
+                      onChange={(e) => setCustomEmailForm({ ...customEmailForm, body: e.target.value })}
+                      placeholder="WRITE YOUR MESSAGE..."
+                      required
+                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-800 text-main resize-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={customEmailLoading}
+                    className="w-full py-3.5 bg-cyan-950/40 hover:bg-cyan-950/60 border border-cyan-500/50 text-cyan-200 text-xs font-mono tracking-widest uppercase transition-all disabled:opacity-40"
+                  >
+                    {customEmailLoading ? 'SENDING GMAIL...' : 'DISPATCH GMAIL MESSAGE'}
+                  </button>
+                </form>
+              </div>
+
+            </div>
+
+            {/* User Feedback Log Table */}
+            <div className="panel-card p-6 rounded-none space-y-4 border border-white/5">
+              <div className="flex justify-between items-center pb-2 border-b border-theme">
+                <h4 className="text-xs font-mono tracking-wider text-main uppercase flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  SUBMITTED USER FEEDBACK & RATINGS
+                </h4>
+                <button
+                  onClick={fetchAdminFeedback}
+                  className="text-zinc-500 hover:text-white transition-colors"
+                  title="Refresh feedback list"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <div className="divide-y divide-theme text-xs font-mono">
+                {adminFeedback.length > 0 ? (
+                  adminFeedback.map((item) => (
+                    <div key={item.id} className="py-3 space-y-1">
+                      <div className="flex justify-between items-center text-[10px] text-zinc-400">
+                        <span className="font-semibold text-main uppercase">{item.username}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-amber-400 font-bold">{"★".repeat(item.rating)}{"☆".repeat(5 - item.rating)} ({item.rating}/5)</span>
+                          <span className="text-zinc-600">{item.created_at}</span>
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-zinc-300 font-light leading-relaxed">"{item.comments}"</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-4 text-zinc-600 italic font-light">No user feedback logged yet.</div>
+                )}
+              </div>
             </div>
           </div>
         )}
