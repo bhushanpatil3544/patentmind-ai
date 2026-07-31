@@ -278,10 +278,23 @@ class DatabaseManager:
                     "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
                     ("BHUSHAN", bhushan_pw, "bhushan3544@gmail.com")
                 )
-            # Remove legacy default 'client' and 'admin' accounts
-            cursor.execute("DELETE FROM users WHERE LOWER(username) IN ('client', 'admin')" if self.is_mysql else "DELETE FROM users WHERE LOWER(username) IN ('client', 'admin')")
+            # Seed default system client accounts
+            demo_users = [
+                ("client_demo", hash_pwd("client123"), "client@patentmind.ai"),
+                ("researcher_dev", hash_pwd("research123"), "researcher@patentmind.ai"),
+                ("patent_analyst", hash_pwd("analyst123"), "analyst@patentmind.ai"),
+                ("legal_advisor", hash_pwd("legal123"), "legal@patentmind.ai")
+            ]
+            for u_name, u_pwd, u_email in demo_users:
+                cursor.execute("SELECT id FROM users WHERE LOWER(username) = %s" if self.is_mysql else "SELECT id FROM users WHERE LOWER(username) = ?", (u_name.lower(),))
+                if not cursor.fetchone():
+                    cursor.execute(
+                        "INSERT INTO users (username, password, email) VALUES (%s, %s, %s)" if self.is_mysql else
+                        "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
+                        (u_name, u_pwd, u_email)
+                    )
             conn.commit()
-            logger.info("Admin user 'BHUSHAN' (Password: 3544, Email: bhushan3544@gmail.com) verified/seeded. Legacy demo accounts purged.")
+            logger.info("Admin user 'BHUSHAN' and default client accounts (client_demo, researcher_dev, patent_analyst, legal_advisor) verified/seeded.")
             
             # Seed default patents if they don't exist
             cursor.execute("SELECT COUNT(*) FROM patents")
