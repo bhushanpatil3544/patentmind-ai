@@ -2744,17 +2744,17 @@ export default function App() {
               <h2 className="text-serif-editorial text-4xl text-main tracking-wide mt-2">RAG KNOWLEDGE SEARCH</h2>
             </div>
 
-            <form onSubmit={handleSearch} className="space-y-4">
-              <div className="relative border-b border-theme focus-within:border-zinc-500 transition-colors duration-250 py-2">
-                <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-550" />
+            <form onSubmit={handleSearch} className="space-y-6">
+              <div className="glass-panel-sleek rounded-xl p-3 relative flex items-center shadow-lg transition-all focus-within:border-[#7C3AED]/60 focus-within:shadow-[0_0_25px_rgba(124,58,237,0.15)]">
+                <Search className="w-4 h-4 text-zinc-400 ml-2 flex-shrink-0" />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="QUERY DATASET RECORDS OR PATENT CLAIMS..."
-                  className="w-full bg-transparent pl-8 pr-32 py-2 text-sm uppercase font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 text-main"
+                  placeholder="SEARCH CLAIMS, ABSTRACTS, OR PATENT SPECIFICATIONS..."
+                  className="w-full bg-transparent pl-4 pr-36 py-2 text-xs uppercase font-mono tracking-wider focus:outline-none placeholder:text-zinc-600 text-main"
                 />
-                <div className="absolute right-20 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <div className="absolute right-28 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   <button
                     type="button"
                     onClick={() => handleVoiceInput(setQuery, 'search')}
@@ -2771,24 +2771,45 @@ export default function App() {
                 <button
                   type="submit"
                   disabled={searchLoading}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-[10px] font-mono tracking-widest uppercase border border-theme hover:border-zinc-500 disabled:opacity-40 text-muted hover:text-main px-4 py-1.5 transition-all duration-150"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono tracking-widest uppercase bg-[#7C3AED] hover:bg-[#8B5CF6] disabled:opacity-40 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-150 shadow-md"
                 >
-                  {searchLoading ? 'RUNNING...' : 'SUBMIT'}
+                  {searchLoading ? 'SEARCHING...' : 'SUBMIT'}
                 </button>
               </div>
 
-              <div className="flex items-center gap-6 text-[10px] font-mono tracking-wider text-zinc-500 pt-2">
+              {/* Quick Search Tag Pills */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-[9px] font-mono text-zinc-550 uppercase tracking-widest mr-2">QUICK SUGGESTIONS:</span>
+                {[
+                  "Vision-Language-Action Models",
+                  "Neural Network Control",
+                  "Autonomous Drone Trajectories",
+                  "Robotic Arm Manipulation",
+                  "Agentic AI Governance"
+                ].map((tag, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setQuery(tag)}
+                    className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-[9px] font-mono text-zinc-400 hover:text-white uppercase transition-all"
+                  >
+                    + {tag}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-6 text-[10px] font-mono tracking-wider text-zinc-500 pt-1">
                 <div className="flex items-center gap-2">
                   <span>SOURCE LIMIT:</span>
                   <select
                     value={sourceFilter}
                     onChange={(e) => setSourceFilter(e.target.value)}
-                    className="bg-transparent border border-theme text-zinc-400 focus:outline-none px-1.5 py-0.5"
+                    className="bg-[#111111] border border-white/10 text-zinc-300 focus:outline-none px-2 py-1 rounded text-[10px]"
                   >
-                    <option value="" className="bg-[#0c0c0e]">ALL SOURCES</option>
-                    <option value="USPTO" className="bg-[#0c0c0e]">USPTO</option>
-                    <option value="WIPO" className="bg-[#0c0c0e]">WIPO</option>
-                    <option value="Google Patents" className="bg-[#0c0c0e]">GOOGLE PATENTS</option>
+                    <option value="">ALL SOURCES</option>
+                    <option value="USPTO">USPTO</option>
+                    <option value="WIPO">WIPO</option>
+                    <option value="Google Patents">GOOGLE PATENTS</option>
                   </select>
                 </div>
 
@@ -2797,12 +2818,12 @@ export default function App() {
                   <select
                     value={sectionFilter}
                     onChange={(e) => setSectionFilter(e.target.value)}
-                    className="bg-transparent border border-theme text-zinc-400 focus:outline-none px-1.5 py-0.5"
+                    className="bg-[#111111] border border-white/10 text-zinc-300 focus:outline-none px-2 py-1 rounded text-[10px]"
                   >
-                    <option value="" className="bg-[#0c0c0e]">ALL SECTIONS</option>
-                    <option value="Abstract" className="bg-[#0c0c0e]">ABSTRACT</option>
-                    <option value="Description" className="bg-[#0c0c0e]">DESCRIPTION</option>
-                    <option value="Claims" className="bg-[#0c0c0e]">CLAIMS</option>
+                    <option value="">ALL SECTIONS</option>
+                    <option value="Abstract">ABSTRACT</option>
+                    <option value="Description">DESCRIPTION</option>
+                    <option value="Claims">CLAIMS</option>
                   </select>
                 </div>
               </div>
@@ -3250,15 +3271,17 @@ export default function App() {
             </div>
 
             {/* Chat Thread Container */}
-            <div className="flex-1 overflow-y-auto panel-card p-6 md:p-8 space-y-6 bg-black/15 flex flex-col border border-theme">
+            <div className="flex-1 overflow-y-auto glass-panel-sleek rounded-2xl p-6 md:p-8 space-y-6 flex flex-col shadow-2xl">
               
               {chatMessages.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
-                  <MessageSquare className="w-10 h-10 text-zinc-650" />
+                  <div className="w-16 h-16 rounded-2xl bg-[#7C3AED]/10 border border-[#7C3AED]/30 flex items-center justify-center text-[#22D3EE] shadow-[0_0_30px_rgba(124,58,237,0.2)]">
+                    <MessageSquare className="w-8 h-8" />
+                  </div>
                   <div className="space-y-2">
-                    <h3 className="text-serif-editorial text-lg text-main">CONVERSE WITH YOUR PATENTS</h3>
-                    <p className="text-xs text-muted max-w-sm font-light">
-                      Ask context-aware questions about your indexed patent PDFs. The chatbot remembers previous turns and links citations.
+                    <h3 className="text-serif-editorial text-2xl text-main">CONVERSE WITH YOUR PATENTS</h3>
+                    <p className="text-xs text-zinc-400 max-w-sm font-light leading-relaxed">
+                      Ask context-aware questions about your indexed patent specifications. The AI chain links citations and references patent claim numbers in real-time.
                     </p>
                   </div>
                 </div>
@@ -3267,12 +3290,16 @@ export default function App() {
                   {chatMessages.map((msg, idx) => (
                     <div 
                       key={idx} 
-                      className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} space-y-1.5`}
+                      className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} space-y-2`}
                     >
                       {/* Role Label */}
                       <div className="flex items-center justify-between gap-2 w-full px-1">
-                        <span className="text-[9px] font-mono text-zinc-550 uppercase tracking-widest flex items-center gap-1">
-                          {msg.role === 'user' ? `👤 ${username}` : '🤖 ✨ AI ANALYST'}
+                        <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest flex items-center gap-1.5 font-semibold">
+                          {msg.role === 'user' ? (
+                            <span className="text-[#22D3EE]">👤 {username}</span>
+                          ) : (
+                            <span className="text-[#8B5CF6]">🤖 PatentMind AI Agent</span>
+                          )}
                         </span>
                         {msg.role === 'assistant' && (
                           <button
@@ -3281,26 +3308,26 @@ export default function App() {
                             className="text-[9px] font-mono text-zinc-500 hover:text-white flex items-center gap-1 transition-colors uppercase"
                             title="Read Aloud (Voice Output)"
                           >
-                            <Volume2 className="w-3 h-3" />
+                            <Volume2 className="w-3 h-3 text-[#22D3EE]" />
                             <span>LISTEN</span>
                           </button>
                         )}
                       </div>
 
                       {/* Content Bubble */}
-                      <div className={`p-4 max-w-[85%] text-xs font-light leading-relaxed font-sans border ${
+                      <div className={`p-4 max-w-[85%] text-xs font-light leading-relaxed font-sans shadow-lg transition-all ${
                         msg.role === 'user' 
-                          ? 'bg-zinc-800/40 border-zinc-700/60 text-zinc-200 rounded-bl-lg rounded-tl-lg rounded-tr-lg' 
-                          : 'bg-black/30 border-theme text-muted rounded-br-lg rounded-tl-lg rounded-tr-lg'
+                          ? 'bg-[#7C3AED]/20 border border-[#7C3AED]/40 text-white rounded-2xl rounded-tr-sm shadow-[0_0_20px_rgba(124,58,237,0.1)]' 
+                          : 'bg-[#18181B]/90 border border-white/10 text-zinc-200 rounded-2xl rounded-tl-sm'
                       }`}>
                         <div className="whitespace-pre-wrap">{msg.content}</div>
 
                         {/* Citation attributions list */}
                         {msg.role === 'assistant' && msg.citations && msg.citations.length > 0 && (
-                          <div className="mt-4 pt-3 border-t border-theme/80 space-y-2.5">
+                          <div className="mt-4 pt-3 border-t border-white/10 space-y-2.5">
                             <button
                               onClick={() => setExpandedCitationIndex(expandedCitationIndex === idx ? null : idx)}
-                              className="flex items-center gap-1.5 text-[9px] font-mono text-zinc-500 hover:text-main transition-colors uppercase tracking-wider"
+                              className="flex items-center gap-1.5 text-[9px] font-mono text-[#22D3EE] hover:text-white transition-colors uppercase tracking-wider font-semibold"
                             >
                               <BookOpen className="w-3.5 h-3.5" />
                               <span>CITED SOURCES ({msg.citations.length})</span>
@@ -3310,13 +3337,13 @@ export default function App() {
                             {expandedCitationIndex === idx && (
                               <div className="space-y-3.5 pl-1 pt-1.5 fade-in">
                                 {msg.citations.map((c, cIdx) => (
-                                  <div key={cIdx} className="space-y-1 bg-black/10 p-2.5 border border-theme/50 text-[11px] text-zinc-400">
-                                    <div className="flex justify-between font-mono text-[9px] text-zinc-500">
-                                      <span className="font-semibold text-main">{c.metadata.patent_number} ({c.metadata.section})</span>
-                                      <span>SCORE: {c.score.toFixed(3)}</span>
+                                  <div key={cIdx} className="space-y-1 bg-black/40 p-3 border border-white/5 rounded-lg text-[11px] text-zinc-400">
+                                    <div className="flex justify-between font-mono text-[9px] text-zinc-400">
+                                      <span className="font-semibold text-[#22D3EE]">{c.metadata.patent_number} ({c.metadata.section})</span>
+                                      <span>SIMILARITY: {(c.score * 100).toFixed(1)}%</span>
                                     </div>
-                                    <div className="text-[11px] font-medium text-zinc-300 mt-0.5">{c.metadata.title}</div>
-                                    <p className="text-[10px] text-zinc-500 italic mt-1.5 border-l border-zinc-800 pl-2 leading-relaxed">
+                                    <div className="text-[11px] font-medium text-white mt-0.5">{c.metadata.title}</div>
+                                    <p className="text-[10px] text-zinc-400 italic mt-1.5 border-l-2 border-[#7C3AED] pl-2 leading-relaxed">
                                       "{c.text}"
                                     </p>
                                   </div>
@@ -3329,7 +3356,7 @@ export default function App() {
 
                       {/* Telemetry metadata footer */}
                       {msg.role === 'assistant' && msg.latency && (
-                        <div className="text-[8px] font-mono text-zinc-650 flex gap-3 px-1">
+                        <div className="text-[8px] font-mono text-zinc-550 flex gap-3 px-1">
                           <span>LLM: {msg.active_llm.toUpperCase()}</span>
                           <span>LATENCY: {msg.latency}s</span>
                           <span>DB: {msg.active_db.toUpperCase()}</span>
@@ -3937,6 +3964,140 @@ export default function App() {
                     </button>
                   ))}
                 </div>
+              </div>
+            </div>
+
+            {/* SUBSCRIPTION & PRICING PLANS (IMAGE 2 REFERENCE DESIGN) */}
+            <div className="space-y-8 pt-4">
+              <div className="text-center space-y-2">
+                <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest">ENTERPRISE SCALE & PLANS</span>
+                <h2 className="text-3xl font-semibold tracking-tight text-main font-sans">Find the right plan for your needs.</h2>
+              </div>
+
+              {/* Brand Logo Ticker */}
+              <div className="flex flex-wrap items-center justify-center gap-8 py-3 text-zinc-500 font-mono text-xs opacity-75 uppercase tracking-wider border-y border-white/5">
+                <span className="font-bold tracking-widest text-zinc-400">DOORDASH</span>
+                <span>Airtable</span>
+                <span className="font-semibold text-zinc-300">OpenAI</span>
+                <span>ServiceTitan</span>
+                <span className="italic">Lemonade</span>
+              </div>
+
+              {/* 3 Pricing Plan Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                {/* 1. ESSENTIALS */}
+                <div className="panel-card p-7 space-y-6 bg-white/5 border border-white/10 hover:border-orange-500/50 rounded-xl transition-all shadow-xl">
+                  <div>
+                    <h3 className="text-xl font-bold text-main">Essentials</h3>
+                    <p className="text-[11px] text-zinc-400 mt-1 font-light">For startups and growing companies</p>
+                  </div>
+                  <div className="py-2">
+                    <span className="text-3xl font-bold text-main">$0</span>
+                    <span className="text-xs text-zinc-400 font-light"> user/month</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => alert("You are currently using the Essentials Free Tier.")}
+                    className="w-full py-3 bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold text-xs tracking-wider uppercase rounded-lg transition-all shadow-md"
+                  >
+                    Try Free Plan
+                  </button>
+                  <ul className="space-y-3 text-xs text-zinc-300 font-light pt-2 border-t border-white/5">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>Global USPTO & Google Patents search access</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>AI-powered custom search rules</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>Up to 10 document OCR extractions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>SQLite fallback local vector store</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* 2. PREMIUM */}
+                <div className="panel-card p-7 space-y-6 bg-purple-950/20 border border-[#7C3AED]/50 hover:border-orange-500/70 rounded-xl transition-all shadow-2xl relative">
+                  <span className="absolute -top-3 right-6 bg-[#7C3AED] text-white text-[9px] font-mono font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-md">POPULAR</span>
+                  <div>
+                    <h3 className="text-xl font-bold text-main">Premium</h3>
+                    <p className="text-[11px] text-zinc-400 mt-1 font-light">For mid-sized companies looking to scale</p>
+                  </div>
+                  <div className="py-2">
+                    <span className="text-3xl font-bold text-main">$12</span>
+                    <span className="text-xs text-zinc-400 font-light"> user/month</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => alert("Redirecting to Premium Plan Checkout...")}
+                    className="w-full py-3 bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold text-xs tracking-wider uppercase rounded-lg transition-all shadow-md"
+                  >
+                    Open Premium Account
+                  </button>
+                  <ul className="space-y-3 text-xs text-zinc-300 font-light pt-2 border-t border-white/5">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#22D3EE] flex-shrink-0 mt-0.5" />
+                      <span>Everything in Essentials, plus:</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#22D3EE] flex-shrink-0 mt-0.5" />
+                      <span>Unlimited Groq & Ollama dual-LLM queries</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#22D3EE] flex-shrink-0 mt-0.5" />
+                      <span>Dynamic RAG review chains & citations</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#22D3EE] flex-shrink-0 mt-0.5" />
+                      <span>AI compliance & prior-art study graphs</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* 3. ENTERPRISE */}
+                <div className="panel-card p-7 space-y-6 bg-white/5 border border-white/10 hover:border-orange-500/50 rounded-xl transition-all shadow-xl">
+                  <div>
+                    <h3 className="text-xl font-bold text-main">Enterprise</h3>
+                    <p className="text-[11px] text-zinc-400 mt-1 font-light">For global enterprises with custom needs</p>
+                  </div>
+                  <div className="py-2">
+                    <span className="text-3xl font-bold text-main">Custom</span>
+                    <span className="text-xs text-zinc-400 font-light"> pricing</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => alert("Sales Inquiry Dispatched. An Enterprise advisor will email you shortly.")}
+                    className="w-full py-3 bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold text-xs tracking-wider uppercase rounded-lg transition-all shadow-md"
+                  >
+                    Contact Sales
+                  </button>
+                  <ul className="space-y-3 text-xs text-zinc-300 font-light pt-2 border-t border-white/5">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>Everything in Premium, plus:</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>Unlimited US & Global database entities</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>Dedicated MySQL & S3 cloud database cluster</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>Named Account Manager & 24/7 priority SLA</span>
+                    </li>
+                  </ul>
+                </div>
+
               </div>
             </div>
 
