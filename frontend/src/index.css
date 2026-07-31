@@ -30,21 +30,11 @@
 }
 
 .app-wrapper {
-  background: radial-gradient(circle at 50% 20%, rgba(13, 148, 136, 0.15), rgba(10, 10, 10, 0.95)), url('/faint_patent_bg.jpg') center/cover no-repeat fixed;
+  background: linear-gradient(135deg, rgba(8, 20, 24, 0.75) 0%, rgba(10, 10, 12, 0.85) 100%), url('/faint_patent_bg.jpg') center/cover no-repeat fixed !important;
   color: var(--text-main);
   font-family: var(--font-family);
   min-height: 100vh;
   transition: all 0.3s ease;
-  position: relative;
-}
-
-.app-wrapper::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 10, 10, 0.85);
-  pointer-events: none;
-  z-index: 0;
 }
 
 .glass-spatial-card {
