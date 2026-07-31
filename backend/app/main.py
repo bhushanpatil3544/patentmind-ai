@@ -1,4 +1,6 @@
 import os
+import io
+import csv
 import time
 import logging
 import json
@@ -6,7 +8,7 @@ import random
 import string
 import requests
 from typing import List, Dict, Any, Optional
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, Depends, status
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, Depends, status, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -748,6 +750,50 @@ def admin_diagnostics(current_user: dict = Depends(get_current_user)):
             "os_environment": "Vercel Serverless" if os.environ.get("VERCEL") else "Self-Hosted Cluster"
         }
     }
+
+
+@app.get("/api/v1/admin/export-metadata")
+def admin_export_metadata(format: str = Query("json"), current_user: dict = Depends(get_current_user)):
+    """
+    Exports all application metadata (users, patents, questions, feedback) as a downloadable file.
+    Supported formats: 'json' or 'csv'. Admin-Only.
+    """
+    admin_user = current_user.get("sub", "")
+    if admin_user != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required to export metadata."
+        )
+    
+    export_data = relational_db.export_all_metadata()
+    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    
+    if format == "csv":
+        output = io.StringIO()
+        # Write each table as a CSV section
+        for table_name, rows in export_data.items():
+            output.write(f"\n=== {table_name.upper()} ===\n")
+            if rows:
+                writer = csv.DictWriter(output, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
+            else:
+                output.write("(empty table)\n")
+        
+        csv_content = output.getvalue()
+        output.close()
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=patentmind_export_{timestamp}.csv"}
+        )
+    else:
+        json_content = json.dumps(export_data, indent=2, ensure_ascii=False, default=str)
+        return Response(
+            content=json_content,
+            media_type="application/json",
+            headers={"Content-Disposition": f"attachment; filename=patentmind_export_{timestamp}.json"}
+        )
 
 
 # --- CORE SECURED ROUTES ---

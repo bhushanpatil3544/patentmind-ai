@@ -42,7 +42,9 @@ import {
   Globe,
   HelpCircle,
   Settings,
-  Sliders
+  Sliders,
+  Download,
+  Activity
 } from 'lucide-react';
 
 // Definitions for Theme switcher: Normal (Paperpillar Light) & Dark (Paperpillar Dark)
@@ -3936,6 +3938,75 @@ export default function App() {
                 ))}
               </div>
             )}
+
+            {/* Export Metadata Download Section */}
+            <div className="panel-card p-6 rounded-none space-y-4 border border-white/5">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-xs font-mono tracking-wider text-main uppercase flex items-center gap-2">
+                    <Database className="w-4 h-4 text-zinc-500" />
+                    EXPORT APPLICATION METADATA
+                  </h3>
+                  <p className="text-[9px] font-mono text-zinc-550 mt-1 uppercase">Download all users, patents, query logs, and feedback records from the active database.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const response = await authenticatedFetch('/api/v1/admin/export-metadata?format=json');
+                      if (response && response.ok) {
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `patentmind_export_${Date.now()}.json`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                      } else {
+                        alert('Export failed. Please try again.');
+                      }
+                    } catch (err) {
+                      console.error('Export error:', err);
+                    }
+                  }}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-[#7C3AED]/15 hover:bg-[#7C3AED]/25 text-[#8B5CF6] border border-[#7C3AED]/30 rounded text-[10px] font-mono tracking-widest uppercase transition-all"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  DOWNLOAD JSON
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const response = await authenticatedFetch('/api/v1/admin/export-metadata?format=csv');
+                      if (response && response.ok) {
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `patentmind_export_${Date.now()}.csv`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                      } else {
+                        alert('Export failed. Please try again.');
+                      }
+                    } catch (err) {
+                      console.error('Export error:', err);
+                    }
+                  }}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-[#22D3EE]/10 hover:bg-[#22D3EE]/20 text-[#22D3EE] border border-[#22D3EE]/30 rounded text-[10px] font-mono tracking-widest uppercase transition-all"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  DOWNLOAD CSV
+                </button>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               

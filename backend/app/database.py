@@ -693,3 +693,56 @@ class DatabaseManager:
             "patents_metadata_count": patents_count,
             "questions_logged_count": questions_count
         }
+
+    def export_all_metadata(self) -> Dict[str, Any]:
+        """Exports all table data for admin download."""
+        conn, cursor = self._get_connection()
+        export = {"users": [], "patents": [], "client_questions": [], "user_feedback": []}
+        try:
+            # Users (exclude password hashes for security)
+            cursor.execute("SELECT id, username, email FROM users ORDER BY id")
+            for row in cursor.fetchall():
+                if self.is_mysql:
+                    export["users"].append({"id": row["id"], "username": row["username"], "email": row.get("email", "")})
+                else:
+                    export["users"].append({"id": row[0], "username": row[1], "email": row[2] if len(row) > 2 else ""})
+
+            # Patents
+            cursor.execute("SELECT patent_number, title, abstract, document_date, inventors, ipc_cpc_codes, source, s3_url, created_at FROM patents ORDER BY id DESC")
+            for row in cursor.fetchall():
+                if self.is_mysql:
+                    export["patents"].append({k: str(v) for k, v in row.items()})
+                else:
+                    export["patents"].append({
+                        "patent_number": row[0], "title": row[1], "abstract": row[2],
+                        "document_date": row[3], "inventors": row[4], "ipc_cpc_codes": row[5],
+                        "source": row[6], "s3_url": row[7], "created_at": str(row[8]) if row[8] else ""
+                    })
+
+            # Client Questions
+            cursor.execute("SELECT id, username, query, answer, active_llm, active_db, latency_sec, created_at FROM client_questions ORDER BY id DESC")
+            for row in cursor.fetchall():
+                if self.is_mysql:
+                    export["client_questions"].append({k: str(v) for k, v in row.items()})
+                else:
+                    export["client_questions"].append({
+                        "id": row[0], "username": row[1], "query": row[2], "answer": row[3],
+                        "active_llm": row[4], "active_db": row[5], "latency_sec": row[6],
+                        "created_at": str(row[7]) if row[7] else ""
+                    })
+
+            # User Feedback
+            cursor.execute("SELECT id, username, rating, comments, created_at FROM user_feedback ORDER BY id DESC")
+            for row in cursor.fetchall():
+                if self.is_mysql:
+                    export["user_feedback"].append({k: str(v) for k, v in row.items()})
+                else:
+                    export["user_feedback"].append({
+                        "id": row[0], "username": row[1], "rating": row[2],
+                        "comments": row[3], "created_at": str(row[4]) if row[4] else ""
+                    })
+        except Exception as e:
+            logger.error(f"Error exporting metadata: {e}")
+        finally:
+            conn.close()
+        return export
