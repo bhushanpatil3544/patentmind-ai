@@ -1523,7 +1523,7 @@ function App() {
     if (welcomeLayout === 'brutalist') {
       wrapperClass = "min-h-screen w-full bg-[#FFFBEB] text-black font-mono relative overflow-hidden flex flex-col justify-between p-8 md:p-12 border-[5px] border-black";
     } else if (welcomeLayout === 'cyber') {
-      wrapperClass = "min-h-screen w-full bg-[#05050A] text-[#10B981] font-mono relative overflow-hidden flex flex-col justify-between p-8 md:p-12 bg-[linear-gradient(rgba(16,185,129,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.04)_1px,transparent_1px)] bg-[size:24px_24px]";
+      wrapperClass = "min-h-screen w-full bg-[#05050A] text-[#10B981] font-mono relative overflow-hidden flex flex-col justify-between p-8 md:p-12";
     } else if (welcomeLayout === 'aurora') {
       wrapperClass = "min-h-screen w-full bg-[#0A0915] text-white font-outfit relative overflow-hidden flex flex-col justify-between p-8 md:p-12";
     }
@@ -2126,11 +2126,10 @@ function App() {
     return (
       <div className={`app-wrapper bg-[#0A0A0A] ${theme} flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans`}>
         
-        {/* Dynamic Ambient Background Grid & Blur Circles */}
+        {/* OVO Hazy Atmospheric Ambient Blurs (Zero Gridlines) */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-          <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] rounded-full bg-[#7C3AED]/10 blur-[130px] animate-pulse duration-[8000ms]" />
-          <div className="absolute bottom-[-10%] right-[10%] w-[450px] h-[450px] rounded-full bg-[#22D3EE]/5 blur-[110px] animate-pulse duration-[6000ms]" />
+          <div className="absolute top-[-10%] left-[20%] w-[550px] h-[550px] rounded-full bg-[#3B82F6]/15 blur-[140px] animate-pulse duration-[8000ms]" />
+          <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] rounded-full bg-[#F97316]/12 blur-[130px] animate-pulse duration-[6000ms]" />
         </div>
 
         {/* Top-Right Theme Selector */}
@@ -2664,22 +2663,21 @@ function App() {
   return (
     <div className={`app-wrapper bg-[#0A0A0A] ${theme} flex flex-col md:flex-row transition-all duration-300 min-h-screen relative overflow-hidden font-sans`}>
       
-      {/* Dynamic Ambient Background Grid & Blur Circles */}
+      {/* OVO Hazy Atmospheric Ambient Blurs (Zero Gridlines) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] rounded-full bg-[#7C3AED]/10 blur-[130px] animate-pulse duration-[8000ms]" />
-        <div className="absolute bottom-[-10%] right-[10%] w-[450px] h-[450px] rounded-full bg-[#22D3EE]/5 blur-[110px] animate-pulse duration-[6000ms]" />
+        <div className="absolute top-[-10%] left-[20%] w-[550px] h-[550px] rounded-full bg-[#3B82F6]/15 blur-[140px] animate-pulse duration-[8000ms]" />
+        <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] rounded-full bg-[#F97316]/12 blur-[130px] animate-pulse duration-[6000ms]" />
       </div>
 
-      {/* LEFT FIXED FLOATING SIDE PANEL (OPTIRISE CURVED DOCK) */}
-      <aside className={`w-full ${isSidebarCollapsed ? 'md:w-[76px]' : 'md:w-[280px]'} md:fixed md:top-4 md:bottom-4 md:left-4 optirise-dock md:rounded-3xl ${isSidebarCollapsed ? 'p-3' : 'p-5'} flex flex-col justify-between overflow-y-auto z-20 transition-all duration-300 select-none`}>
+      {/* LEFT FIXED FLOATING SIDE PANEL (OVO HAZY CURVED DOCK) */}
+      <aside className={`w-full ${isSidebarCollapsed ? 'md:w-[76px]' : 'md:w-[280px]'} md:fixed md:top-4 md:bottom-4 md:left-4 ovo-dock md:rounded-3xl ${isSidebarCollapsed ? 'p-3' : 'p-5'} flex flex-col justify-between overflow-y-auto z-20 transition-all duration-300 select-none`}>
         <div className="space-y-5">
           
           {/* Brand Header & Sidebar Hide/Expand Toggle */}
           <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center flex-col gap-3' : 'justify-between'}`}>
             <div className="flex items-center gap-2.5">
-              <div className="w-8.5 h-8.5 rounded-2xl bg-gradient-to-tr from-[#7C3AED] via-[#A855F7] to-[#F59E0B] p-[1px] shadow-[0_0_20px_rgba(168,85,247,0.4)] flex-shrink-0">
-                <div className="w-full h-full bg-[#0E121B] rounded-[15px] flex items-center justify-center text-[#F59E0B] font-bold text-sm">
+              <div className="w-8.5 h-8.5 rounded-2xl bg-gradient-to-tr from-[#2563EB] via-[#3B82F6] to-[#FB923C] p-[1px] shadow-[0_0_20px_rgba(59,130,246,0.4)] flex-shrink-0">
+                <div className="w-full h-full bg-[#0B0E17] rounded-[15px] flex items-center justify-center text-[#FB923C] font-bold text-sm">
                   ⚡
                 </div>
               </div>
@@ -2847,11 +2845,11 @@ function App() {
                   title={tab.label}
                   className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5'} rounded-2xl text-xs font-medium transition-all duration-300 ${
                     isActive 
-                      ? 'bg-gradient-to-r from-[#7C3AED]/35 via-[#A855F7]/25 to-[#F59E0B]/15 text-white font-semibold border-l-2 border-[#F59E0B] shadow-[0_0_25px_rgba(245,158,11,0.25)]' 
+                      ? 'bg-gradient-to-r from-[#2563EB]/40 via-[#3B82F6]/25 to-[#FB923C]/15 text-white font-semibold border-l-2 border-[#FB923C] shadow-[0_0_25px_rgba(249,115,22,0.25)]' 
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <TabIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#F59E0B]' : 'text-slate-400'}`} />
+                  <TabIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#FB923C]' : 'text-slate-400'}`} />
                   {!isSidebarCollapsed && <span>{tab.label}</span>}
                 </button>
               );

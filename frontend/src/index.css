@@ -5,88 +5,88 @@
 @tailwind utilities;
 
 /* ==========================================
-   SPATIAL VISION GLASSMORPHISM THEME
-   (Nike Ambient Studio Inspired for Computer AI)
+   OVO HAZY WEBFLOW DESIGN SYSTEM
+   (NO GRIDLINES, HAZY AMBIENT BLUR GLOWS & CURVED DOCK)
    ========================================== */
 
 :root, .theme-normal, .theme-dark, .theme-carbon, .theme-cyber, .theme-brutalist {
-  --bg-app: #07080C;
-  --bg-panel: #0E121B;
-  --bg-sidebar: #090C14;
-  --bg-card: #121624;
-  --bg-hover: #1A2032;
-  --border-panel: 1px solid rgba(255, 255, 255, 0.08);
+  --bg-app: #06070A;
+  --bg-panel: #0B0E17;
+  --bg-sidebar: #080A10;
+  --bg-card: #111522;
+  --bg-hover: #181E2E;
+  --border-panel: 1px solid rgba(255, 255, 255, 0.1);
   --text-main: #FFFFFF;
   --text-muted: #94A3B8;
   --text-label: #64748B;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --accent: #8B5CF6;
-  --accent-secondary: #A855F7;
-  --highlight: #F59E0B;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --accent: #3B82F6;
+  --accent-secondary: #F97316;
+  --highlight: #FB923C;
   --font-family: 'Outfit', 'Inter', sans-serif;
-  --backdrop: blur(32px);
-  --btn-grad: linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #F59E0B 100%);
+  --backdrop: blur(36px);
+  --btn-grad: linear-gradient(135deg, #2563EB 0%, #3B82F6 50%, #F97316 100%);
   --btn-text: #FFFFFF;
 }
 
 .app-wrapper {
-  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.22) 0%, transparent 55%),
-              radial-gradient(circle at 85% 25%, rgba(245, 158, 11, 0.12) 0%, transparent 45%),
-              radial-gradient(circle at 15% 75%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-              linear-gradient(135deg, #07080C 0%, #0C0F17 100%),
-              url('/faint_patent_bg.jpg') center/cover no-repeat fixed !important;
+  background: radial-gradient(circle at 35% 10%, rgba(37, 99, 235, 0.25) 0%, rgba(37, 99, 235, 0.05) 50%, transparent 70%),
+              radial-gradient(circle at 80% 30%, rgba(249, 115, 22, 0.20) 0%, rgba(249, 115, 22, 0.04) 45%, transparent 65%),
+              radial-gradient(circle at 15% 85%, rgba(59, 130, 246, 0.18) 0%, transparent 55%),
+              radial-gradient(circle at 75% 85%, rgba(251, 146, 60, 0.15) 0%, transparent 50%),
+              linear-gradient(135deg, #06070A 0%, #0B0E16 100%) !important;
   color: var(--text-main);
   font-family: var(--font-family);
   min-height: 100vh;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ==========================================
-   OPTIRISE AGENCY WEBFLOW DESIGN SYSTEM
-   (NO GRIDLINES, CURVED DOCK & SUNSET GLOWS)
+   OVO HAZY COMPONENT STYLES
    ========================================== */
 
-.optirise-dock {
-  background: rgba(14, 18, 27, 0.85);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 1.5rem;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(139, 92, 246, 0.15);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.optirise-card {
-  background: rgba(16, 20, 32, 0.78);
+.ovo-dock, .optirise-dock {
+  background: rgba(11, 14, 23, 0.82);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.5rem;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(168, 85, 247, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(59, 130, 246, 0.15);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.optirise-card:hover {
-  border-color: rgba(168, 85, 247, 0.35);
-  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.85), 0 0 45px rgba(168, 85, 247, 0.2);
-  transform: translateY(-2px);
+
+.ovo-card, .optirise-card {
+  background: rgba(15, 19, 31, 0.75);
+  backdrop-filter: blur(36px);
+  -webkit-backdrop-filter: blur(36px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 35px rgba(37, 99, 235, 0.08);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ovo-card:hover, .optirise-card:hover {
+  border-color: rgba(96, 165, 250, 0.45);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 50px rgba(59, 130, 246, 0.25);
+  transform: translateY(-3px) scale(1.005);
 }
 
-.optirise-pill {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.ovo-pill, .optirise-pill {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.optirise-pill:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(245, 158, 11, 0.4);
+.ovo-pill:hover, .optirise-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(249, 115, 22, 0.5);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
   transform: translateY(-1px);
 }
 
-.optirise-gradient-text {
-  background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 35%, #C084FC 75%, #F59E0B 100%);
+.ovo-gradient-text, .optirise-gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #93C5FD 50%, #FB923C 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -110,23 +110,23 @@
 .btn-theme {
   background: var(--btn-grad);
   color: var(--btn-text);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn-theme:hover {
-  filter: brightness(1.2);
+  filter: brightness(1.15);
+  box-shadow: 0 15px 35px rgba(249, 115, 22, 0.4);
+  transform: translateY(-1px);
 }
 
-/* Custom noise overlays */
+/* Custom noise overlays - zero gridlines */
 .theme-carbon.bg-grain {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
-  background-repeat: repeat;
+  opacity: 1;
 }
 
 .theme-cyber.bg-grain {
-  background-size: 20px 20px;
-  background-image: linear-gradient(to right, rgba(16, 185, 129, 0.03) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+  opacity: 1;
 }
 
 /* Custom scrollbars */
