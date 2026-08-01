@@ -2671,32 +2671,32 @@ function App() {
         <div className="absolute bottom-[-10%] right-[10%] w-[450px] h-[450px] rounded-full bg-[#22D3EE]/5 blur-[110px] animate-pulse duration-[6000ms]" />
       </div>
 
-      {/* LEFT FIXED FLOATING SIDE PANEL (COLLAPSIBLE SIDEBAR) */}
-      <aside className={`w-full ${isSidebarCollapsed ? 'md:w-[76px]' : 'md:w-[280px]'} md:fixed md:top-4 md:bottom-4 md:left-4 bg-[#08181C]/95 backdrop-blur-2xl border border-[#22D3EE]/20 md:rounded-2xl ${isSidebarCollapsed ? 'p-3' : 'p-5'} flex flex-col justify-between overflow-y-auto z-20 shadow-[0_0_40px_rgba(13,148,136,0.15)] transition-all duration-300 select-none`}>
+      {/* LEFT FIXED FLOATING SIDE PANEL (OPTIRISE CURVED DOCK) */}
+      <aside className={`w-full ${isSidebarCollapsed ? 'md:w-[76px]' : 'md:w-[280px]'} md:fixed md:top-4 md:bottom-4 md:left-4 optirise-dock md:rounded-3xl ${isSidebarCollapsed ? 'p-3' : 'p-5'} flex flex-col justify-between overflow-y-auto z-20 transition-all duration-300 select-none`}>
         <div className="space-y-5">
           
           {/* Brand Header & Sidebar Hide/Expand Toggle */}
           <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center flex-col gap-3' : 'justify-between'}`}>
             <div className="flex items-center gap-2.5">
-              <div className="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-[#0D9488] to-[#22D3EE] p-[1px] shadow-[0_0_20px_rgba(34,211,238,0.3)] flex-shrink-0">
-                <div className="w-full h-full bg-[#08181C] rounded-[11px] flex items-center justify-center text-[#22D3EE] font-bold text-sm">
+              <div className="w-8.5 h-8.5 rounded-2xl bg-gradient-to-tr from-[#7C3AED] via-[#A855F7] to-[#F59E0B] p-[1px] shadow-[0_0_20px_rgba(168,85,247,0.4)] flex-shrink-0">
+                <div className="w-full h-full bg-[#0E121B] rounded-[15px] flex items-center justify-center text-[#F59E0B] font-bold text-sm">
                   ⚡
                 </div>
               </div>
               {!isSidebarCollapsed && (
-                <span className="font-sans font-bold text-base text-white tracking-tight truncate">PatentMind AI</span>
+                <span className="font-outfit font-bold text-base text-white tracking-tight truncate">PatentMind AI</span>
               )}
             </div>
 
             <div className="flex items-center gap-1.5">
               {!isSidebarCollapsed && (
-                <span className="text-[9px] font-mono text-[#22D3EE] bg-[#22D3EE]/10 border border-[#22D3EE]/20 px-2 py-0.5 rounded-full font-semibold">v2.1</span>
+                <span className="text-[9px] font-mono text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-2.5 py-0.5 rounded-full font-semibold">v2.1</span>
               )}
               {/* Hide / Show Sidebar Toggle Button */}
               <button
                 type="button"
                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                className="p-1.5 rounded-lg bg-teal-900/30 border border-[#22D3EE]/20 text-[#22D3EE] hover:bg-[#22D3EE]/20 transition-all flex items-center justify-center"
+                className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-purple-300 hover:bg-white/10 transition-all flex items-center justify-center"
                 title={isSidebarCollapsed ? "Expand Sidebar (Show Text)" : "Hide Sidebar (Collapse to Icons)"}
               >
                 {isSidebarCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
@@ -2705,9 +2705,9 @@ function App() {
           </div>
 
           {/* User Session Profile */}
-          <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2' : 'justify-between p-2.5'} rounded-xl bg-[#0E262B]/80 border border-[#22D3EE]/20 shadow-md`}>
+          <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2' : 'justify-between p-2.5'} rounded-2xl bg-white/5 border border-white/10 shadow-md`}>
             <div className="flex items-center gap-2.5">
-              <div className="w-7.5 h-7.5 rounded-full bg-[#0D9488]/30 border border-[#22D3EE]/40 flex items-center justify-center text-[#22D3EE] font-bold text-xs shadow-sm flex-shrink-0" title={username}>
+              <div className="w-7.5 h-7.5 rounded-full bg-[#7C3AED]/30 border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] font-bold text-xs shadow-sm flex-shrink-0" title={username}>
                 {username ? username.charAt(0).toUpperCase() : 'U'}
               </div>
               {!isSidebarCollapsed && (
@@ -2726,7 +2726,7 @@ function App() {
                   setShowChangePasswordModal(true);
                   setChangePasswordMsg('');
                 }}
-                className="p-1.5 text-teal-200/60 hover:text-white hover:bg-teal-900/30 rounded-lg transition-all"
+                className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                 title="Change Account Password"
               >
                 <KeyRound className="w-3.5 h-3.5" />
@@ -2737,10 +2737,10 @@ function App() {
           {/* Change Password Modal */}
           {showChangePasswordModal && (
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-[#091B1F] border border-[#22D3EE]/30 panel-card p-6 md:p-8 max-w-sm w-full space-y-5 fade-in rounded-2xl shadow-2xl">
+              <div className="bg-[#0E121B] border border-white/10 optirise-card p-6 md:p-8 max-w-sm w-full space-y-5 fade-in rounded-3xl shadow-2xl">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-mono uppercase tracking-wider text-main flex items-center gap-2">
-                    <KeyRound className="w-4 h-4 text-[#22D3EE]" />
+                    <KeyRound className="w-4 h-4 text-[#F59E0B]" />
                     CHANGE ACCOUNT PASSWORD
                   </h3>
                   <button
@@ -2788,14 +2788,14 @@ function App() {
                     <button
                       type="button"
                       onClick={() => setShowChangePasswordModal(false)}
-                      className="flex-1 py-2 border border-theme text-[10px] font-mono text-zinc-400 hover:text-white uppercase tracking-wider"
+                      className="flex-1 py-2 border border-theme text-[10px] font-mono text-zinc-400 hover:text-white uppercase tracking-wider rounded-xl"
                     >
                       CANCEL
                     </button>
                     <button
                       type="submit"
                       disabled={changePasswordLoading}
-                      className="flex-1 py-2 btn-theme text-[10px] font-mono uppercase tracking-wider disabled:opacity-40"
+                      className="flex-1 py-2 btn-theme text-[10px] font-mono uppercase tracking-wider disabled:opacity-40 rounded-xl"
                     >
                       {changePasswordLoading ? 'UPDATING...' : 'UPDATE PASSWORD'}
                     </button>
@@ -2808,26 +2808,26 @@ function App() {
           {/* Multi-Language Selector */}
           {!isSidebarCollapsed && (
             <div className="space-y-1.5">
-              <label className="text-[9px] font-mono text-teal-200/50 uppercase tracking-wider block px-1">LANGUAGE</label>
-              <div className="relative flex items-center border border-[#22D3EE]/20 bg-[#0E262B]/80 rounded-xl px-2.5 py-1.5">
-                <Globe className="w-3.5 h-3.5 text-[#22D3EE] mr-2 flex-shrink-0" />
+              <label className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block px-1">LANGUAGE</label>
+              <div className="relative flex items-center border border-white/10 bg-white/5 rounded-2xl px-3 py-1.5">
+                <Globe className="w-3.5 h-3.5 text-[#F59E0B] mr-2 flex-shrink-0" />
                 <select
                   value={selectedLanguage}
                   onChange={(e) => setSelectedLanguage(e.target.value)}
-                  className="w-full bg-transparent text-xs font-sans focus:outline-none border-none text-teal-100 cursor-pointer"
+                  className="w-full bg-transparent text-xs font-sans focus:outline-none border-none text-slate-200 cursor-pointer"
                 >
-                  <option value="English" className="bg-[#08181C] text-teal-200">English (US 🇺🇸)</option>
-                  <option value="Hindi" className="bg-[#08181C] text-teal-200">Hindi (हिंदी 🇮🇳)</option>
-                  <option value="Spanish" className="bg-[#08181C] text-teal-200">Spanish (Español 🇪🇸)</option>
-                  <option value="French" className="bg-[#08181C] text-teal-200">French (Français 🇫🇷)</option>
-                  <option value="German" className="bg-[#08181C] text-teal-200">German (Deutsch 🇩🇪)</option>
+                  <option value="English" className="bg-[#0E121B] text-slate-200">English (US 🇺🇸)</option>
+                  <option value="Hindi" className="bg-[#0E121B] text-slate-200">Hindi (हिंदी 🇮🇳)</option>
+                  <option value="Spanish" className="bg-[#0E121B] text-slate-200">Spanish (Español 🇪🇸)</option>
+                  <option value="French" className="bg-[#0E121B] text-slate-200">French (Français 🇫🇷)</option>
+                  <option value="German" className="bg-[#0E121B] text-slate-200">German (Deutsch 🇩🇪)</option>
                 </select>
               </div>
             </div>
           )}
 
           {/* Navigation Menu */}
-          <nav className="flex flex-col gap-1 text-left pt-1">
+          <nav className="flex flex-col gap-1.5 text-left pt-1">
             {[
               { id: 'search', label: 'Patent Search', icon: Search },
               { id: 'dashboard', label: 'Analytics & Metrics', icon: BarChart3 },
@@ -2845,13 +2845,13 @@ function App() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   title={tab.label}
-                  className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'} rounded-2xl text-xs font-medium transition-all duration-300 ${
+                  className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5'} rounded-2xl text-xs font-medium transition-all duration-300 ${
                     isActive 
-                      ? 'bg-gradient-to-r from-[#7C3AED]/30 via-[#8B5CF6]/20 to-[#06B6D4]/15 text-white font-semibold border-l-2 border-[#8B5CF6] shadow-[0_0_25px_rgba(139,92,246,0.3)]' 
+                      ? 'bg-gradient-to-r from-[#7C3AED]/35 via-[#A855F7]/25 to-[#F59E0B]/15 text-white font-semibold border-l-2 border-[#F59E0B] shadow-[0_0_25px_rgba(245,158,11,0.25)]' 
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <TabIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#06B6D4]' : 'text-slate-400'}`} />
+                  <TabIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#F59E0B]' : 'text-slate-400'}`} />
                   {!isSidebarCollapsed && <span>{tab.label}</span>}
                 </button>
               );
@@ -2878,11 +2878,11 @@ function App() {
         {activeTab === 'search' && (
           <div className="space-y-12 fade-in">
             <div>
-              <span className="text-[10px] font-mono tracking-widest text-[#06B6D4] uppercase flex items-center gap-2 font-semibold">
-                <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6]" />
+              <span className="text-[10px] font-mono tracking-widest text-[#F59E0B] uppercase flex items-center gap-2 font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-[#A855F7]" />
                 01. ADVANCED VECTOR INTELLIGENCE
               </span>
-              <h2 className="quantara-gradient-text text-4xl md:text-5xl font-outfit font-semibold tracking-tight mt-1.5">
+              <h2 className="optirise-gradient-text text-4xl md:text-5xl font-outfit font-semibold tracking-tight mt-1.5">
                 RAG KNOWLEDGE SEARCH
               </h2>
             </div>

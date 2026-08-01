@@ -10,29 +10,30 @@
    ========================================== */
 
 :root, .theme-normal, .theme-dark, .theme-carbon, .theme-cyber, .theme-brutalist {
-  --bg-app: #030712;
-  --bg-panel: #0B0F19;
-  --bg-sidebar: #070A12;
-  --bg-card: #0F172A;
-  --bg-hover: #1E293B;
-  --border-panel: 1px solid rgba(255, 255, 255, 0.1);
+  --bg-app: #07080C;
+  --bg-panel: #0E121B;
+  --bg-sidebar: #090C14;
+  --bg-card: #121624;
+  --bg-hover: #1A2032;
+  --border-panel: 1px solid rgba(255, 255, 255, 0.08);
   --text-main: #FFFFFF;
   --text-muted: #94A3B8;
   --text-label: #64748B;
-  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color: rgba(255, 255, 255, 0.08);
   --accent: #8B5CF6;
-  --accent-secondary: #7C3AED;
-  --highlight: #06B6D4;
+  --accent-secondary: #A855F7;
+  --highlight: #F59E0B;
   --font-family: 'Outfit', 'Inter', sans-serif;
   --backdrop: blur(32px);
-  --btn-grad: linear-gradient(135deg, #7C3AED 0%, #06B6D4 100%);
+  --btn-grad: linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #F59E0B 100%);
   --btn-text: #FFFFFF;
 }
 
 .app-wrapper {
-  background: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 60%),
-              radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.12) 0%, transparent 55%),
-              linear-gradient(135deg, #030712 0%, #070B16 100%),
+  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.22) 0%, transparent 55%),
+              radial-gradient(circle at 85% 25%, rgba(245, 158, 11, 0.12) 0%, transparent 45%),
+              radial-gradient(circle at 15% 75%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+              linear-gradient(135deg, #07080C 0%, #0C0F17 100%),
               url('/faint_patent_bg.jpg') center/cover no-repeat fixed !important;
   color: var(--text-main);
   font-family: var(--font-family);
@@ -41,56 +42,53 @@
 }
 
 /* ==========================================
-   QUANTARA WEBFLOW AI DESIGN SYSTEM
+   OPTIRISE AGENCY WEBFLOW DESIGN SYSTEM
+   (NO GRIDLINES, CURVED DOCK & SUNSET GLOWS)
    ========================================== */
 
-.quantara-card {
-  background: rgba(11, 15, 25, 0.75);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(124, 58, 237, 0.08);
+.optirise-dock {
+  background: rgba(14, 18, 27, 0.85);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(139, 92, 246, 0.15);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.quantara-card:hover {
-  border-color: rgba(139, 92, 246, 0.4);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(139, 92, 246, 0.22);
+
+.optirise-card {
+  background: rgba(16, 20, 32, 0.78);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(168, 85, 247, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.optirise-card:hover {
+  border-color: rgba(168, 85, 247, 0.35);
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.85), 0 0 45px rgba(168, 85, 247, 0.2);
+  transform: translateY(-2px);
 }
 
-.quantara-pill {
-  background: rgba(255, 255, 255, 0.04);
+.optirise-pill {
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
   transition: all 0.25s ease;
 }
-.quantara-pill:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(34, 211, 238, 0.4);
+.optirise-pill:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(245, 158, 11, 0.4);
   transform: translateY(-1px);
 }
 
-.quantara-gradient-text {
-  background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 40%, #A78BFA 80%, #22D3EE 100%);
+.optirise-gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 35%, #C084FC 75%, #F59E0B 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-.quantara-glow-border {
-  position: relative;
-}
-.quantara-glow-border::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  background: linear-gradient(90deg, rgba(124, 58, 237, 0.5), rgba(34, 211, 238, 0.5));
-  border-radius: inherit;
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.quantara-glow-border:hover::after {
-  opacity: 1;
 }
 
 .text-main {
