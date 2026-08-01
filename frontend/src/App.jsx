@@ -44,7 +44,10 @@ import {
   Settings,
   Sliders,
   Download,
-  Activity
+  Activity,
+  Paperclip,
+  ArrowUp,
+  MoreHorizontal
 } from 'lucide-react';
 
 // Definitions for Theme switcher: Normal (Paperpillar Light) & Dark (Paperpillar Dark)
@@ -330,6 +333,14 @@ export default function App() {
   const [chatSourceFilter, setChatSourceFilter] = useState('');
   const [chatSectionFilter, setChatSectionFilter] = useState('');
   const [expandedCitationIndex, setExpandedCitationIndex] = useState(null);
+  
+  // ChatGPT-style PDF & Toggle states
+  const [attachedPdfFile, setAttachedPdfFile] = useState(null);
+  const [attachedPdfName, setAttachedPdfName] = useState('');
+  const [chatModeDeepSearch, setChatModeDeepSearch] = useState(true);
+  const [chatModeReasoning, setChatModeReasoning] = useState(false);
+  const [pdfAnalyzingLoading, setPdfAnalyzingLoading] = useState(false);
+  const pdfInputRef = useRef(null);
   
   const chatEndRef = useRef(null);
 
@@ -1096,6 +1107,59 @@ export default function App() {
       }]);
     } finally {
       setChatLoading(false);
+    }
+  };
+
+  const handleChatPdfUpload = async (file) => {
+    if (!file) return;
+    setAttachedPdfFile(file);
+    setAttachedPdfName(file.name);
+    setChatLoading(true);
+
+    const userMsg = { role: 'user', content: `📄 Attached PDF Document: ${file.name} [Extracting Text & Analyzing...]` };
+    setChatMessages(prev => [...prev, userMsg]);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await authenticatedFetch('/api/v1/idea/analyze', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response) return;
+      const data = await response.json();
+      if (response.ok) {
+        setChatMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `📊 **PDF Specification Analysis Complete** for **${file.name}**:\n\n${data.ai_analysis}`,
+          citations: data.matched_patents ? data.matched_patents.map(p => ({
+            metadata: { patent_number: p.patent_number, title: p.title, section: p.sections ? p.sections.join(', ') : 'Patent Match' },
+            score: p.avg_score,
+            text: p.excerpt
+          })) : [],
+          latency: data.latency_sec,
+          active_llm: data.active_llm,
+          active_db: 'Vector Store'
+        }]);
+      } else {
+        setChatMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `⚠️ PDF Analysis Error: ${data.detail || 'Failed to extract text from PDF.'}`,
+          citations: []
+        }]);
+      }
+    } catch (err) {
+      setChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `⚠️ Error uploading PDF: ${err.message || 'Connection error'}`,
+        citations: []
+      }]);
+    } finally {
+      setChatLoading(false);
+      setAttachedPdfFile(null);
+      setAttachedPdfName('');
     }
   };
 
@@ -3260,33 +3324,85 @@ export default function App() {
           </div>
         )}
 
-        {/* CHATBOT TAB */}
+        {/* CHATBOT TAB (CHATGPT STYLE WITH DIRECT PDF ANALYZER) */}
         {activeTab === 'chat' && (
-          <div className="flex-1 flex flex-col space-y-6 fade-in h-[calc(100vh-8rem)]">
+          <div className="flex-1 flex flex-col space-y-6 fade-in h-[calc(100vh-8rem)] justify-between">
             
-            {/* Header */}
-            <div>
-              <span className="text-[11px] text-muted font-mono tracking-widest uppercase">06. CONVERSATIONAL RAG</span>
-              <h2 className="text-serif-editorial text-4xl text-main tracking-wide mt-2">KNOWLEDGE AGENT CHAT</h2>
-            </div>
+            {/* Hidden File Input for PDF Analyzer */}
+            <input
+              type="file"
+              ref={pdfInputRef}
+              accept=".pdf"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleChatPdfUpload(e.target.files[0]);
+                  e.target.value = null;
+                }
+              }}
+            />
 
-            {/* Chat Thread Container */}
-            <div className="flex-1 overflow-y-auto glass-panel-sleek rounded-2xl p-6 md:p-8 space-y-6 flex flex-col shadow-2xl">
+            {/* Chat Thread Container OR Centered Hero Title */}
+            <div className="flex-1 overflow-y-auto space-y-6 flex flex-col justify-center">
               
               {chatMessages.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
-                  <div className="w-16 h-16 rounded-2xl bg-[#7C3AED]/10 border border-[#7C3AED]/30 flex items-center justify-center text-[#22D3EE] shadow-[0_0_30px_rgba(124,58,237,0.2)]">
-                    <MessageSquare className="w-8 h-8" />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-serif-editorial text-2xl text-main">CONVERSE WITH YOUR PATENTS</h3>
-                    <p className="text-xs text-zinc-400 max-w-sm font-light leading-relaxed">
-                      Ask context-aware questions about your indexed patent specifications. The AI chain links citations and references patent claim numbers in real-time.
-                    </p>
+                <div className="flex flex-col items-center justify-center text-center p-6 space-y-6 max-w-xl mx-auto my-auto">
+                  <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-main font-sans">
+                    What can I help with?
+                  </h2>
+                  <p className="text-xs text-zinc-400 font-light leading-relaxed">
+                    Ask any question, analyze patent claims, or attach a PDF specification directly using the paperclip 📎 button below.
+                  </p>
+
+                  {/* Quick Action Suggestion Cards */}
+                  <div className="grid grid-cols-2 gap-3 w-full pt-2">
+                    <button
+                      onClick={() => pdfInputRef.current?.click()}
+                      className="p-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left space-y-1 transition-all group"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-mono text-[#22D3EE] font-semibold">
+                        <Paperclip className="w-3.5 h-3.5" />
+                        <span>ANALYZE PDF</span>
+                      </div>
+                      <p className="text-[10px] text-zinc-400 font-light">Upload PDF for instant AI prior-art analysis</p>
+                    </button>
+
+                    <button
+                      onClick={() => setChatInput("Search for recent AI prior-art patents in USPTO database")}
+                      className="p-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left space-y-1 transition-all group"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-mono text-[#8B5CF6] font-semibold">
+                        <Globe className="w-3.5 h-3.5" />
+                        <span>DEEP SEARCH</span>
+                      </div>
+                      <p className="text-[10px] text-zinc-400 font-light">Query dense vector store for claim matches</p>
+                    </button>
+
+                    <button
+                      onClick={() => setChatInput("Study claim differentiations for my invention idea")}
+                      className="p-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left space-y-1 transition-all group"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-mono text-amber-400 font-semibold">
+                        <Lightbulb className="w-3.5 h-3.5" />
+                        <span>REASON & STRATEGY</span>
+                      </div>
+                      <p className="text-[10px] text-zinc-400 font-light">Consult AI Patent Strategy Advisor persona</p>
+                    </button>
+
+                    <button
+                      onClick={() => setChatInput("Explain CPC classification codes G06F and H04L")}
+                      className="p-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left space-y-1 transition-all group"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 font-semibold">
+                        <Tag className="w-3.5 h-3.5" />
+                        <span>STUDY CODES</span>
+                      </div>
+                      <p className="text-[10px] text-zinc-400 font-light">Decode IPC/CPC technology classifications</p>
+                    </button>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6 flex-1">
+                <div className="space-y-6 flex-1 overflow-y-auto glass-panel-sleek rounded-2xl p-6 md:p-8 shadow-2xl">
                   {chatMessages.map((msg, idx) => (
                     <div 
                       key={idx} 
@@ -3298,7 +3414,7 @@ export default function App() {
                           {msg.role === 'user' ? (
                             <span className="text-[#22D3EE]">👤 {username}</span>
                           ) : (
-                            <span className="text-[#8B5CF6]">🤖 PatentMind AI Agent</span>
+                            <span className="text-[#8B5CF6]">🤖 PatentMind AI</span>
                           )}
                         </span>
                         {msg.role === 'assistant' && (
@@ -3315,10 +3431,10 @@ export default function App() {
                       </div>
 
                       {/* Content Bubble */}
-                      <div className={`p-4 max-w-[85%] text-xs font-light leading-relaxed font-sans shadow-lg transition-all ${
+                      <div className={`p-4.5 max-w-[85%] text-xs font-light leading-relaxed font-sans shadow-lg transition-all ${
                         msg.role === 'user' 
                           ? 'bg-[#7C3AED]/20 border border-[#7C3AED]/40 text-white rounded-2xl rounded-tr-sm shadow-[0_0_20px_rgba(124,58,237,0.1)]' 
-                          : 'bg-[#18181B]/90 border border-white/10 text-zinc-200 rounded-2xl rounded-tl-sm'
+                          : 'bg-[#18181B]/95 border border-white/10 text-zinc-200 rounded-2xl rounded-tl-sm'
                       }`}>
                         <div className="whitespace-pre-wrap">{msg.content}</div>
 
@@ -3365,99 +3481,132 @@ export default function App() {
 
                     </div>
                   ))}
-                </div>
-              )}
 
-              {/* Typing indicator */}
-              {chatLoading && (
-                <div className="flex flex-col items-start space-y-1.5 self-start">
-                  <span className="text-[9px] font-mono text-zinc-550 uppercase tracking-widest px-1">AI ANALYST</span>
-                  <div className="p-4 bg-black/25 border border-theme text-xs font-mono text-zinc-500 tracking-wider flex items-center gap-2">
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-zinc-600" />
-                    <span>SYNTHESIZING CONTEXT AND QUERYING LLM...</span>
-                  </div>
+                  {/* Typing / Analyzing Indicator */}
+                  {chatLoading && (
+                    <div className="flex flex-col items-start space-y-1.5 self-start">
+                      <span className="text-[9px] font-mono text-[#8B5CF6] uppercase tracking-widest px-1 font-semibold">🤖 PatentMind AI</span>
+                      <div className="p-4 bg-[#18181B] border border-[#7C3AED]/30 rounded-2xl text-xs font-mono text-zinc-300 tracking-wider flex items-center gap-3 shadow-lg">
+                        <RefreshCw className="w-4 h-4 animate-spin text-[#22D3EE]" />
+                        <span>SYNTHESIZING CONTEXT & RUNNING AI ANALYSIS...</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div ref={chatEndRef} />
                 </div>
               )}
-              
-              <div ref={chatEndRef} />
             </div>
 
-            {/* Input Bar & Controls */}
-            <div className="space-y-3">
-              {/* Filter controls */}
-              <div className="flex flex-wrap gap-4 text-[9px] font-mono text-zinc-500 tracking-wider items-center justify-between px-1">
-                <div className="flex gap-4">
-                  <div className="flex items-center gap-1.5">
-                    <span>SOURCE:</span>
-                    <select
-                      value={chatSourceFilter}
-                      onChange={(e) => setChatSourceFilter(e.target.value)}
-                      className="bg-transparent border border-theme text-zinc-400 focus:outline-none px-1 py-0.5 text-[9px]"
-                    >
-                      <option value="" className="bg-[#0c0c0e]">ALL SOURCES</option>
-                      <option value="USPTO" className="bg-[#0c0c0e]">USPTO</option>
-                      <option value="WIPO" className="bg-[#0c0c0e]">WIPO</option>
-                      <option value="Google Patents" className="bg-[#0c0c0e]">GOOGLE PATENTS</option>
-                    </select>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <span>SECTION:</span>
-                    <select
-                      value={chatSectionFilter}
-                      onChange={(e) => setChatSectionFilter(e.target.value)}
-                      className="bg-transparent border border-theme text-zinc-400 focus:outline-none px-1 py-0.5 text-[9px]"
-                    >
-                      <option value="" className="bg-[#0c0c0e]">ALL SECTIONS</option>
-                      <option value="Abstract" className="bg-[#0c0c0e]">ABSTRACT</option>
-                      <option value="Description" className="bg-[#0c0c0e]">DESCRIPTION</option>
-                      <option value="Claims" className="bg-[#0c0c0e]">CLAIMS</option>
-                    </select>
-                  </div>
+            {/* CHATGPT STYLE FLOATING INPUT CONTAINER */}
+            <div className="max-w-3xl w-full mx-auto space-y-2">
+              
+              {/* Attached PDF Badge (if uploading) */}
+              {attachedPdfName && (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-[#7C3AED]/20 border border-[#7C3AED]/40 rounded-lg text-xs font-mono text-[#22D3EE] w-fit animate-pulse">
+                  <Paperclip className="w-3.5 h-3.5" />
+                  <span>Analyzing: {attachedPdfName}</span>
                 </div>
+              )}
 
-                {chatMessages.length > 0 && (
-                  <button
-                    onClick={() => setChatMessages([])}
-                    className="flex items-center gap-1 text-zinc-500 hover:text-zinc-300 transition-colors uppercase"
-                    title="Clear history"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>RESET THREAD</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Text Input Block */}
-              <form onSubmit={handleChatSend} className="relative flex items-center border-b border-theme focus-within:border-zinc-550 transition-colors py-2 bg-black/5 pr-4 pl-2">
-                <input
-                  type="text"
+              {/* Floating Input Box */}
+              <form onSubmit={handleChatSend} className="glass-panel-sleek rounded-2xl p-3.5 space-y-3 border border-white/10 shadow-2xl focus-within:border-[#7C3AED]/50 transition-all">
+                
+                {/* Textarea Input */}
+                <textarea
+                  rows={2}
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleChatSend(e);
+                    }
+                  }}
                   disabled={chatLoading}
-                  placeholder="ASK THE PATENT AGENT A QUESTION OR FOLLOW UP..."
-                  className="w-full bg-transparent py-2 px-3 text-xs uppercase font-mono tracking-wider focus:outline-none placeholder:text-zinc-700 text-main disabled:opacity-40"
+                  placeholder="Ask anything or attach a patent PDF specification..."
+                  className="w-full bg-transparent text-xs font-sans tracking-wide focus:outline-none placeholder:text-zinc-500 text-main resize-none border-none p-1"
                 />
-                <button
-                  type="button"
-                  onClick={() => handleVoiceInput(setChatInput, 'chat')}
-                  className={`p-2 transition-all mr-1.5 ${
-                    isListening && activeListeningField === 'chat'
-                      ? 'text-red-400 bg-red-950/40 animate-pulse rounded'
-                      : 'text-zinc-500 hover:text-white'
-                  }`}
-                  title="Voice Input (Speech-to-Text)"
-                >
-                  {isListening && activeListeningField === 'chat' ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-                </button>
-                <button
-                  type="submit"
-                  disabled={chatLoading || !chatInput.trim()}
-                  className="p-2 border border-theme hover:border-zinc-550 text-zinc-500 hover:text-main transition-all disabled:opacity-30 flex-shrink-0"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                </button>
+
+                {/* Bottom Toolbar inside Input Box */}
+                <div className="flex items-center justify-between pt-1 border-t border-white/5">
+                  
+                  {/* Left Action Buttons */}
+                  <div className="flex items-center gap-2">
+                    {/* Paperclip Button for PDF Upload */}
+                    <button
+                      type="button"
+                      onClick={() => pdfInputRef.current?.click()}
+                      disabled={chatLoading}
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-all text-xs font-mono flex items-center gap-1.5"
+                      title="Attach Patent PDF Specification"
+                    >
+                      <Paperclip className="w-4 h-4 text-zinc-400" />
+                    </button>
+
+                    {/* Deep Search Toggle Pill */}
+                    <button
+                      type="button"
+                      onClick={() => setChatModeDeepSearch(!chatModeDeepSearch)}
+                      className={`px-3 py-1.5 rounded-full text-[10px] font-mono tracking-wider transition-all flex items-center gap-1.5 border ${
+                        chatModeDeepSearch
+                          ? 'bg-[#22D3EE]/15 border-[#22D3EE]/40 text-[#22D3EE] font-semibold'
+                          : 'bg-white/5 border-white/10 text-zinc-500 hover:text-zinc-300'
+                      }`}
+                    >
+                      <Globe className="w-3.5 h-3.5" />
+                      <span>Deep Search</span>
+                    </button>
+
+                    {/* Reason Toggle Pill */}
+                    <button
+                      type="button"
+                      onClick={() => setChatModeReasoning(!chatModeReasoning)}
+                      className={`px-3 py-1.5 rounded-full text-[10px] font-mono tracking-wider transition-all flex items-center gap-1.5 border ${
+                        chatModeReasoning
+                          ? 'bg-[#7C3AED]/20 border-[#7C3AED]/40 text-[#8B5CF6] font-semibold'
+                          : 'bg-white/5 border-white/10 text-zinc-500 hover:text-zinc-300'
+                      }`}
+                    >
+                      <Lightbulb className="w-3.5 h-3.5" />
+                      <span>Reason</span>
+                    </button>
+
+                    {/* Voice Assist Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleVoiceInput(setChatInput, 'chat')}
+                      className={`p-1.5 rounded-lg transition-all ${
+                        isListening && activeListeningField === 'chat'
+                          ? 'text-red-400 bg-red-950/40 animate-pulse'
+                          : 'text-zinc-500 hover:text-white'
+                      }`}
+                      title="Voice Speech-to-Text"
+                    >
+                      {isListening && activeListeningField === 'chat' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </button>
+                  </div>
+
+                  {/* Right Action: Circle ArrowUp Send Button */}
+                  <button
+                    type="submit"
+                    disabled={chatLoading || (!chatInput.trim() && !attachedPdfFile)}
+                    className="w-8 h-8 rounded-full bg-[#7C3AED] hover:bg-[#8B5CF6] disabled:opacity-30 disabled:bg-zinc-800 text-white flex items-center justify-center transition-all shadow-lg flex-shrink-0"
+                    title="Send message"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </button>
+
+                </div>
               </form>
+
+              {/* Bottom Disclaimer */}
+              <div className="text-center">
+                <span className="text-[9px] font-mono text-zinc-550">
+                  AI can make mistakes. Please double-check responses against official USPTO/WIPO sources.
+                </span>
+              </div>
+
             </div>
 
           </div>
