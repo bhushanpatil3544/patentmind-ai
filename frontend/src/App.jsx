@@ -507,10 +507,19 @@ export default function App() {
     }
   };
 
+  const mainContentRef = useRef(null);
+
+  // Auto-scroll main viewport to top whenever activeTab changes
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTop = 0;
+    }
+  }, [activeTab]);
+
   // Scroll to bottom on chat messages update
   useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (chatEndRef.current && chatMessages.length > 0) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [chatMessages, chatLoading]);
 
@@ -2845,7 +2854,7 @@ export default function App() {
         </div>
       </aside>
 
-      <main className={`flex-1 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[300px]'} p-8 md:p-12 max-w-5xl overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-300`}>
+      <main ref={mainContentRef} className={`flex-1 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[300px]'} p-8 md:p-12 max-w-5xl overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-300`}>
 
         {/* SEMANTIC SEARCH & RAG TAB */}
         {activeTab === 'search' && (
