@@ -3249,19 +3249,28 @@ export default function App() {
 
         {/* DATASET IMPORT TAB */}
         {activeTab === 'dataset' && (
-          <div className="space-y-12 fade-in">
+          <div className="space-y-8 fade-in max-w-4xl">
             <div>
-              <span className="text-[11px] text-muted font-mono tracking-widest uppercase">05. DATASET IMPORT</span>
-              <h2 className="text-serif-editorial text-4xl text-main tracking-wide mt-2">BULK DATASET INDEXER</h2>
+              <span className="text-[10px] text-muted font-mono tracking-widest uppercase">05. BATCH INGESTION</span>
+              <h2 className="text-4xl font-semibold tracking-tight text-main font-sans mt-1">Bulk Dataset Indexer</h2>
+              <p className="text-xs text-zinc-400 font-light mt-1">
+                Ingest large structured collections of patent specifications and technical documents in a single automated pipeline.
+              </p>
             </div>
 
-            <div className="panel-card p-8 rounded-none space-y-6">
-              <p className="text-xs text-muted leading-relaxed font-light">
-                Ingest large structured collections of patents/technical documents in a single stream. Select and upload a JSON (array of records matching the schema) or CSV dataset file. The processing pipeline will parse, validate, chunk, and embed the documents automatically.
-              </p>
+            <div className="glass-panel-sleek p-8 rounded-2xl border border-white/10 space-y-6 shadow-2xl">
+              <div className="space-y-2">
+                <h3 className="text-base font-semibold text-white font-sans flex items-center gap-2">
+                  <Database className="w-4 h-4 text-[#22D3EE]" />
+                  Batch Vectorization Pipeline
+                </h3>
+                <p className="text-xs text-zinc-300 leading-relaxed font-light">
+                  Upload a structured <strong>JSON</strong> (array of patent records) or <strong>CSV</strong> dataset file. The processing engine will parse, validate fields, chunk claim text, and index vector embeddings into the database automatically.
+                </p>
+              </div>
 
               <form onSubmit={handleDatasetSubmit} className="space-y-6">
-                <div className="border border-dashed border-theme hover:border-zinc-500 transition-colors p-8 flex flex-col items-center justify-center gap-2 cursor-pointer bg-black/10">
+                <div className="border-2 border-dashed border-[#22D3EE]/30 hover:border-[#7C3AED]/70 transition-all p-10 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer bg-white/5 group shadow-inner">
                   <input
                     type="file"
                     accept=".json,.csv"
@@ -3269,21 +3278,31 @@ export default function App() {
                     className="hidden"
                     id="dataset-file-input"
                   />
-                  <label htmlFor="dataset-file-input" className="cursor-pointer text-center">
-                    <FileCode className="w-6 h-6 text-zinc-555 mx-auto mb-2" />
-                    <span className="text-xs font-mono tracking-wider uppercase text-zinc-400 block">
-                      {datasetFile ? datasetFile.name : 'SELECT DATASET FILE (JSON / CSV)'}
+                  <label htmlFor="dataset-file-input" className="cursor-pointer text-center space-y-2">
+                    <div className="w-12 h-12 rounded-2xl bg-[#7C3AED]/20 border border-[#7C3AED]/40 flex items-center justify-center text-[#22D3EE] mx-auto shadow-lg group-hover:scale-110 transition-transform">
+                      <FileCode className="w-6 h-6" />
+                    </div>
+                    <span className="text-sm font-semibold text-white block font-sans">
+                      {datasetFile ? datasetFile.name : 'Choose a JSON or CSV dataset file'}
                     </span>
-                    <span className="text-[9px] text-zinc-650 font-mono uppercase mt-1 block">MAX SIZE 25MB</span>
+                    <span className="text-[10px] text-zinc-400 font-mono uppercase block">Max File Size: 25MB • JSON / CSV</span>
                   </label>
+                </div>
+
+                {/* Sample JSON/CSV Schema helper */}
+                <div className="p-4 bg-white/5 border border-white/5 rounded-xl text-xs font-mono space-y-1.5 text-zinc-400">
+                  <span className="text-[#22D3EE] font-bold block text-[10px] uppercase">Expected Schema Fields:</span>
+                  <p className="text-[11px] text-zinc-300">
+                    <code className="text-[#8B5CF6]">patent_number</code>, <code className="text-[#8B5CF6]">title</code>, <code className="text-[#8B5CF6]">abstract</code>, <code className="text-[#8B5CF6]">claims</code>, <code className="text-[#8B5CF6]">source</code>, <code className="text-[#8B5CF6]">document_date</code>
+                  </p>
                 </div>
 
                 <button
                   type="submit"
                   disabled={datasetLoading}
-                  className="w-full py-3.5 btn-theme text-xs font-mono tracking-widest uppercase disabled:opacity-40"
+                  className="w-full py-3.5 bg-[#7C3AED] hover:bg-[#8B5CF6] text-white font-semibold text-xs font-sans tracking-wider uppercase rounded-xl transition-all shadow-lg disabled:opacity-40"
                 >
-                  {datasetLoading ? 'BATCH INDEXING DATASET RECORDS...' : 'START BULK INGESTION'}
+                  {datasetLoading ? 'BATCH VECTORIZING DATASET RECORDS...' : 'START BULK INGESTION'}
                 </button>
               </form>
             </div>
