@@ -2587,27 +2587,27 @@ export default function App() {
         <div className="absolute bottom-[-10%] right-[10%] w-[450px] h-[450px] rounded-full bg-[#22D3EE]/5 blur-[110px] animate-pulse duration-[6000ms]" />
       </div>
 
-      {/* LEFT FIXED FLOATING SIDE PANEL */}
-      <aside className="w-full md:w-[280px] md:fixed md:top-4 md:bottom-4 md:left-4 bg-[#121212]/90 backdrop-blur-2xl border border-white/10 md:rounded-2xl p-5 flex flex-col justify-between overflow-y-auto z-20 shadow-2xl">
+      {/* LEFT FIXED FLOATING SIDE PANEL (TEAL & CYAN GLASSMORPHIC THEME MATCH) */}
+      <aside className="w-full md:w-[280px] md:fixed md:top-4 md:bottom-4 md:left-4 bg-[#08181C]/90 backdrop-blur-2xl border border-[#22D3EE]/20 md:rounded-2xl p-5 flex flex-col justify-between overflow-y-auto z-20 shadow-[0_0_40px_rgba(13,148,136,0.15)]">
         <div className="space-y-6">
           
           {/* Brand Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#7C3AED] to-[#22D3EE] p-[1px] shadow-[0_0_20px_rgba(124,58,237,0.3)]">
-                <div className="w-full h-full bg-[#121212] rounded-[11px] flex items-center justify-center text-[#22D3EE] font-bold text-sm">
+              <div className="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-[#0D9488] to-[#22D3EE] p-[1px] shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+                <div className="w-full h-full bg-[#08181C] rounded-[11px] flex items-center justify-center text-[#22D3EE] font-bold text-sm">
                   ⚡
                 </div>
               </div>
               <span className="font-sans font-bold text-base text-white tracking-tight">PatentMind AI</span>
             </div>
-            <span className="text-[9px] font-mono text-zinc-500 bg-white/5 border border-white/5 px-2 py-0.5 rounded-full">v2.1</span>
+            <span className="text-[9px] font-mono text-[#22D3EE] bg-[#22D3EE]/10 border border-[#22D3EE]/20 px-2 py-0.5 rounded-full font-semibold">v2.1</span>
           </div>
 
           {/* User Session Profile */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#0E262B]/80 border border-[#22D3EE]/20 shadow-md">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-full bg-[#7C3AED]/20 border border-[#7C3AED]/40 flex items-center justify-center text-[#22D3EE] font-bold text-xs">
+              <div className="w-7.5 h-7.5 rounded-full bg-[#0D9488]/30 border border-[#22D3EE]/40 flex items-center justify-center text-[#22D3EE] font-bold text-xs shadow-sm">
                 {username ? username.charAt(0).toUpperCase() : 'U'}
               </div>
               <div className="flex flex-col">
@@ -2623,7 +2623,7 @@ export default function App() {
                 setShowChangePasswordModal(true);
                 setChangePasswordMsg('');
               }}
-              className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+              className="p-1.5 text-teal-200/60 hover:text-white hover:bg-teal-900/30 rounded-lg transition-all"
               title="Change Account Password"
             >
               <KeyRound className="w-3.5 h-3.5" />
@@ -2633,10 +2633,10 @@ export default function App() {
           {/* Change Password Modal */}
           {showChangePasswordModal && (
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-[#0f0f12] border border-white/10 panel-card p-6 md:p-8 max-w-sm w-full space-y-5 fade-in rounded-2xl shadow-2xl">
+              <div className="bg-[#091B1F] border border-[#22D3EE]/30 panel-card p-6 md:p-8 max-w-sm w-full space-y-5 fade-in rounded-2xl shadow-2xl">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-mono uppercase tracking-wider text-main flex items-center gap-2">
-                    <KeyRound className="w-4 h-4 text-zinc-400" />
+                    <KeyRound className="w-4 h-4 text-[#22D3EE]" />
                     CHANGE ACCOUNT PASSWORD
                   </h3>
                   <button
@@ -2703,19 +2703,19 @@ export default function App() {
 
           {/* Multi-Language Selector */}
           <div className="space-y-1.5">
-            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider block px-1">LANGUAGE</label>
-            <div className="relative flex items-center border border-white/5 bg-white/5 rounded-lg px-2.5 py-1.5">
-              <Globe className="w-3.5 h-3.5 text-zinc-400 mr-2 flex-shrink-0" />
+            <label className="text-[9px] font-mono text-teal-200/50 uppercase tracking-wider block px-1">LANGUAGE</label>
+            <div className="relative flex items-center border border-[#22D3EE]/20 bg-[#0E262B]/80 rounded-xl px-2.5 py-1.5">
+              <Globe className="w-3.5 h-3.5 text-[#22D3EE] mr-2 flex-shrink-0" />
               <select
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="w-full bg-transparent text-xs font-sans focus:outline-none border-none text-zinc-200 cursor-pointer"
+                className="w-full bg-transparent text-xs font-sans focus:outline-none border-none text-teal-100 cursor-pointer"
               >
-                <option value="English" className="bg-[#121212] text-zinc-300">English (US 🇺🇸)</option>
-                <option value="Hindi" className="bg-[#121212] text-zinc-300">Hindi (हिंदी 🇮🇳)</option>
-                <option value="Spanish" className="bg-[#121212] text-zinc-300">Spanish (Español 🇪🇸)</option>
-                <option value="French" className="bg-[#121212] text-zinc-300">French (Français 🇫🇷)</option>
-                <option value="German" className="bg-[#121212] text-zinc-300">German (Deutsch 🇩🇪)</option>
+                <option value="English" className="bg-[#08181C] text-teal-200">English (US 🇺🇸)</option>
+                <option value="Hindi" className="bg-[#08181C] text-teal-200">Hindi (हिंदी 🇮🇳)</option>
+                <option value="Spanish" className="bg-[#08181C] text-teal-200">Spanish (Español 🇪🇸)</option>
+                <option value="French" className="bg-[#08181C] text-teal-200">French (Français 🇫🇷)</option>
+                <option value="German" className="bg-[#08181C] text-teal-200">German (Deutsch 🇩🇪)</option>
               </select>
             </div>
           </div>
@@ -2738,13 +2738,13 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                  className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                     isActive 
-                      ? 'bg-white/10 text-white font-semibold border-l-2 border-[#7C3AED] shadow-sm' 
-                      : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-gradient-to-r from-[#0D9488]/30 to-[#22D3EE]/15 text-white font-semibold border-l-2 border-[#22D3EE] shadow-[0_0_15px_rgba(34,211,238,0.15)]' 
+                      : 'text-teal-100/60 hover:text-white hover:bg-[#0E262B]/50'
                   }`}
                 >
-                  <TabIcon className={`w-4 h-4 ${isActive ? 'text-[#22D3EE]' : 'text-zinc-400'}`} />
+                  <TabIcon className={`w-4 h-4 ${isActive ? 'text-[#22D3EE]' : 'text-teal-200/50'}`} />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -2753,10 +2753,10 @@ export default function App() {
         </div>
 
         {/* Sidebar Footer with Logout */}
-        <div className="pt-4 border-t border-white/5 mt-6">
+        <div className="pt-4 border-t border-[#22D3EE]/10 mt-6">
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-teal-200/60 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
           >
             <LogOut className="w-4 h-4 text-red-500" />
             <span>Log out</span>
