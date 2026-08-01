@@ -67,14 +67,24 @@ const API_BASE = '';
 const apiUrl = (path) => path.startsWith('http') ? path : `${API_BASE}${path}`;
 
 export default function App() {
+  const getValidStorageItem = (key) => {
+    try {
+      const val = localStorage.getItem(key);
+      if (!val || val === 'undefined' || val === 'null' || val === 'false') return '';
+      return val;
+    } catch {
+      return '';
+    }
+  };
+
   // Session & Auth state
-  const [token, setToken] = useState(localStorage.getItem('token') || '');
-  const [username, setUsername] = useState(localStorage.getItem('username') || '');
+  const [token, setToken] = useState(() => getValidStorageItem('token'));
+  const [username, setUsername] = useState(() => getValidStorageItem('username'));
   const [authMode, setAuthMode] = useState('login'); // login / register
   const [authForm, setAuthForm] = useState({ username: '', password: '', email: '' });
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
-  const [authRole, setAuthRole] = useState('client'); // client / admin
+  const [authRole, setAuthRole] = useState(() => getValidStorageItem('authRole') || 'client'); // client / admin
 
   const isAdminUser = () => {
     const u = (username || '').toLowerCase();
@@ -106,7 +116,7 @@ export default function App() {
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingSlide, setOnboardingSlide] = useState(0);
-  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem('token'));
+  const [showWelcome, setShowWelcome] = useState(() => !getValidStorageItem('token'));
   const [welcomeLayout, setWelcomeLayout] = useState('claymation'); // claymation / brutalist / cyber / aurora
 
   // Voice Assistance & Multi-Language & Platform Settings states
