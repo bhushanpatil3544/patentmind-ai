@@ -5,36 +5,35 @@
 @tailwind utilities;
 
 /* ==========================================
-   OVO HAZY WEBFLOW DESIGN SYSTEM
-   (NO GRIDLINES, HAZY AMBIENT BLUR GLOWS & CURVED DOCK)
+   ZELECT WEBFLOW SAAS DESIGN SYSTEM
+   (HORIZONTAL NAVBAR, NEON ORANGE ACCENTS, ZERO GRIDLINES & DYNAMIC ANIMATIONS)
    ========================================== */
 
 :root, .theme-normal, .theme-dark, .theme-carbon, .theme-cyber, .theme-brutalist {
-  --bg-app: #06070A;
-  --bg-panel: #0B0E17;
-  --bg-sidebar: #080A10;
-  --bg-card: #111522;
-  --bg-hover: #181E2E;
+  --bg-app: #06080E;
+  --bg-panel: #0A0D18;
+  --bg-sidebar: #070912;
+  --bg-card: #0F1322;
+  --bg-hover: #161B2E;
   --border-panel: 1px solid rgba(255, 255, 255, 0.1);
   --text-main: #FFFFFF;
   --text-muted: #94A3B8;
   --text-label: #64748B;
   --border-color: rgba(255, 255, 255, 0.1);
-  --accent: #3B82F6;
-  --accent-secondary: #F97316;
-  --highlight: #FB923C;
-  --font-family: 'Outfit', 'Inter', sans-serif;
+  --accent: #FF3F05;
+  --accent-secondary: #FF6422;
+  --highlight: #F59E0B;
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
   --backdrop: blur(36px);
-  --btn-grad: linear-gradient(135deg, #2563EB 0%, #3B82F6 50%, #F97316 100%);
+  --btn-grad: linear-gradient(135deg, #FF3F05 0%, #FF6422 60%, #F59E0B 100%);
   --btn-text: #FFFFFF;
 }
 
 .app-wrapper {
-  background: radial-gradient(circle at 35% 10%, rgba(37, 99, 235, 0.25) 0%, rgba(37, 99, 235, 0.05) 50%, transparent 70%),
-              radial-gradient(circle at 80% 30%, rgba(249, 115, 22, 0.20) 0%, rgba(249, 115, 22, 0.04) 45%, transparent 65%),
-              radial-gradient(circle at 15% 85%, rgba(59, 130, 246, 0.18) 0%, transparent 55%),
-              radial-gradient(circle at 75% 85%, rgba(251, 146, 60, 0.15) 0%, transparent 50%),
-              linear-gradient(135deg, #06070A 0%, #0B0E16 100%) !important;
+  background: radial-gradient(circle at 20% 15%, rgba(255, 63, 5, 0.12) 0%, rgba(255, 100, 34, 0.03) 45%, transparent 65%),
+              radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.14) 0%, rgba(139, 92, 246, 0.03) 50%, transparent 70%),
+              radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.10) 0%, transparent 60%),
+              linear-gradient(180deg, #06080E 0%, #0B0F1D 100%) !important;
   color: var(--text-main);
   font-family: var(--font-family);
   min-height: 100vh;
@@ -42,35 +41,35 @@
 }
 
 /* ==========================================
-   OVO HAZY COMPONENT STYLES
+   ZELECT SAAS COMPONENT STYLES
    ========================================== */
 
-.ovo-dock, .optirise-dock {
-  background: rgba(11, 14, 23, 0.82);
+.zelect-navbar, .ovo-dock, .optirise-dock {
+  background: rgba(11, 15, 29, 0.85);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 9999px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 63, 5, 0.12);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.ovo-card, .optirise-card {
-  background: rgba(15, 19, 31, 0.75);
+.zelect-card, .ovo-card, .optirise-card {
+  background: rgba(15, 19, 34, 0.78);
   backdrop-filter: blur(36px);
   -webkit-backdrop-filter: blur(36px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1.5rem;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 35px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(99, 102, 241, 0.05);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.ovo-card:hover, .optirise-card:hover {
-  border-color: rgba(96, 165, 250, 0.45);
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 50px rgba(59, 130, 246, 0.25);
-  transform: translateY(-3px) scale(1.005);
+.zelect-card:hover, .ovo-card:hover, .optirise-card:hover {
+  border-color: rgba(255, 63, 5, 0.45);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 45px rgba(255, 63, 5, 0.22);
+  transform: translateY(-4px);
 }
 
-.ovo-pill, .optirise-pill {
+.zelect-pill, .ovo-pill, .optirise-pill {
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -78,15 +77,43 @@
   border-radius: 9999px;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.ovo-pill:hover, .optirise-pill:hover {
+.zelect-pill:hover, .ovo-pill:hover, .optirise-pill:hover {
   background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(249, 115, 22, 0.5);
-  box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
+  border-color: rgba(255, 100, 34, 0.5);
+  box-shadow: 0 0 25px rgba(255, 63, 5, 0.25);
   transform: translateY(-1px);
 }
 
-.ovo-gradient-text, .optirise-gradient-text {
-  background: linear-gradient(135deg, #FFFFFF 0%, #93C5FD 50%, #FB923C 100%);
+.zelect-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 63, 5, 0.12);
+  border: 1px solid rgba(255, 63, 5, 0.3);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #FF6422;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.zelect-pulse-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 9999px;
+  background-color: #FF3F05;
+  box-shadow: 0 0 10px #FF3F05;
+  animation: zelectPulse 2s infinite;
+}
+
+@keyframes zelectPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+.zelect-gradient-text, .ovo-gradient-text, .optirise-gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FF6422 60%, #F59E0B 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -111,12 +138,12 @@
   background: var(--btn-grad);
   color: var(--btn-text);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 10px 25px rgba(255, 63, 5, 0.3);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn-theme:hover {
   filter: brightness(1.15);
-  box-shadow: 0 15px 35px rgba(249, 115, 22, 0.4);
+  box-shadow: 0 15px 35px rgba(255, 100, 34, 0.45);
   transform: translateY(-1px);
 }
 

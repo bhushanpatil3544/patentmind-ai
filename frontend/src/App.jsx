@@ -2126,10 +2126,10 @@ function App() {
     return (
       <div className={`app-wrapper bg-[#0A0A0A] ${theme} flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans`}>
         
-        {/* OVO Hazy Atmospheric Ambient Blurs (Zero Gridlines) */}
+        {/* Zelect SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-          <div className="absolute top-[-10%] left-[20%] w-[550px] h-[550px] rounded-full bg-[#3B82F6]/15 blur-[140px] animate-pulse duration-[8000ms]" />
-          <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] rounded-full bg-[#F97316]/12 blur-[130px] animate-pulse duration-[6000ms]" />
+          <div className="absolute top-[-5%] left-[15%] w-[600px] h-[600px] rounded-full bg-[#FF3F05]/12 blur-[150px] animate-pulse duration-[8000ms]" />
+          <div className="absolute bottom-[-10%] right-[15%] w-[550px] h-[550px] rounded-full bg-[#6366F1]/10 blur-[140px] animate-pulse duration-[7000ms]" />
         </div>
 
         {/* Top-Right Theme Selector */}
@@ -2663,178 +2663,39 @@ function App() {
   return (
     <div className={`app-wrapper bg-[#0A0A0A] ${theme} flex flex-col md:flex-row transition-all duration-300 min-h-screen relative overflow-hidden font-sans`}>
       
-      {/* OVO Hazy Atmospheric Ambient Blurs (Zero Gridlines) */}
+      {/* Zelect SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-        <div className="absolute top-[-10%] left-[20%] w-[550px] h-[550px] rounded-full bg-[#3B82F6]/15 blur-[140px] animate-pulse duration-[8000ms]" />
-        <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] rounded-full bg-[#F97316]/12 blur-[130px] animate-pulse duration-[6000ms]" />
+        <div className="absolute top-[-5%] left-[15%] w-[600px] h-[600px] rounded-full bg-[#FF3F05]/12 blur-[150px] animate-pulse duration-[8000ms]" />
+        <div className="absolute bottom-[-10%] right-[15%] w-[550px] h-[550px] rounded-full bg-[#6366F1]/10 blur-[140px] animate-pulse duration-[7000ms]" />
       </div>
 
-      {/* LEFT FIXED FLOATING SIDE PANEL (OVO HAZY CURVED DOCK) */}
-      <aside className={`w-full ${isSidebarCollapsed ? 'md:w-[76px]' : 'md:w-[280px]'} md:fixed md:top-4 md:bottom-4 md:left-4 ovo-dock md:rounded-3xl ${isSidebarCollapsed ? 'p-3' : 'p-5'} flex flex-col justify-between overflow-y-auto z-20 transition-all duration-300 select-none`}>
-        <div className="space-y-5">
+      {/* TOP FLOATING HORIZONTAL NAVIGATION BAR (ZELECT SAAS DOCK) */}
+      <header className="fixed top-4 inset-x-0 z-40 px-4 md:px-6 flex justify-center pointer-events-none select-none">
+        <div className="zelect-navbar pointer-events-auto max-w-7xl w-full px-5 py-2.5 md:py-3 rounded-full flex items-center justify-between gap-3 md:gap-6 border border-white/10 shadow-2xl transition-all duration-300">
           
-          {/* Brand Header & Sidebar Hide/Expand Toggle */}
-          <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center flex-col gap-3' : 'justify-between'}`}>
-            <div className="flex items-center gap-2.5">
-              <div className="w-8.5 h-8.5 rounded-2xl bg-gradient-to-tr from-[#2563EB] via-[#3B82F6] to-[#FB923C] p-[1px] shadow-[0_0_20px_rgba(59,130,246,0.4)] flex-shrink-0">
-                <div className="w-full h-full bg-[#0B0E17] rounded-[15px] flex items-center justify-center text-[#FB923C] font-bold text-sm">
-                  ⚡
-                </div>
+          {/* Brand Header Badge */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FF3F05] via-[#FF6422] to-[#F59E0B] p-[1px] shadow-[0_0_20px_rgba(255,63,5,0.4)] flex-shrink-0">
+              <div className="w-full h-full bg-[#06080E] rounded-full flex items-center justify-center text-[#FF6422] font-bold text-sm">
+                ⚡
               </div>
-              {!isSidebarCollapsed && (
-                <span className="font-outfit font-bold text-base text-white tracking-tight truncate">PatentMind AI</span>
-              )}
             </div>
-
-            <div className="flex items-center gap-1.5">
-              {!isSidebarCollapsed && (
-                <span className="text-[9px] font-mono text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-2.5 py-0.5 rounded-full font-semibold">v2.1</span>
-              )}
-              {/* Hide / Show Sidebar Toggle Button */}
-              <button
-                type="button"
-                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-purple-300 hover:bg-white/10 transition-all flex items-center justify-center"
-                title={isSidebarCollapsed ? "Expand Sidebar (Show Text)" : "Hide Sidebar (Collapse to Icons)"}
-              >
-                {isSidebarCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-              </button>
-            </div>
+            <span className="font-sans font-bold text-base md:text-lg text-white tracking-tight hidden md:inline-block">
+              PatentMind <span className="text-[10px] text-[#FF6422] font-mono font-semibold ml-1 px-2 py-0.5 rounded-full bg-[#FF3F05]/10 border border-[#FF3F05]/30">v2.1</span>
+            </span>
           </div>
 
-          {/* User Session Profile */}
-          <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2' : 'justify-between p-2.5'} rounded-2xl bg-white/5 border border-white/10 shadow-md`}>
-            <div className="flex items-center gap-2.5">
-              <div className="w-7.5 h-7.5 rounded-full bg-[#7C3AED]/30 border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] font-bold text-xs shadow-sm flex-shrink-0" title={username}>
-                {username ? username.charAt(0).toUpperCase() : 'U'}
-              </div>
-              {!isSidebarCollapsed && (
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-white tracking-wide uppercase truncate max-w-[110px]">{username}</span>
-                  <span className="text-[9px] text-emerald-400 font-mono flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online
-                  </span>
-                </div>
-              )}
-            </div>
-            {!isSidebarCollapsed && (
-              <button
-                type="button"
-                onClick={() => {
-                  setShowChangePasswordModal(true);
-                  setChangePasswordMsg('');
-                }}
-                className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
-                title="Change Account Password"
-              >
-                <KeyRound className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Change Password Modal */}
-          {showChangePasswordModal && (
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-[#0E121B] border border-white/10 optirise-card p-6 md:p-8 max-w-sm w-full space-y-5 fade-in rounded-3xl shadow-2xl">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-mono uppercase tracking-wider text-main flex items-center gap-2">
-                    <KeyRound className="w-4 h-4 text-[#F59E0B]" />
-                    CHANGE ACCOUNT PASSWORD
-                  </h3>
-                  <button
-                    onClick={() => setShowChangePasswordModal(false)}
-                    className="text-zinc-500 hover:text-white font-mono text-xs"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                {changePasswordMsg && (
-                  <div className={`p-2.5 text-[9.5px] font-mono rounded border ${
-                    changePasswordMsg.startsWith('SUCCESS')
-                      ? 'border-emerald-900 bg-emerald-950/30 text-emerald-400'
-                      : 'border-red-900 bg-red-950/30 text-red-400'
-                  }`}>
-                    {changePasswordMsg}
-                  </div>
-                )}
-
-                <form onSubmit={handleChangePassword} className="space-y-4">
-                  <div className="border-b border-theme py-1">
-                    <label className="text-[9px] font-mono text-zinc-500 block mb-1 uppercase">CURRENT PASSWORD</label>
-                    <input
-                      type="password"
-                      value={changePasswordForm.old_password}
-                      onChange={(e) => setChangePasswordForm({ ...changePasswordForm, old_password: e.target.value })}
-                      required
-                      className="w-full bg-transparent text-xs font-mono text-main focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="border-b border-theme py-1">
-                    <label className="text-[9px] font-mono text-zinc-500 block mb-1 uppercase">NEW PASSWORD (MIN 4 CHARACTERS)</label>
-                    <input
-                      type="password"
-                      value={changePasswordForm.new_password}
-                      onChange={(e) => setChangePasswordForm({ ...changePasswordForm, new_password: e.target.value })}
-                      required
-                      className="w-full bg-transparent text-xs font-mono text-main focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="flex gap-2 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowChangePasswordModal(false)}
-                      className="flex-1 py-2 border border-theme text-[10px] font-mono text-zinc-400 hover:text-white uppercase tracking-wider rounded-xl"
-                    >
-                      CANCEL
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={changePasswordLoading}
-                      className="flex-1 py-2 btn-theme text-[10px] font-mono uppercase tracking-wider disabled:opacity-40 rounded-xl"
-                    >
-                      {changePasswordLoading ? 'UPDATING...' : 'UPDATE PASSWORD'}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Multi-Language Selector */}
-          {!isSidebarCollapsed && (
-            <div className="space-y-1.5">
-              <label className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block px-1">LANGUAGE</label>
-              <div className="relative flex items-center border border-white/10 bg-white/5 rounded-2xl px-3 py-1.5">
-                <Globe className="w-3.5 h-3.5 text-[#F59E0B] mr-2 flex-shrink-0" />
-                <select
-                  value={selectedLanguage}
-                  onChange={(e) => setSelectedLanguage(e.target.value)}
-                  className="w-full bg-transparent text-xs font-sans focus:outline-none border-none text-slate-200 cursor-pointer"
-                >
-                  <option value="English" className="bg-[#0E121B] text-slate-200">English (US 🇺🇸)</option>
-                  <option value="Hindi" className="bg-[#0E121B] text-slate-200">Hindi (हिंदी 🇮🇳)</option>
-                  <option value="Spanish" className="bg-[#0E121B] text-slate-200">Spanish (Español 🇪🇸)</option>
-                  <option value="French" className="bg-[#0E121B] text-slate-200">French (Français 🇫🇷)</option>
-                  <option value="German" className="bg-[#0E121B] text-slate-200">German (Deutsch 🇩🇪)</option>
-                </select>
-              </div>
-            </div>
-          )}
-
-          {/* Navigation Menu */}
-          <nav className="flex flex-col gap-1.5 text-left pt-1">
+          {/* Center Horizontal Navigation Menu */}
+          <nav className="flex items-center gap-1 md:gap-2 overflow-x-auto py-1 px-1 no-scrollbar">
             {[
-              { id: 'search', label: 'Patent Search', icon: Search },
-              { id: 'dashboard', label: 'Analytics & Metrics', icon: BarChart3 },
-              { id: 'upload', label: 'Document Upload', icon: UploadCloud },
-              { id: 'dataset', label: 'Dataset Import', icon: Database },
-              { id: 'chat', label: 'Patent Chatbot', icon: MessageSquare },
-              { id: 'help', label: 'Help & Feedback', icon: HelpCircle },
-              { id: 'settings', label: 'System Settings', icon: Settings },
-              { id: 'admin', label: 'Admin Control', icon: Cpu }
+              { id: 'search', label: 'Search', icon: Search },
+              { id: 'dashboard', label: 'Analytics', icon: BarChart3 },
+              { id: 'upload', label: 'Upload', icon: UploadCloud },
+              { id: 'dataset', label: 'Dataset', icon: Database },
+              { id: 'chat', label: 'Chatbot', icon: MessageSquare },
+              { id: 'help', label: 'Help', icon: HelpCircle },
+              { id: 'settings', label: 'Settings', icon: Settings },
+              { id: 'admin', label: 'Admin', icon: Cpu }
             ].map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -2843,34 +2704,139 @@ function App() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   title={tab.label}
-                  className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-4 py-2.5'} rounded-2xl text-xs font-medium transition-all duration-300 ${
+                  className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 flex-shrink-0 ${
                     isActive 
-                      ? 'bg-gradient-to-r from-[#2563EB]/40 via-[#3B82F6]/25 to-[#FB923C]/15 text-white font-semibold border-l-2 border-[#FB923C] shadow-[0_0_25px_rgba(249,115,22,0.25)]' 
+                      ? 'bg-gradient-to-r from-[#FF3F05] to-[#FF6422] text-white font-semibold shadow-[0_0_20px_rgba(255,63,5,0.4)] scale-[1.02]' 
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <TabIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#FB923C]' : 'text-slate-400'}`} />
-                  {!isSidebarCollapsed && <span>{tab.label}</span>}
+                  <TabIcon className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <span>{tab.label}</span>
                 </button>
               );
             })}
           </nav>
-        </div>
 
-        {/* Sidebar Footer with Logout */}
-        <div className="pt-4 border-t border-white/10 mt-4">
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            title="Log out"
-            className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-2' : 'gap-2.5 px-3 py-2'} text-xs font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all`}
-          >
-            <LogOut className="w-4 h-4 text-red-500 flex-shrink-0" />
-            {!isSidebarCollapsed && <span>Log out</span>}
-          </button>
-        </div>
-      </aside>
+          {/* Right Controls & Profile */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Language Dropdown Pill */}
+            <div className="relative flex items-center bg-white/5 border border-white/10 rounded-full px-2.5 py-1.5 hover:border-white/20 transition-all">
+              <Globe className="w-3.5 h-3.5 text-[#FF6422] mr-1.5 flex-shrink-0" />
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                className="bg-transparent text-[11px] font-sans text-slate-200 focus:outline-none border-none cursor-pointer w-[45px] md:w-[70px] truncate"
+              >
+                <option value="English" className="bg-[#0A0D18] text-slate-200">En 🇺🇸</option>
+                <option value="Hindi" className="bg-[#0A0D18] text-slate-200">Hi 🇮🇳</option>
+                <option value="Spanish" className="bg-[#0A0D18] text-slate-200">Es 🇪🇸</option>
+                <option value="French" className="bg-[#0A0D18] text-slate-200">Fr 🇫🇷</option>
+                <option value="German" className="bg-[#0A0D18] text-slate-200">De 🇩🇪</option>
+              </select>
+            </div>
 
-      <main ref={mainContentRef} className={`flex-1 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[300px]'} p-8 md:p-12 max-w-5xl overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-300`}>
+            {/* User Profile & Password Modal Toggle */}
+            <div className="hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full py-1.5 px-3" title={`User: ${username}`}>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+              <span className="text-xs font-semibold text-white tracking-wide uppercase truncate max-w-[90px]">{username}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowChangePasswordModal(true);
+                  setChangePasswordMsg('');
+                }}
+                className="text-slate-400 hover:text-[#FF6422] transition-all ml-1 p-0.5 rounded"
+                title="Change Account Password"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Logout Button */}
+            <button
+              onClick={() => setShowLogoutModal(true)}
+              title="Log out"
+              className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-full transition-all border border-transparent hover:border-red-500/20"
+            >
+              <LogOut className="w-4 h-4 text-red-500" />
+            </button>
+          </div>
+
+        </div>
+      </header>
+
+      {/* Change Password Modal */}
+      {showChangePasswordModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0B0F1D] border border-white/10 zelect-card p-6 md:p-8 max-w-sm w-full space-y-5 fade-in rounded-3xl shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-main flex items-center gap-2">
+                <KeyRound className="w-4 h-4 text-[#FF6422]" />
+                CHANGE ACCOUNT PASSWORD
+              </h3>
+              <button
+                onClick={() => setShowChangePasswordModal(false)}
+                className="text-zinc-500 hover:text-white font-mono text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            {changePasswordMsg && (
+              <div className={`p-2.5 text-[9.5px] font-mono rounded border ${
+                changePasswordMsg.startsWith('SUCCESS')
+                  ? 'border-emerald-900 bg-emerald-950/30 text-emerald-400'
+                  : 'border-red-900 bg-red-950/30 text-red-400'
+              }`}>
+                {changePasswordMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div className="border-b border-white/10 py-1">
+                <label className="text-[9px] font-mono text-zinc-400 block mb-1 uppercase">CURRENT PASSWORD</label>
+                <input
+                  type="password"
+                  value={changePasswordForm.old_password}
+                  onChange={(e) => setChangePasswordForm({ ...changePasswordForm, old_password: e.target.value })}
+                  required
+                  className="w-full bg-transparent text-xs font-mono text-main focus:outline-none"
+                />
+              </div>
+
+              <div className="border-b border-white/10 py-1">
+                <label className="text-[9px] font-mono text-zinc-400 block mb-1 uppercase">NEW PASSWORD (MIN 4 CHARACTERS)</label>
+                <input
+                  type="password"
+                  value={changePasswordForm.new_password}
+                  onChange={(e) => setChangePasswordForm({ ...changePasswordForm, new_password: e.target.value })}
+                  required
+                  className="w-full bg-transparent text-xs font-mono text-main focus:outline-none"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowChangePasswordModal(false)}
+                  className="flex-1 py-2 border border-white/10 text-[10px] font-mono text-zinc-400 hover:text-white uppercase tracking-wider rounded-xl"
+                >
+                  CANCEL
+                </button>
+                <button
+                  type="submit"
+                  disabled={changePasswordLoading}
+                  className="flex-1 py-2 btn-theme text-[10px] font-mono uppercase tracking-wider disabled:opacity-40 rounded-xl"
+                >
+                  {changePasswordLoading ? 'UPDATING...' : 'UPDATE PASSWORD'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <main ref={mainContentRef} className="w-full max-w-6xl mx-auto pt-28 pb-20 px-6 overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-300">
 
         {/* SEMANTIC SEARCH & RAG TAB */}
         {activeTab === 'search' && (
