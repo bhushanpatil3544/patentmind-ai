@@ -2728,7 +2728,6 @@ export default function App() {
               { id: 'upload', label: 'Document Upload', icon: UploadCloud },
               { id: 'dataset', label: 'Dataset Import', icon: Database },
               { id: 'chat', label: 'Patent Chatbot', icon: MessageSquare },
-              { id: 'idea', label: 'Idea Analyzer', icon: Sparkles },
               { id: 'help', label: 'Help & Feedback', icon: HelpCircle },
               { id: 'settings', label: 'System Settings', icon: Settings },
               ...(isAdminUser() ? [{ id: 'admin', label: 'Admin Control', icon: Cpu }] : [])
