@@ -4754,9 +4754,14 @@ export default function App() {
                       className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none text-main uppercase border-none py-1"
                     >
                       <option value="" className="bg-[#0c0c0e]">-- SELECT USER --</option>
-                      {(adminUsers || []).map((u) => (
-                        <option key={u} value={u} className="bg-[#0c0c0e]">{String(u).toUpperCase()}</option>
-                      ))}
+                      {(adminUsers || []).map((u, idx) => {
+                        const val = typeof u === 'object' ? (u?.username || '') : String(u || '');
+                        return (
+                          <option key={idx} value={val} className="bg-[#0c0c0e]">
+                            {val.toUpperCase()}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
 
@@ -4991,19 +4996,24 @@ export default function App() {
               </div>
 
               <div className="divide-y divide-theme text-xs font-mono">
-                {adminFeedback.length > 0 ? (
-                  adminFeedback.map((item) => (
-                    <div key={item.id} className="py-3 space-y-1">
-                      <div className="flex justify-between items-center text-[10px] text-zinc-400">
-                        <span className="font-semibold text-main uppercase">{item.username}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-amber-400 font-bold">{"★".repeat(item.rating)}{"☆".repeat(5 - item.rating)} ({item.rating}/5)</span>
-                          <span className="text-zinc-600">{item.created_at}</span>
+                {(adminFeedback || []).length > 0 ? (
+                  adminFeedback.map((item, itemIdx) => {
+                    const ratingNum = Math.min(Math.max(Number(item?.rating) || 5, 1), 5);
+                    return (
+                      <div key={item?.id || itemIdx} className="py-3 space-y-1">
+                        <div className="flex justify-between items-center text-[10px] text-zinc-400">
+                          <span className="font-semibold text-main uppercase">{item?.username || 'ANONYMOUS'}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-amber-400 font-bold">
+                              {"★".repeat(ratingNum)}{"☆".repeat(5 - ratingNum)} ({ratingNum}/5)
+                            </span>
+                            <span className="text-zinc-600">{item?.created_at || ''}</span>
+                          </div>
                         </div>
+                        <p className="text-[11px] text-zinc-300 font-light leading-relaxed">"{item?.comments || ''}"</p>
                       </div>
-                      <p className="text-[11px] text-zinc-300 font-light leading-relaxed">"{item.comments}"</p>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="py-4 text-zinc-600 italic font-light">No user feedback logged yet.</div>
                 )}
