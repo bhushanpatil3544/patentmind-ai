@@ -1366,7 +1366,7 @@ async def fetch_google_patents_dataset(
                     f"The method of claim 1, wherein data streams are encrypted and indexed into vector memory."
                 ],
                 "inventors": [f"Dr. {['Alan Vance', 'Elena Rostova', 'Bhushan Patil', 'Marcus Chen', 'Sarah Lin'][i % 5]}"],
-                "ipc_cpc_codes": [f"G06F 17/{30 + i}", f"H04L 29/{06 + i}"],
+                "ipc_cpc_codes": [f"G06F 17/{30 + i}", f"H04L 29/{6 + i}"],
                 "source": "Google Patents",
                 "document_date": f"202{3 + (i % 3)}-0{1 + (i % 9)}-15"
             }
