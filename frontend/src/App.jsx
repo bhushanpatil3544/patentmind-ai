@@ -3577,7 +3577,7 @@ export default function App() {
 
         {/* CHATBOT TAB (CHATGPT STYLE WITH DIRECT PDF ANALYZER) */}
         {activeTab === 'chat' && (
-          <div className="flex-1 flex flex-col space-y-6 fade-in h-[calc(100vh-8rem)] justify-between">
+          <div className="flex-1 flex flex-col space-y-8 fade-in min-h-[78vh] justify-between max-w-4xl w-full mx-auto">
             
             {/* Hidden File Input for PDF Analyzer */}
             <input
@@ -3594,10 +3594,10 @@ export default function App() {
             />
 
             {/* Chat Thread Container OR Centered Hero Title */}
-            <div className="flex-1 overflow-y-auto space-y-6 flex flex-col justify-center">
+            <div className="flex-1 space-y-6 flex flex-col justify-center my-auto">
               
               {chatMessages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center text-center p-6 space-y-6 max-w-xl mx-auto my-auto">
+                <div className="flex flex-col items-center justify-center text-center p-4 space-y-6 max-w-xl mx-auto my-auto">
                   <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-main font-sans">
                     What can I help with?
                   </h2>
