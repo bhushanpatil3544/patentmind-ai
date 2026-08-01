@@ -366,6 +366,7 @@ export default function App() {
   const [datasetActiveTab, setDatasetActiveTab] = useState('google'); // 'google' | 'file'
   
   const chatEndRef = useRef(null);
+  const pdfInputRef = useRef(null);
 
   // Idea Analyzer states
   const [ideaFile, setIdeaFile] = useState(null);
