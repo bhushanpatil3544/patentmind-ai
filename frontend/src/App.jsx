@@ -4831,36 +4831,40 @@ export default function App() {
 
                 <div className="divide-y divide-theme text-xs font-mono">
                   {(adminUsersDetailed || []).length > 0 ? (
-                    adminUsersDetailed.map((u) => (
-                      <div key={u.username} className="py-2.5 flex justify-between items-center group">
-                        <div className="flex flex-col">
-                          <span className="text-main uppercase font-semibold">{u.username}</span>
-                          <span className="text-[9px] text-zinc-500">{u.email || 'NO GMAIL REGISTERED'}</span>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          {u.username.toLowerCase() !== 'bhushan' && u.email && (
-                            <button
-                              onClick={() => handleSendCredentialsEmail(u.username)}
-                              className="text-zinc-500 hover:text-[#22D3EE] transition-colors p-1"
-                              title={`Send account credentials to ${u.email}`}
-                            >
-                              <Mail className="w-3.5 h-3.5" />
-                            </button>
-                          )}
+                    adminUsersDetailed.map((u, uIdx) => {
+                      const uname = typeof u === 'string' ? u : (u?.username || '');
+                      const uemail = typeof u === 'object' ? u?.email : '';
+                      return (
+                        <div key={uIdx} className="py-2.5 flex justify-between items-center group">
+                          <div className="flex flex-col">
+                            <span className="text-main uppercase font-semibold">{uname || 'USER'}</span>
+                            <span className="text-[9px] text-zinc-500">{uemail || 'NO GMAIL REGISTERED'}</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            {uname.toLowerCase() !== 'bhushan' && uemail && (
+                              <button
+                                onClick={() => handleSendCredentialsEmail(uname)}
+                                className="text-zinc-500 hover:text-[#22D3EE] transition-colors p-1"
+                                title={`Send account credentials to ${uemail}`}
+                              >
+                                <Mail className="w-3.5 h-3.5" />
+                              </button>
+                            )}
 
-                          {u.username.toLowerCase() !== 'bhushan' && (
-                            <button
-                              onClick={() => handleUserDelete(u.username)}
-                              className="text-zinc-650 hover:text-red-500 transition-colors p-1"
-                              title={`Delete user account ${u.username}`}
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
+                            {uname.toLowerCase() !== 'bhushan' && (
+                              <button
+                                onClick={() => handleUserDelete(uname)}
+                                className="text-zinc-650 hover:text-red-500 transition-colors p-1"
+                                title={`Delete user account ${uname}`}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="py-4 text-zinc-655 italic font-light">No users found.</div>
                   )}
