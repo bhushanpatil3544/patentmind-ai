@@ -50,7 +50,8 @@ import {
   ChevronLeft,
   ChevronRight,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  Loader2
 } from 'lucide-react';
 
 // Definitions for Theme switcher: Normal (Paperpillar Light) & Dark (Paperpillar Dark)
