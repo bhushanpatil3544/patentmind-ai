@@ -2602,7 +2602,23 @@ export default function App() {
             </form>
           )}
 
-          <div className="text-center pt-2">
+          <div className="text-center pt-2 space-y-3">
+            {/* Quick Demo Admin Auto-Login Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setAuthForm({ username: 'BHUSHAN', password: '3544', email: 'bhushan3544@gmail.com' });
+                setTimeout(() => {
+                  const fakeEvent = { preventDefault: () => {} };
+                  handleAuthSubmit(fakeEvent);
+                }, 50);
+              }}
+              className="w-full py-2.5 bg-gradient-to-r from-[#0D9488]/30 to-[#22D3EE]/20 hover:from-[#0D9488]/50 hover:to-[#22D3EE]/40 border border-[#22D3EE]/40 rounded-full text-[11px] font-semibold font-sans text-[#22D3EE] transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              <span>QUICK ENTER AS BHUSHAN (ADMIN ⚡)</span>
+            </button>
+
             <button
               onClick={() => {
                 setAuthMode(authMode === 'login' ? 'register' : 'login');
