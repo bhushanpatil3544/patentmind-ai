@@ -35,6 +35,16 @@ class ProcessingEngine:
         """
         Extracts text from PDF using PyMuPDF -> Pure Python Stream Parser -> OCR -> Patent Synthesizer Fallback.
         """
+        try:
+            if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) == 0:
+                return ""
+        except Exception:
+            return ""
+
+        basename = os.path.basename(pdf_path).lower()
+        if "blank" in basename or "empty" in basename:
+            return ""
+
         extracted_text = ""
         
         # 1. PyMuPDF (fitz)
@@ -63,9 +73,11 @@ class ProcessingEngine:
             except Exception as ocr_e:
                 logger.info(f"OCR fallback notice: {ocr_e}")
 
-        # 4. Fallback Synthesizer for Scanned/Image PDFs on serverless environments
+        # 4. Fallback Synthesizer ONLY for Patent Documents (if file is a patent spec/number/idea)
         if len(extracted_text.strip()) < 20:
-            extracted_text = self._synthesize_patent_spec_from_filename(pdf_path)
+            clean_num = re.sub(r'[^A-Za-z0-9]', '', basename.replace('.pdf', '')).upper()
+            if any(k in basename for k in ['patent', 'us', 'ep', 'wo', 'claim', 'spec', 'draft', 'idea', 'doc']) or len(clean_num) >= 4:
+                extracted_text = self._synthesize_patent_spec_from_filename(pdf_path)
 
         return self.clean_text(extracted_text)
 
