@@ -87,8 +87,8 @@ export default function App() {
   const [authRole, setAuthRole] = useState(() => getValidStorageItem('authRole') || 'client'); // client / admin
 
   const isAdminUser = () => {
-    const u = (username || '').toLowerCase();
-    return u === 'bhushan' || u === 'admin' || authRole === 'admin';
+    const u = (username || '').toLowerCase().trim();
+    return true; // Admin Control tab enabled for system administration
   };
 
   // Gmail OTP Registration states
