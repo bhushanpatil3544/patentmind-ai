@@ -671,7 +671,7 @@ def get_all_users(current_user: dict = Depends(get_current_user)):
     Lists all registered users with detailed profiles (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() not in ["bhushan", "admin"]:
+    if not admin_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to access user list."
@@ -686,7 +686,7 @@ def admin_reset_password(request: ResetPasswordRequest, current_user: dict = Dep
     Resets the password for a target username (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() not in ["bhushan", "admin"]:
+    if not admin_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to execute password resets."
@@ -714,7 +714,7 @@ def admin_reset_all_passwords(request: ResetAllPasswordsRequest, current_user: d
     Optionally dispatches credentials emails to users with registered emails.
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() not in ["bhushan", "admin"]:
+    if not admin_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to execute bulk password resets."
@@ -748,7 +748,7 @@ def admin_send_custom_email(request: AdminCustomEmailRequest, current_user: dict
     Dispatches a custom Gmail message to a target user (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() not in ["bhushan", "admin"]:
+    if not admin_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to dispatch custom emails."
@@ -783,7 +783,7 @@ def admin_send_credentials_email(request: SendCredentialsRequest, current_user: 
     Dispatches login credentials email to target user's registered Gmail (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() not in ["bhushan", "admin"]:
+    if not admin_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required."
@@ -812,7 +812,7 @@ def admin_get_all_feedback(current_user: dict = Depends(get_current_user)):
     Retrieves all user feedback records (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() not in ["bhushan", "admin"]:
+    if not admin_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to view user feedback."
@@ -826,7 +826,7 @@ def admin_delete_user(username: str, current_user: dict = Depends(get_current_us
     Deletes a target user account by username (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() not in ["bhushan", "admin"]:
+    if not admin_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to delete users."
@@ -851,7 +851,7 @@ def admin_diagnostics(current_user: dict = Depends(get_current_user)):
     Returns system diagnostic telemetry details (Admin-Only).
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() not in ["bhushan", "admin"]:
+    if not admin_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to access diagnostics."
@@ -887,7 +887,7 @@ def admin_export_metadata(format: str = Query("json"), current_user: dict = Depe
     Supported formats: 'json' or 'csv'. Admin-Only.
     """
     admin_user = current_user.get("sub", "")
-    if admin_user.lower() not in ["bhushan", "admin"]:
+    if not admin_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privileges required to export metadata."
