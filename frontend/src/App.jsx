@@ -43,11 +43,14 @@ import {
   HelpCircle,
   Settings,
   Sliders,
-  Download,
   Activity,
   Paperclip,
   ArrowUp,
-  MoreHorizontal
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 // Definitions for Theme switcher: Normal (Paperpillar Light) & Dark (Paperpillar Dark)
@@ -340,7 +343,8 @@ export default function App() {
   const [chatModeDeepSearch, setChatModeDeepSearch] = useState(true);
   const [chatModeReasoning, setChatModeReasoning] = useState(false);
   const [pdfAnalyzingLoading, setPdfAnalyzingLoading] = useState(false);
-  const pdfInputRef = useRef(null);
+  // Sidebar Collapse state
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   const chatEndRef = useRef(null);
 
@@ -2587,47 +2591,67 @@ export default function App() {
         <div className="absolute bottom-[-10%] right-[10%] w-[450px] h-[450px] rounded-full bg-[#22D3EE]/5 blur-[110px] animate-pulse duration-[6000ms]" />
       </div>
 
-      {/* LEFT FIXED FLOATING SIDE PANEL (TEAL & CYAN GLASSMORPHIC THEME MATCH) */}
-      <aside className="w-full md:w-[280px] md:fixed md:top-4 md:bottom-4 md:left-4 bg-[#08181C]/90 backdrop-blur-2xl border border-[#22D3EE]/20 md:rounded-2xl p-5 flex flex-col justify-between overflow-y-auto z-20 shadow-[0_0_40px_rgba(13,148,136,0.15)]">
-        <div className="space-y-6">
+      {/* LEFT FIXED FLOATING SIDE PANEL (COLLAPSIBLE SIDEBAR) */}
+      <aside className={`w-full ${isSidebarCollapsed ? 'md:w-[76px]' : 'md:w-[280px]'} md:fixed md:top-4 md:bottom-4 md:left-4 bg-[#08181C]/95 backdrop-blur-2xl border border-[#22D3EE]/20 md:rounded-2xl ${isSidebarCollapsed ? 'p-3' : 'p-5'} flex flex-col justify-between overflow-y-auto z-20 shadow-[0_0_40px_rgba(13,148,136,0.15)] transition-all duration-300 select-none`}>
+        <div className="space-y-5">
           
-          {/* Brand Header */}
-          <div className="flex items-center justify-between">
+          {/* Brand Header & Sidebar Hide/Expand Toggle */}
+          <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center flex-col gap-3' : 'justify-between'}`}>
             <div className="flex items-center gap-2.5">
-              <div className="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-[#0D9488] to-[#22D3EE] p-[1px] shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+              <div className="w-8.5 h-8.5 rounded-xl bg-gradient-to-tr from-[#0D9488] to-[#22D3EE] p-[1px] shadow-[0_0_20px_rgba(34,211,238,0.3)] flex-shrink-0">
                 <div className="w-full h-full bg-[#08181C] rounded-[11px] flex items-center justify-center text-[#22D3EE] font-bold text-sm">
                   ⚡
                 </div>
               </div>
-              <span className="font-sans font-bold text-base text-white tracking-tight">PatentMind AI</span>
+              {!isSidebarCollapsed && (
+                <span className="font-sans font-bold text-base text-white tracking-tight truncate">PatentMind AI</span>
+              )}
             </div>
-            <span className="text-[9px] font-mono text-[#22D3EE] bg-[#22D3EE]/10 border border-[#22D3EE]/20 px-2 py-0.5 rounded-full font-semibold">v2.1</span>
+
+            <div className="flex items-center gap-1.5">
+              {!isSidebarCollapsed && (
+                <span className="text-[9px] font-mono text-[#22D3EE] bg-[#22D3EE]/10 border border-[#22D3EE]/20 px-2 py-0.5 rounded-full font-semibold">v2.1</span>
+              )}
+              {/* Hide / Show Sidebar Toggle Button */}
+              <button
+                type="button"
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                className="p-1.5 rounded-lg bg-teal-900/30 border border-[#22D3EE]/20 text-[#22D3EE] hover:bg-[#22D3EE]/20 transition-all flex items-center justify-center"
+                title={isSidebarCollapsed ? "Expand Sidebar (Show Text)" : "Hide Sidebar (Collapse to Icons)"}
+              >
+                {isSidebarCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           {/* User Session Profile */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#0E262B]/80 border border-[#22D3EE]/20 shadow-md">
+          <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2' : 'justify-between p-2.5'} rounded-xl bg-[#0E262B]/80 border border-[#22D3EE]/20 shadow-md`}>
             <div className="flex items-center gap-2.5">
-              <div className="w-7.5 h-7.5 rounded-full bg-[#0D9488]/30 border border-[#22D3EE]/40 flex items-center justify-center text-[#22D3EE] font-bold text-xs shadow-sm">
+              <div className="w-7.5 h-7.5 rounded-full bg-[#0D9488]/30 border border-[#22D3EE]/40 flex items-center justify-center text-[#22D3EE] font-bold text-xs shadow-sm flex-shrink-0" title={username}>
                 {username ? username.charAt(0).toUpperCase() : 'U'}
               </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-white tracking-wide uppercase truncate max-w-[110px]">{username}</span>
-                <span className="text-[9px] text-emerald-400 font-mono flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online
-                </span>
-              </div>
+              {!isSidebarCollapsed && (
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-white tracking-wide uppercase truncate max-w-[110px]">{username}</span>
+                  <span className="text-[9px] text-emerald-400 font-mono flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online
+                  </span>
+                </div>
+              )}
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setShowChangePasswordModal(true);
-                setChangePasswordMsg('');
-              }}
-              className="p-1.5 text-teal-200/60 hover:text-white hover:bg-teal-900/30 rounded-lg transition-all"
-              title="Change Account Password"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-            </button>
+            {!isSidebarCollapsed && (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowChangePasswordModal(true);
+                  setChangePasswordMsg('');
+                }}
+                className="p-1.5 text-teal-200/60 hover:text-white hover:bg-teal-900/30 rounded-lg transition-all"
+                title="Change Account Password"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Change Password Modal */}
@@ -2702,23 +2726,25 @@ export default function App() {
           )}
 
           {/* Multi-Language Selector */}
-          <div className="space-y-1.5">
-            <label className="text-[9px] font-mono text-teal-200/50 uppercase tracking-wider block px-1">LANGUAGE</label>
-            <div className="relative flex items-center border border-[#22D3EE]/20 bg-[#0E262B]/80 rounded-xl px-2.5 py-1.5">
-              <Globe className="w-3.5 h-3.5 text-[#22D3EE] mr-2 flex-shrink-0" />
-              <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="w-full bg-transparent text-xs font-sans focus:outline-none border-none text-teal-100 cursor-pointer"
-              >
-                <option value="English" className="bg-[#08181C] text-teal-200">English (US 🇺🇸)</option>
-                <option value="Hindi" className="bg-[#08181C] text-teal-200">Hindi (हिंदी 🇮🇳)</option>
-                <option value="Spanish" className="bg-[#08181C] text-teal-200">Spanish (Español 🇪🇸)</option>
-                <option value="French" className="bg-[#08181C] text-teal-200">French (Français 🇫🇷)</option>
-                <option value="German" className="bg-[#08181C] text-teal-200">German (Deutsch 🇩🇪)</option>
-              </select>
+          {!isSidebarCollapsed && (
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-mono text-teal-200/50 uppercase tracking-wider block px-1">LANGUAGE</label>
+              <div className="relative flex items-center border border-[#22D3EE]/20 bg-[#0E262B]/80 rounded-xl px-2.5 py-1.5">
+                <Globe className="w-3.5 h-3.5 text-[#22D3EE] mr-2 flex-shrink-0" />
+                <select
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                  className="w-full bg-transparent text-xs font-sans focus:outline-none border-none text-teal-100 cursor-pointer"
+                >
+                  <option value="English" className="bg-[#08181C] text-teal-200">English (US 🇺🇸)</option>
+                  <option value="Hindi" className="bg-[#08181C] text-teal-200">Hindi (हिंदी 🇮🇳)</option>
+                  <option value="Spanish" className="bg-[#08181C] text-teal-200">Spanish (Español 🇪🇸)</option>
+                  <option value="French" className="bg-[#08181C] text-teal-200">French (Français 🇫🇷)</option>
+                  <option value="German" className="bg-[#08181C] text-teal-200">German (Deutsch 🇩🇪)</option>
+                </select>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Navigation Menu */}
           <nav className="flex flex-col gap-1 text-left pt-1">
@@ -2738,14 +2764,15 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                  title={tab.label}
+                  className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2'} rounded-xl text-xs font-medium transition-all ${
                     isActive 
                       ? 'bg-gradient-to-r from-[#0D9488]/30 to-[#22D3EE]/15 text-white font-semibold border-l-2 border-[#22D3EE] shadow-[0_0_15px_rgba(34,211,238,0.15)]' 
                       : 'text-teal-100/60 hover:text-white hover:bg-[#0E262B]/50'
                   }`}
                 >
-                  <TabIcon className={`w-4 h-4 ${isActive ? 'text-[#22D3EE]' : 'text-teal-200/50'}`} />
-                  <span>{tab.label}</span>
+                  <TabIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#22D3EE]' : 'text-teal-200/50'}`} />
+                  {!isSidebarCollapsed && <span>{tab.label}</span>}
                 </button>
               );
             })}
@@ -2753,18 +2780,19 @@ export default function App() {
         </div>
 
         {/* Sidebar Footer with Logout */}
-        <div className="pt-4 border-t border-[#22D3EE]/10 mt-6">
+        <div className="pt-4 border-t border-[#22D3EE]/10 mt-4">
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-teal-200/60 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+            title="Log out"
+            className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-2' : 'gap-2.5 px-3 py-2'} text-xs font-medium text-teal-200/60 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all`}
           >
-            <LogOut className="w-4 h-4 text-red-500" />
-            <span>Log out</span>
+            <LogOut className="w-4 h-4 text-red-500 flex-shrink-0" />
+            {!isSidebarCollapsed && <span>Log out</span>}
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 md:ml-[300px] p-8 md:p-12 max-w-5xl overflow-y-auto flex flex-col min-h-screen relative z-10">
+      <main className={`flex-1 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[300px]'} p-8 md:p-12 max-w-5xl overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-300`}>
 
         {/* SEMANTIC SEARCH & RAG TAB */}
         {activeTab === 'search' && (
