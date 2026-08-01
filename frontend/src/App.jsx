@@ -565,8 +565,8 @@ export default function App() {
       const response = await authenticatedFetch('/api/v1/auth/admin/users');
       if (response && response.ok) {
         const data = await response.json();
-        setAdminUsers(data.users);
-        if (data.users_detailed) {
+        setAdminUsers(Array.isArray(data?.users) ? data.users : []);
+        if (Array.isArray(data?.users_detailed)) {
           setAdminUsersDetailed(data.users_detailed);
         }
       }
@@ -581,7 +581,7 @@ export default function App() {
       const response = await authenticatedFetch('/api/v1/admin/diagnostics');
       if (response && response.ok) {
         const data = await response.json();
-        setAdminDiagnostics(data.telemetry);
+        setAdminDiagnostics(data?.telemetry || null);
       }
     } catch (err) {
       console.error("Failed to list system telemetry stats:", err);
@@ -594,7 +594,7 @@ export default function App() {
       const response = await authenticatedFetch('/api/v1/admin/feedback');
       if (response && response.ok) {
         const data = await response.json();
-        setAdminFeedback(data.feedback);
+        setAdminFeedback(Array.isArray(data?.feedback) ? data.feedback : []);
       }
     } catch (err) {
       console.error("Failed to fetch user feedback:", err);
@@ -4754,8 +4754,8 @@ export default function App() {
                       className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none text-main uppercase border-none py-1"
                     >
                       <option value="" className="bg-[#0c0c0e]">-- SELECT USER --</option>
-                      {adminUsers.map((u) => (
-                        <option key={u} value={u} className="bg-[#0c0c0e]">{u.toUpperCase()}</option>
+                      {(adminUsers || []).map((u) => (
+                        <option key={u} value={u} className="bg-[#0c0c0e]">{String(u).toUpperCase()}</option>
                       ))}
                     </select>
                   </div>
@@ -4830,7 +4830,7 @@ export default function App() {
                 </div>
 
                 <div className="divide-y divide-theme text-xs font-mono">
-                  {adminUsersDetailed.length > 0 ? (
+                  {(adminUsersDetailed || []).length > 0 ? (
                     adminUsersDetailed.map((u) => (
                       <div key={u.username} className="py-2.5 flex justify-between items-center group">
                         <div className="flex flex-col">
