@@ -2970,45 +2970,6 @@ export default function App() {
               </div>
             ) : (
               <>
-                {/* Executive Top Metric KPI Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="glass-panel-sleek p-5 rounded-2xl border border-white/10 shadow-xl space-y-2">
-                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">TOTAL PATENTS INDEXED</span>
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-2xl font-bold text-white font-sans">14,820</span>
-                      <span className="text-[10px] font-mono text-emerald-400 font-semibold">+14.2%</span>
-                    </div>
-                    <span className="text-[9.5px] text-zinc-500 font-light block">USPTO & WIPO Seed DB</span>
-                  </div>
-
-                  <div className="glass-panel-sleek p-5 rounded-2xl border border-white/10 shadow-xl space-y-2">
-                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">TOP DENSITY SECTOR</span>
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-2xl font-bold text-[#22D3EE] font-sans">AI & Neural</span>
-                      <span className="text-[10px] font-mono text-[#22D3EE] font-semibold">38% Vol</span>
-                    </div>
-                    <span className="text-[9.5px] text-zinc-500 font-light block">Highest filing volume</span>
-                  </div>
-
-                  <div className="glass-panel-sleek p-5 rounded-2xl border border-white/10 shadow-xl space-y-2">
-                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">TOP WHITE-SPACE TARGET</span>
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-2xl font-bold text-amber-400 font-sans">Neuromorphic</span>
-                      <span className="text-[10px] font-mono text-amber-400 font-semibold">94/100</span>
-                    </div>
-                    <span className="text-[9.5px] text-zinc-500 font-light block">Maximum IP Opportunity</span>
-                  </div>
-
-                  <div className="glass-panel-sleek p-5 rounded-2xl border border-white/10 shadow-xl space-y-2">
-                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">RETRIEVAL LATENCY</span>
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-2xl font-bold text-purple-400 font-sans">0.34s</span>
-                      <span className="text-[10px] font-mono text-emerald-400 font-semibold">Optimal</span>
-                    </div>
-                    <span className="text-[9.5px] text-zinc-500 font-light block">Dual Groq / Ollama RAG</span>
-                  </div>
-                </div>
-
                 {/* SECTION 1: Top Fields Where Patents Are Created Most */}
                 <div className="glass-panel-sleek p-7 rounded-2xl border border-white/10 shadow-2xl space-y-6">
                   <div className="flex justify-between items-center pb-4 border-b border-white/10">
