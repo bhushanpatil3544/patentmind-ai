@@ -2845,13 +2845,13 @@ function App() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   title={tab.label}
-                  className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2'} rounded-xl text-xs font-medium transition-all ${
+                  className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'} rounded-2xl text-xs font-medium transition-all duration-300 ${
                     isActive 
-                      ? 'bg-gradient-to-r from-[#0D9488]/30 to-[#22D3EE]/15 text-white font-semibold border-l-2 border-[#22D3EE] shadow-[0_0_15px_rgba(34,211,238,0.15)]' 
-                      : 'text-teal-100/60 hover:text-white hover:bg-[#0E262B]/50'
+                      ? 'bg-gradient-to-r from-[#7C3AED]/30 via-[#8B5CF6]/20 to-[#06B6D4]/15 text-white font-semibold border-l-2 border-[#8B5CF6] shadow-[0_0_25px_rgba(139,92,246,0.3)]' 
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <TabIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#22D3EE]' : 'text-teal-200/50'}`} />
+                  <TabIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#06B6D4]' : 'text-slate-400'}`} />
                   {!isSidebarCollapsed && <span>{tab.label}</span>}
                 </button>
               );
@@ -2860,11 +2860,11 @@ function App() {
         </div>
 
         {/* Sidebar Footer with Logout */}
-        <div className="pt-4 border-t border-[#22D3EE]/10 mt-4">
+        <div className="pt-4 border-t border-white/10 mt-4">
           <button
             onClick={() => setShowLogoutModal(true)}
             title="Log out"
-            className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-2' : 'gap-2.5 px-3 py-2'} text-xs font-medium text-teal-200/60 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all`}
+            className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-2' : 'gap-2.5 px-3 py-2'} text-xs font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all`}
           >
             <LogOut className="w-4 h-4 text-red-500 flex-shrink-0" />
             {!isSidebarCollapsed && <span>Log out</span>}
@@ -2878,8 +2878,13 @@ function App() {
         {activeTab === 'search' && (
           <div className="space-y-12 fade-in">
             <div>
-              <span className="text-[11px] text-muted font-mono tracking-widest uppercase">01. SEMANTIC MATCHING</span>
-              <h2 className="text-serif-editorial text-4xl text-main tracking-wide mt-2">RAG KNOWLEDGE SEARCH</h2>
+              <span className="text-[10px] font-mono tracking-widest text-[#06B6D4] uppercase flex items-center gap-2 font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                01. ADVANCED VECTOR INTELLIGENCE
+              </span>
+              <h2 className="quantara-gradient-text text-4xl md:text-5xl font-outfit font-semibold tracking-tight mt-1.5">
+                RAG KNOWLEDGE SEARCH
+              </h2>
             </div>
 
             <form onSubmit={handleSearch} className="space-y-6">
