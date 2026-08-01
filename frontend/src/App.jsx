@@ -66,7 +66,7 @@ const API_BASE = '';
 
 const apiUrl = (path) => path.startsWith('http') ? path : `${API_BASE}${path}`;
 
-export default function App() {
+function App() {
   const getValidStorageItem = (key) => {
     try {
       const val = localStorage.getItem(key);
@@ -5067,5 +5067,56 @@ export default function App() {
         </div>
       )}
     </div>
+  );
+}
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an unhandled rendering error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col items-center justify-center p-6 space-y-6 font-sans">
+          <div className="max-w-md w-full bg-[#141417] border border-cyan-500/40 p-6 rounded-2xl shadow-2xl space-y-4 text-center">
+            <div className="w-12 h-12 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto text-xl font-bold">
+              ⚡
+            </div>
+            <h2 className="text-lg font-mono text-[#22D3EE] font-semibold uppercase">SYSTEM RECOVERY INTERFACE</h2>
+            <p className="text-xs text-zinc-400 leading-relaxed font-mono">
+              {this.state.error?.message || "An isolated UI state anomaly was intercepted."}
+            </p>
+            <button
+              onClick={() => {
+                this.setState({ hasError: false, error: null });
+                window.location.reload();
+              }}
+              className="w-full py-3 bg-gradient-to-r from-[#0D9488] to-[#22D3EE] text-black font-semibold text-xs font-mono tracking-widest rounded-xl uppercase hover:brightness-110 transition-all shadow-lg cursor-pointer"
+            >
+              RECOVER & RELOAD PLATFORM
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function AppWrapper() {
+  return (
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   );
 }
