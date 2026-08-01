@@ -3714,9 +3714,9 @@ export default function App() {
                       {/* Telemetry metadata footer */}
                       {msg.role === 'assistant' && msg.latency && (
                         <div className="text-[8px] font-mono text-zinc-550 flex gap-3 px-1">
-                          <span>LLM: {msg.active_llm.toUpperCase()}</span>
+                          {msg.active_llm && <span>LLM: {msg.active_llm.toUpperCase()}</span>}
                           <span>LATENCY: {msg.latency}s</span>
-                          <span>DB: {msg.active_db.toUpperCase()}</span>
+                          {msg.active_db && <span>DB: {msg.active_db.toUpperCase()}</span>}
                         </div>
                       )}
 
