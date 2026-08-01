@@ -2588,217 +2588,184 @@ export default function App() {
       </div>
 
       {/* LEFT FIXED FLOATING SIDE PANEL */}
-      <aside className="w-full md:w-[290px] md:fixed md:top-4 md:bottom-4 md:left-4 bg-[#121212]/80 backdrop-blur-xl border border-white/5 md:rounded-2xl p-6 md:p-8 flex flex-col justify-between overflow-y-auto z-20 shadow-2xl">
-        <div className="space-y-7">
+      <aside className="w-full md:w-[280px] md:fixed md:top-4 md:bottom-4 md:left-4 bg-[#121212]/90 backdrop-blur-2xl border border-white/10 md:rounded-2xl p-5 flex flex-col justify-between overflow-y-auto z-20 shadow-2xl">
+        <div className="space-y-6">
           
           {/* Brand Header */}
-          <div>
-            <h1 className="font-outfit font-light text-3xl tracking-wider leading-none text-main">
-              PATENT<br />MIND AI
-            </h1>
-            <div className="w-12 h-[1px] bg-zinc-700/60 my-4"></div>
-            
-            {/* User Session Profile & Password Change */}
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <User className="w-3.5 h-3.5 text-zinc-400" />
-                <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider">
-                  SESSION: <strong className="text-main font-semibold">{username}</strong>
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowChangePasswordModal(true);
-                  setChangePasswordMsg('');
-                }}
-                className="text-[9px] font-mono text-zinc-500 hover:text-white flex items-center gap-1 border border-theme px-2 py-0.5 rounded uppercase tracking-wider transition-colors"
-                title="Change Account Password"
-              >
-                <KeyRound className="w-3 h-3" />
-                <span>CHANGE PW</span>
-              </button>
-            </div>
-
-            {/* Change Password Modal */}
-            {showChangePasswordModal && (
-              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div className="bg-[#0f0f12] border border-theme panel-card p-6 md:p-8 max-w-sm w-full space-y-5 fade-in">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-mono uppercase tracking-wider text-main flex items-center gap-2">
-                      <KeyRound className="w-4 h-4 text-zinc-400" />
-                      CHANGE ACCOUNT PASSWORD
-                    </h3>
-                    <button
-                      onClick={() => setShowChangePasswordModal(false)}
-                      className="text-zinc-500 hover:text-white font-mono text-xs"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  {changePasswordMsg && (
-                    <div className={`p-2.5 text-[9.5px] font-mono rounded border ${
-                      changePasswordMsg.startsWith('SUCCESS')
-                        ? 'border-emerald-900 bg-emerald-950/30 text-emerald-400'
-                        : 'border-red-900 bg-red-950/30 text-red-400'
-                    }`}>
-                      {changePasswordMsg}
-                    </div>
-                  )}
-
-                  <form onSubmit={handleChangePassword} className="space-y-4">
-                    <div className="border-b border-theme py-1">
-                      <label className="text-[9px] font-mono text-zinc-500 block mb-1 uppercase">CURRENT PASSWORD</label>
-                      <input
-                        type="password"
-                        value={changePasswordForm.old_password}
-                        onChange={(e) => setChangePasswordForm({ ...changePasswordForm, old_password: e.target.value })}
-                        required
-                        className="w-full bg-transparent text-xs font-mono text-main focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="border-b border-theme py-1">
-                      <label className="text-[9px] font-mono text-zinc-500 block mb-1 uppercase">NEW PASSWORD (MIN 4 CHARACTERS)</label>
-                      <input
-                        type="password"
-                        value={changePasswordForm.new_password}
-                        onChange={(e) => setChangePasswordForm({ ...changePasswordForm, new_password: e.target.value })}
-                        required
-                        className="w-full bg-transparent text-xs font-mono text-main focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="flex gap-2 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => setShowChangePasswordModal(false)}
-                        className="flex-1 py-2 border border-theme text-[10px] font-mono text-zinc-400 hover:text-white uppercase tracking-wider"
-                      >
-                        CANCEL
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={changePasswordLoading}
-                        className="flex-1 py-2 btn-theme text-[10px] font-mono uppercase tracking-wider disabled:opacity-40"
-                      >
-                        {changePasswordLoading ? 'UPDATING...' : 'UPDATE PASSWORD'}
-                      </button>
-                    </div>
-                  </form>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#7C3AED] to-[#22D3EE] p-[1px] shadow-[0_0_20px_rgba(124,58,237,0.3)]">
+                <div className="w-full h-full bg-[#121212] rounded-[11px] flex items-center justify-center text-[#22D3EE] font-bold text-sm">
+                  ⚡
                 </div>
               </div>
-            )}
+              <span className="font-sans font-bold text-base text-white tracking-tight">PatentMind AI</span>
+            </div>
+            <span className="text-[9px] font-mono text-zinc-500 bg-white/5 border border-white/5 px-2 py-0.5 rounded-full">v2.1</span>
           </div>
 
-          {/* Multi-Language & Voice Assistance Widget */}
-          <div className="py-4 border-b border-theme space-y-3">
-            <div className="flex justify-between items-center text-[9px] font-mono text-zinc-500 tracking-wider">
-              <span>MULTILINGUAL & VOICE ASSIST</span>
-              <span className="uppercase font-semibold text-zinc-400">
-                {selectedLanguage}
-              </span>
+          {/* User Session Profile */}
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-full bg-[#7C3AED]/20 border border-[#7C3AED]/40 flex items-center justify-center text-[#22D3EE] font-bold text-xs">
+                {username ? username.charAt(0).toUpperCase() : 'U'}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-white tracking-wide uppercase truncate max-w-[110px]">{username}</span>
+                <span className="text-[9px] text-emerald-400 font-mono flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online
+                </span>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => {
+                setShowChangePasswordModal(true);
+                setChangePasswordMsg('');
+              }}
+              className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+              title="Change Account Password"
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+            </button>
+          </div>
 
-            <div className="relative flex items-center border border-theme bg-black/10 px-2.5 py-1">
-              <Globe className="w-3 h-3 text-zinc-500 mr-2 flex-shrink-0" />
+          {/* Change Password Modal */}
+          {showChangePasswordModal && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-[#0f0f12] border border-white/10 panel-card p-6 md:p-8 max-w-sm w-full space-y-5 fade-in rounded-2xl shadow-2xl">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-mono uppercase tracking-wider text-main flex items-center gap-2">
+                    <KeyRound className="w-4 h-4 text-zinc-400" />
+                    CHANGE ACCOUNT PASSWORD
+                  </h3>
+                  <button
+                    onClick={() => setShowChangePasswordModal(false)}
+                    className="text-zinc-500 hover:text-white font-mono text-xs"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {changePasswordMsg && (
+                  <div className={`p-2.5 text-[9.5px] font-mono rounded border ${
+                    changePasswordMsg.startsWith('SUCCESS')
+                      ? 'border-emerald-900 bg-emerald-950/30 text-emerald-400'
+                      : 'border-red-900 bg-red-950/30 text-red-400'
+                  }`}>
+                    {changePasswordMsg}
+                  </div>
+                )}
+
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                  <div className="border-b border-theme py-1">
+                    <label className="text-[9px] font-mono text-zinc-500 block mb-1 uppercase">CURRENT PASSWORD</label>
+                    <input
+                      type="password"
+                      value={changePasswordForm.old_password}
+                      onChange={(e) => setChangePasswordForm({ ...changePasswordForm, old_password: e.target.value })}
+                      required
+                      className="w-full bg-transparent text-xs font-mono text-main focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="border-b border-theme py-1">
+                    <label className="text-[9px] font-mono text-zinc-500 block mb-1 uppercase">NEW PASSWORD (MIN 4 CHARACTERS)</label>
+                    <input
+                      type="password"
+                      value={changePasswordForm.new_password}
+                      onChange={(e) => setChangePasswordForm({ ...changePasswordForm, new_password: e.target.value })}
+                      required
+                      className="w-full bg-transparent text-xs font-mono text-main focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowChangePasswordModal(false)}
+                      className="flex-1 py-2 border border-theme text-[10px] font-mono text-zinc-400 hover:text-white uppercase tracking-wider"
+                    >
+                      CANCEL
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={changePasswordLoading}
+                      className="flex-1 py-2 btn-theme text-[10px] font-mono uppercase tracking-wider disabled:opacity-40"
+                    >
+                      {changePasswordLoading ? 'UPDATING...' : 'UPDATE PASSWORD'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Multi-Language Selector */}
+          <div className="space-y-1.5">
+            <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider block px-1">LANGUAGE</label>
+            <div className="relative flex items-center border border-white/5 bg-white/5 rounded-lg px-2.5 py-1.5">
+              <Globe className="w-3.5 h-3.5 text-zinc-400 mr-2 flex-shrink-0" />
               <select
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="w-full bg-transparent text-[10px] font-mono focus:outline-none border-none text-zinc-300 uppercase cursor-pointer"
+                className="w-full bg-transparent text-xs font-sans focus:outline-none border-none text-zinc-200 cursor-pointer"
               >
-                <option value="English" className="bg-zinc-950 text-zinc-400">ENGLISH (US 🇺🇸)</option>
-                <option value="Hindi" className="bg-zinc-950 text-zinc-400">HINDI (हिंदी 🇮🇳)</option>
-                <option value="Spanish" className="bg-zinc-950 text-zinc-400">SPANISH (ESPAÑOL 🇪🇸)</option>
-                <option value="French" className="bg-zinc-950 text-zinc-400">FRENCH (FRANÇAIS 🇫🇷)</option>
-                <option value="German" className="bg-zinc-950 text-zinc-400">GERMAN (DEUTSCH 🇩🇪)</option>
+                <option value="English" className="bg-[#121212] text-zinc-300">English (US 🇺🇸)</option>
+                <option value="Hindi" className="bg-[#121212] text-zinc-300">Hindi (हिंदी 🇮🇳)</option>
+                <option value="Spanish" className="bg-[#121212] text-zinc-300">Spanish (Español 🇪🇸)</option>
+                <option value="French" className="bg-[#121212] text-zinc-300">French (Français 🇫🇷)</option>
+                <option value="German" className="bg-[#121212] text-zinc-300">German (Deutsch 🇩🇪)</option>
               </select>
             </div>
-
-            {isSpeaking && (
-              <button
-                onClick={() => handleSpeakText('')}
-                className="w-full py-1.5 text-[9px] font-mono border border-amber-800 bg-amber-950/30 text-amber-400 flex items-center justify-center gap-1.5 rounded animate-pulse"
-              >
-                <VolumeX className="w-3.5 h-3.5" />
-                <span>STOP VOICE NARRATION</span>
-              </button>
-            )}
           </div>
 
           {/* Navigation Menu */}
-          <nav className="flex flex-col gap-1.5 text-left">
+          <nav className="flex flex-col gap-1 text-left pt-1">
             {[
-              { id: 'search', label: 'PATENT SEARCH', icon: Search },
-              { id: 'dashboard', label: 'ANALYTICS & METRICS', icon: BarChart3 },
-              { id: 'upload', label: 'DOCUMENT UPLOAD', icon: UploadCloud },
-              { id: 'dataset', label: 'DATASET IMPORT', icon: Database },
-              { id: 'chat', label: 'PATENT CHATBOT', icon: MessageSquare },
-              { id: 'idea', label: 'IDEA ANALYZER', icon: Sparkles },
-              { id: 'help', label: 'HELP & FEEDBACK', icon: HelpCircle },
-              { id: 'settings', label: 'SYSTEM SETTINGS', icon: Settings },
-              ...(isAdminUser() ? [{ id: 'admin', label: 'ADMIN CONTROL', icon: Cpu }] : [])
+              { id: 'search', label: 'Patent Search', icon: Search },
+              { id: 'dashboard', label: 'Analytics & Metrics', icon: BarChart3 },
+              { id: 'upload', label: 'Document Upload', icon: UploadCloud },
+              { id: 'dataset', label: 'Dataset Import', icon: Database },
+              { id: 'chat', label: 'Patent Chatbot', icon: MessageSquare },
+              { id: 'idea', label: 'Idea Analyzer', icon: Sparkles },
+              { id: 'help', label: 'Help & Feedback', icon: HelpCircle },
+              { id: 'settings', label: 'System Settings', icon: Settings },
+              ...(isAdminUser() ? [{ id: 'admin', label: 'Admin Control', icon: Cpu }] : [])
             ].map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
-                <motion.button
+                <button
                   key={tab.id}
-                  whileHover={{ x: 4, backgroundColor: 'rgba(255,255,255,0.03)' }}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-[10px] font-mono tracking-widest uppercase transition-all ${
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                     isActive 
-                      ? 'bg-purple-950/20 text-[#22D3EE] border-l-2 border-[#7C3AED] font-semibold shadow-[0_0_15px_rgba(124,58,237,0.1)]' 
-                      : 'text-[#A1A1AA] hover:text-white'
+                      ? 'bg-white/10 text-white font-semibold border-l-2 border-[#7C3AED] shadow-sm' 
+                      : 'text-zinc-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <TabIcon className={`w-3.5 h-3.5 ${isActive ? 'text-[#22D3EE]' : 'text-zinc-500'}`} />
+                  <TabIcon className={`w-4 h-4 ${isActive ? 'text-[#22D3EE]' : 'text-zinc-400'}`} />
                   <span>{tab.label}</span>
-                </motion.button>
+                </button>
               );
             })}
           </nav>
         </div>
 
         {/* Sidebar Footer with Logout */}
-        <div className="pt-6 border-t border-theme mt-8 space-y-4">
+        <div className="pt-4 border-t border-white/5 mt-6">
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="flex items-center gap-2.5 text-[10px] font-mono text-zinc-400 hover:text-red-400 transition-colors uppercase tracking-wider"
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
           >
-            <LogOut className="w-3.5 h-3.5 text-red-500" />
-            <span>LOG OUT</span>
+            <LogOut className="w-4 h-4 text-red-500" />
+            <span>Log out</span>
           </button>
-          
-          <div className="text-[9px] text-zinc-650 font-mono tracking-wider flex items-center justify-between">
-            <span>SECURE LINK ENCRYPTED</span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-550 inline-block"></span>
-              SSL
-            </span>
-          </div>
         </div>
       </aside>
 
-      <main className="flex-1 md:ml-[320px] p-8 md:p-12 max-w-5xl overflow-y-auto flex flex-col min-h-screen relative z-10">
-
-        {/* Top Ticker Slider Banner */}
-        <div className="w-full bg-zinc-950/80 border border-theme/60 backdrop-blur-md rounded-none py-2.5 px-4 mb-8 overflow-hidden relative flex items-center gap-4 select-none">
-          <div className="flex items-center gap-1.5 flex-shrink-0 text-emerald-500 font-mono text-[9px] font-bold uppercase tracking-widest border-r border-theme pr-4">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>SYSTEM MONITOR</span>
-          </div>
-          <div className="flex-1 overflow-hidden relative h-4">
-            <div className="animate-marquee whitespace-nowrap text-[9px] font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-12 absolute">
-              <span>💡 PATENT INDEX STATUS: <strong className="text-white">ONLINE</strong></span>
-              <span>⚡ ACTIVE AI ENGINE: <strong className="text-white">GROQ LLM (HYBRID CLOUD)</strong></span>
-              <span>🔐 NETWORK LINK: <strong className="text-white">SECURED SSL ACTIVE</strong></span>
-              <span>📊 TOTAL PATENTS INDEXED: <strong className="text-white">DEFAULT SEED COMPLETED</strong></span>
-              <span>🤖 COMPILER STATUS: <strong className="text-white">SUCCESS (v2.1.0-CLEAN)</strong></span>
-            </div>
-          </div>
-        </div>
+      <main className="flex-1 md:ml-[300px] p-8 md:p-12 max-w-5xl overflow-y-auto flex flex-col min-h-screen relative z-10">
 
         {/* SEMANTIC SEARCH & RAG TAB */}
         {activeTab === 'search' && (
