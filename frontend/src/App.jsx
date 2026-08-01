@@ -3920,78 +3920,113 @@ export default function App() {
           </div>
         )}
 
-        {/* HELP & FEEDBACK TAB */}
+        {/* HELP & FEEDBACK TAB (OFFICIAL BRAND LOGOS + SURVEY CARD) */}
         {activeTab === 'help' && (
           <div className="space-y-8 fade-in max-w-4xl">
             <div>
               <span className="text-[10px] text-muted font-mono tracking-widest uppercase">08. SUPPORT & FEEDBACK</span>
-              <h2 className="text-serif-editorial text-3xl text-main tracking-wide mt-1">HELP & FEEDBACK</h2>
+              <h2 className="text-4xl font-semibold tracking-tight text-main font-sans mt-1">Help & Feedback</h2>
+              <p className="text-xs text-zinc-400 font-light mt-1">Connect directly with our engineering team or submit your platform survey evaluation.</p>
             </div>
 
-            {/* SECTION 1: DIRECT CONTACT WP & IG BOXES (COMPACT SIZE) */}
-            <div className="space-y-3">
-              <h3 className="text-[11px] font-mono tracking-widest text-main uppercase flex items-center gap-2 pb-1 border-b border-theme">
-                <HelpCircle className="w-3.5 h-3.5 text-cyan-400" />
+            {/* SECTION 1: DIRECT CONTACT CHANNELS (OFFICIAL BRAND SVG LOGOS) */}
+            <div className="space-y-4">
+              <h3 className="text-xs font-mono tracking-widest text-zinc-400 uppercase flex items-center gap-2 pb-2 border-b border-white/10">
+                <HelpCircle className="w-4 h-4 text-[#22D3EE]" />
                 DIRECT CONTACT CHANNELS
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
-                {/* WhatsApp Support Box */}
-                <div className="panel-card p-4 border-emerald-800/60 bg-emerald-950/20 space-y-2.5 rounded">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl">
+                
+                {/* Official WhatsApp Support Card */}
+                <div className="glass-panel-sleek p-5 border border-emerald-500/30 bg-emerald-950/20 space-y-4 rounded-2xl shadow-xl hover:border-emerald-400/60 transition-all group">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-mono font-semibold text-emerald-400 tracking-wider flex items-center gap-1.5">
-                      💬 WHATSAPP
-                    </span>
-                    <span className="text-[8.5px] font-mono bg-emerald-900/50 text-emerald-300 px-2 py-0.5 rounded border border-emerald-700/50 uppercase">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shadow-md">
+                        <svg className="w-5 h-5 fill-current text-[#25D366]" viewBox="0 0 24 24">
+                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l.279.444-1.034 3.774 3.861-1.013.437.262z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-white font-sans">WhatsApp</h4>
+                        <span className="text-[10px] text-zinc-400 font-mono">24/7 Tech Support</span>
+                      </div>
+                    </div>
+                    <span className="text-[9px] font-mono bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-500/30 uppercase font-semibold">
                       ONLINE
                     </span>
                   </div>
-                  <p className="text-[11px] font-mono text-zinc-300">
-                    Direct tech support: <strong>+91 9359082546</strong>
+
+                  <p className="text-xs font-sans text-zinc-300 font-light">
+                    Direct developer hotline: <strong className="text-white font-mono">+91 9359082546</strong>
                   </p>
+
                   <a
                     href="https://wa.me/919359082546"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-2 bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-200 border border-emerald-500/50 rounded text-[10.5px] font-mono tracking-wider uppercase transition-all"
+                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-black font-bold rounded-xl text-xs font-sans tracking-wide uppercase transition-all shadow-lg"
                   >
-                    <span>OPEN WHATSAPP CHAT</span>
+                    <span>Open WhatsApp Chat</span>
                   </a>
                 </div>
 
-                {/* Instagram Profile Box */}
-                <div className="panel-card p-4 border-pink-800/60 bg-pink-950/20 space-y-2.5 rounded">
+                {/* Official Instagram Profile Card */}
+                <div className="glass-panel-sleek p-5 border border-pink-500/30 bg-pink-950/20 space-y-4 rounded-2xl shadow-xl hover:border-pink-400/60 transition-all group">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-mono font-semibold text-pink-400 tracking-wider flex items-center gap-1.5">
-                      📸 INSTAGRAM
-                    </span>
-                    <span className="text-[8.5px] font-mono bg-pink-900/50 text-pink-300 px-2 py-0.5 rounded border border-pink-700/50 uppercase">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center shadow-md">
+                        <svg className="w-5 h-5 fill-current text-[#E4405F]" viewBox="0 0 24 24">
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-white font-sans">Instagram</h4>
+                        <span className="text-[10px] text-zinc-400 font-mono">Official Handle</span>
+                      </div>
+                    </div>
+                    <span className="text-[9px] font-mono bg-pink-500/20 text-pink-400 px-2.5 py-0.5 rounded-full border border-pink-500/30 uppercase font-semibold">
                       OFFICIAL
                     </span>
                   </div>
-                  <p className="text-[11px] font-mono text-zinc-300">
-                    Lead Dev: <strong>@patil.bhushan1</strong>
+
+                  <p className="text-xs font-sans text-zinc-300 font-light">
+                    Lead Dev: <strong className="text-white font-mono">@patil.bhushan1</strong>
                   </p>
+
                   <a
                     href="https://instagram.com/patil.bhushan1"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-2 bg-pink-600/30 hover:bg-pink-600/40 text-pink-200 border border-pink-500/50 rounded text-[10.5px] font-mono tracking-wider uppercase transition-all"
+                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] text-white font-bold rounded-xl text-xs font-sans tracking-wide uppercase transition-all shadow-lg"
                   >
-                    <span>VISIT INSTAGRAM</span>
+                    <span>Visit Instagram</span>
                   </a>
                 </div>
+
               </div>
             </div>
 
-            {/* SECTION 2: COMPACT FEEDBACK FORM */}
-            <div className="panel-card p-5 space-y-4 border-theme max-w-2xl rounded">
-              <div className="flex justify-between items-center pb-2 border-b border-theme">
-                <h3 className="text-xs font-mono tracking-widest text-main uppercase flex items-center gap-2">
-                  <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
-                  SUBMIT FEEDBACK
-                </h3>
-                <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">EVALUATION</span>
+            {/* SECTION 2: ONBOARDING EXPERIENCE & RATING SURVEY CARD (IMAGE 2 DESIGN) */}
+            <div className="glass-panel-sleek p-7 space-y-6 border border-white/10 max-w-2xl rounded-2xl shadow-2xl">
+              
+              {/* Card Illustration Header */}
+              <div className="p-6 bg-white/5 border border-white/5 rounded-xl text-center space-y-3">
+                <div className="flex justify-center gap-4 text-3xl">
+                  <span className="cursor-pointer hover:scale-125 transition-transform" onClick={() => setFeedbackRating(5)}>😁</span>
+                  <span className="cursor-pointer hover:scale-125 transition-transform" onClick={() => setFeedbackRating(4)}>😊</span>
+                  <span className="cursor-pointer hover:scale-125 transition-transform" onClick={() => setFeedbackRating(3)}>😐</span>
+                  <span className="cursor-pointer hover:scale-125 transition-transform" onClick={() => setFeedbackRating(2)}>🙁</span>
+                  <span className="cursor-pointer hover:scale-125 transition-transform" onClick={() => setFeedbackRating(1)}>😡</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white font-sans">Onboarding & Platform Experience Survey</h3>
+                  <p className="text-xs text-zinc-400 font-light mt-1">Evaluate the effectiveness of your AI patent search and onboarding experience.</p>
+                </div>
+                <div className="flex justify-center gap-2 pt-1">
+                  <span className="text-[10px] font-mono bg-white/10 text-zinc-300 px-3 py-1 rounded-full border border-white/5">User Experience</span>
+                  <span className="text-[10px] font-mono bg-rose-500/20 text-rose-300 px-3 py-1 rounded-full border border-rose-500/30 font-semibold">❤️ Popular</span>
+                </div>
               </div>
 
               {feedbackResult && (
