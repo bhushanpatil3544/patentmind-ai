@@ -991,15 +991,18 @@ def chat_with_agent(chat_request: ChatRequest, current_user: dict = Depends(get_
         
         # Retrieve context from vector store (Fast lookup top 3 chunks)
         query_vector = rag_chain.embedder.embed_query(last_user_msg)
-        rag_chain.db._last_query_text = last_user_msg
+        if hasattr(rag_chain.db, "_last_query_text"):
+            rag_chain.db._last_query_text = last_user_msg
         retrieved_chunks = rag_chain.db.search(query_vector, filter_metadata=filters if filters else None, limit=3)
         
-        # Format chunks to compact context
+        # Format chunks to compact context safely
         context_str = ""
         for idx, chunk in enumerate(retrieved_chunks, start=1):
-            meta = chunk["metadata"]
-            snippet = chunk['text'][:300].replace('\n', ' ')
-            context_str += f"[{idx}] Patent {meta['patent_number']} ({meta['section']}): {snippet}...\n"
+            meta = chunk.get("metadata", {}) if isinstance(chunk, dict) else {}
+            pnum = meta.get("patent_number", f"DOC-{idx}")
+            sec = meta.get("section", "Specification")
+            snippet = chunk.get("text", "")[:300].replace('\n', ' ') if isinstance(chunk, dict) else ""
+            context_str += f"[{idx}] Patent {pnum} ({sec}): {snippet}...\n"
 
         # Construct messages history block
         from app.rag import SYSTEM_PROMPT

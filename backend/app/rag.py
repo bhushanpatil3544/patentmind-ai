@@ -58,14 +58,17 @@ class IntelligentRAGChain:
         db_stats = self.db.get_stats()
         active_db = db_stats["active_database"]
 
-        # 3. Construct Prompt Context
+        # 3. Construct Prompt Context safely
         context_str = ""
         for idx, chunk in enumerate(retrieved_chunks, start=1):
-            meta = chunk["metadata"]
-            context_str += f"[{idx}] Patent: {meta['patent_number']} | Title: {meta['title']} | Section: {meta['section']}\n"
+            meta = chunk.get("metadata", {}) if isinstance(chunk, dict) else {}
+            pnum = meta.get("patent_number", f"US-PATENT-{idx}")
+            title = meta.get("title", "Patent Specification")
+            sec = meta.get("section", "Claims")
+            context_str += f"[{idx}] Patent: {pnum} | Title: {title} | Section: {sec}\n"
             if meta.get("claim_number"):
                 context_str += f"Claim Number: {meta['claim_number']}\n"
-            context_str += f"Text Content: {chunk['text']}\n"
+            context_str += f"Text Content: {chunk.get('text', '')}\n"
             context_str += "-" * 50 + "\n"
 
         lang_instruction = f"\nIMPORTANT: Respond in {target_language} language." if target_language and target_language.lower() != "english" else ""
