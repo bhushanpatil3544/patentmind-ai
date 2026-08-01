@@ -105,10 +105,10 @@ class ProcessingEngine:
             except Exception as ocr_e:
                 logger.warning(f"PaddleOCR fallback failed: {ocr_e}")
 
-            return "Scanned Patent Specification Document: Technical architecture, claim scope, and prior-art search."
+            return ""
         except Exception as e:
             logger.error(f"Image PDF extraction error: {e}")
-            return "Scanned Patent Specification Document: Technical prior-art analysis."
+            return ""
 
     def clean_text(self, text: str) -> str:
         """

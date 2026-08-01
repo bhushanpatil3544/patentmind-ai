@@ -1351,8 +1351,12 @@ async def analyze_idea(
         if os.path.exists(temp_pdf_path):
             os.remove(temp_pdf_path)
         
-        if not extracted_text or len(extracted_text.strip()) < 10:
-            extracted_text = f"Patent specification idea document uploaded by user ({file.filename}). Analysis of technical system features, claim differentiations, and prior art landscape."
+        clean_extracted = extracted_text.strip() if extracted_text else ""
+        if not clean_extracted or len(clean_extracted) < 10 or "placeholder content" in clean_extracted.lower():
+            raise HTTPException(
+                status_code=400,
+                detail=f"The uploaded document '{file.filename}' is blank or contains no extractable text. Please upload a PDF specification with readable patent text or diagrams."
+            )
         
         query_vector = embedder.embed_query(extracted_text[:3000])
         retrieved_chunks = db.search(query_vector, filter_metadata=None, limit=10)
