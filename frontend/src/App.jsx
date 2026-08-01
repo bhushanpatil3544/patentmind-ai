@@ -2124,12 +2124,13 @@ function App() {
     }
 
     return (
-      <div className={`app-wrapper bg-[#0A0A0A] ${theme} flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans`}>
+      <div className={`app-wrapper bg-[#050816] ${theme} flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans`}>
         
-        {/* Zelect SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
+        {/* Wrangler Enterprise SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-          <div className="absolute top-[-5%] left-[15%] w-[600px] h-[600px] rounded-full bg-[#FF3F05]/12 blur-[150px] animate-pulse duration-[8000ms]" />
-          <div className="absolute bottom-[-10%] right-[15%] w-[550px] h-[550px] rounded-full bg-[#6366F1]/10 blur-[140px] animate-pulse duration-[7000ms]" />
+          <div className="absolute top-[-10%] left-[15%] w-[650px] h-[650px] rounded-full bg-[#5B7CFA]/15 blur-[160px] animate-pulse duration-[9000ms]" />
+          <div className="absolute bottom-[-10%] right-[15%] w-[600px] h-[600px] rounded-full bg-[#00C2FF]/15 blur-[150px] animate-pulse duration-[7000ms]" />
+          <div className="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#7B61FF]/12 blur-[140px]" />
         </div>
 
         {/* Top-Right Theme Selector */}
@@ -2661,32 +2662,33 @@ function App() {
 
   // CORE APPLICATION DASHBOARD (LOGGED IN)
   return (
-    <div className={`app-wrapper bg-[#0A0A0A] ${theme} flex flex-col md:flex-row transition-all duration-300 min-h-screen relative overflow-hidden font-sans`}>
+    <div className={`app-wrapper bg-[#050816] ${theme} flex flex-col md:flex-row transition-all duration-500 min-h-screen relative overflow-hidden font-sans`}>
       
-      {/* Zelect SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
+      {/* Wrangler Enterprise SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-        <div className="absolute top-[-5%] left-[15%] w-[600px] h-[600px] rounded-full bg-[#FF3F05]/12 blur-[150px] animate-pulse duration-[8000ms]" />
-        <div className="absolute bottom-[-10%] right-[15%] w-[550px] h-[550px] rounded-full bg-[#6366F1]/10 blur-[140px] animate-pulse duration-[7000ms]" />
+        <div className="absolute top-[-10%] left-[10%] w-[650px] h-[650px] rounded-full bg-[#5B7CFA]/15 blur-[160px] animate-pulse duration-[9000ms]" />
+        <div className="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] rounded-full bg-[#00C2FF]/15 blur-[150px] animate-pulse duration-[7000ms]" />
+        <div className="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full bg-[#7B61FF]/12 blur-[150px]" />
       </div>
 
-      {/* TOP FLOATING HORIZONTAL NAVIGATION BAR (ZELECT SAAS DOCK) */}
-      <header className="fixed top-4 inset-x-0 z-40 px-4 md:px-6 flex justify-center pointer-events-none select-none">
-        <div className="zelect-navbar pointer-events-auto max-w-7xl w-full px-5 py-2.5 md:py-3 rounded-full flex items-center justify-between gap-3 md:gap-6 border border-white/10 shadow-2xl transition-all duration-300">
+      {/* TOP FLOATING HORIZONTAL ENTERPRISE NAVBAR (WRANGLER DOCK) */}
+      <header className="fixed top-4 inset-x-0 z-50 px-4 md:px-6 flex justify-center pointer-events-none select-none">
+        <div className="wrangler-navbar pointer-events-auto max-w-7xl w-full px-5 py-2.5 md:py-3 rounded-full flex items-center justify-between gap-3 md:gap-6 border border-white/10 shadow-2xl transition-all duration-300">
           
           {/* Brand Header Badge */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FF3F05] via-[#FF6422] to-[#F59E0B] p-[1px] shadow-[0_0_20px_rgba(255,63,5,0.4)] flex-shrink-0">
-              <div className="w-full h-full bg-[#06080E] rounded-full flex items-center justify-center text-[#FF6422] font-bold text-sm">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] p-[1px] shadow-[0_0_20px_rgba(0,194,255,0.4)] flex-shrink-0">
+              <div className="w-full h-full bg-[#050816] rounded-full flex items-center justify-center text-[#00C2FF] font-bold text-sm">
                 ⚡
               </div>
             </div>
-            <span className="font-sans font-bold text-base md:text-lg text-white tracking-tight hidden md:inline-block">
-              PatentMind <span className="text-[10px] text-[#FF6422] font-mono font-semibold ml-1 px-2 py-0.5 rounded-full bg-[#FF3F05]/10 border border-[#FF3F05]/30">v2.1</span>
+            <span className="font-heading font-bold text-base md:text-lg text-white tracking-tight hidden md:inline-block">
+              PatentMind <span className="text-[10px] text-[#00C2FF] font-mono font-semibold ml-1 px-2.5 py-0.5 rounded-full bg-[#5B7CFA]/15 border border-[#5B7CFA]/40 shadow-[0_0_10px_rgba(91,124,250,0.2)]">AI Enterprise</span>
             </span>
           </div>
 
           {/* Center Horizontal Navigation Menu */}
-          <nav className="flex items-center gap-1 md:gap-2 overflow-x-auto py-1 px-1 no-scrollbar">
+          <nav className="flex items-center gap-1 md:gap-1.5 overflow-x-auto py-1 px-1 no-scrollbar">
             {[
               { id: 'search', label: 'Search', icon: Search },
               { id: 'dashboard', label: 'Analytics', icon: BarChart3 },
@@ -2706,8 +2708,8 @@ function App() {
                   title={tab.label}
                   className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 flex-shrink-0 ${
                     isActive 
-                      ? 'bg-gradient-to-r from-[#FF3F05] to-[#FF6422] text-white font-semibold shadow-[0_0_20px_rgba(255,63,5,0.4)] scale-[1.02]' 
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-gradient-to-r from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] text-white font-semibold shadow-[0_0_25px_rgba(0,194,255,0.4)] scale-[1.03]' 
+                      : 'text-slate-300 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <TabIcon className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
@@ -2721,23 +2723,23 @@ function App() {
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Language Dropdown Pill */}
             <div className="relative flex items-center bg-white/5 border border-white/10 rounded-full px-2.5 py-1.5 hover:border-white/20 transition-all">
-              <Globe className="w-3.5 h-3.5 text-[#FF6422] mr-1.5 flex-shrink-0" />
+              <Globe className="w-3.5 h-3.5 text-[#00C2FF] mr-1.5 flex-shrink-0" />
               <select
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
                 className="bg-transparent text-[11px] font-sans text-slate-200 focus:outline-none border-none cursor-pointer w-[45px] md:w-[70px] truncate"
               >
-                <option value="English" className="bg-[#0A0D18] text-slate-200">En 🇺🇸</option>
-                <option value="Hindi" className="bg-[#0A0D18] text-slate-200">Hi 🇮🇳</option>
-                <option value="Spanish" className="bg-[#0A0D18] text-slate-200">Es 🇪🇸</option>
-                <option value="French" className="bg-[#0A0D18] text-slate-200">Fr 🇫🇷</option>
-                <option value="German" className="bg-[#0A0D18] text-slate-200">De 🇩🇪</option>
+                <option value="English" className="bg-[#050816] text-slate-200">En 🇺🇸</option>
+                <option value="Hindi" className="bg-[#050816] text-slate-200">Hi 🇮🇳</option>
+                <option value="Spanish" className="bg-[#050816] text-slate-200">Es 🇪🇸</option>
+                <option value="French" className="bg-[#050816] text-slate-200">Fr 🇫🇷</option>
+                <option value="German" className="bg-[#050816] text-slate-200">De 🇩🇪</option>
               </select>
             </div>
 
             {/* User Profile & Password Modal Toggle */}
             <div className="hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full py-1.5 px-3" title={`User: ${username}`}>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+              <span className="w-2 h-2 rounded-full bg-[#00C2FF] animate-pulse shadow-[0_0_10px_rgba(0,194,255,0.9)]"></span>
               <span className="text-xs font-semibold text-white tracking-wide uppercase truncate max-w-[90px]">{username}</span>
               <button
                 type="button"
@@ -2745,7 +2747,7 @@ function App() {
                   setShowChangePasswordModal(true);
                   setChangePasswordMsg('');
                 }}
-                className="text-slate-400 hover:text-[#FF6422] transition-all ml-1 p-0.5 rounded"
+                className="text-slate-400 hover:text-[#00C2FF] transition-all ml-1 p-0.5 rounded"
                 title="Change Account Password"
               >
                 <KeyRound className="w-3.5 h-3.5" />
@@ -2768,10 +2770,10 @@ function App() {
       {/* Change Password Modal */}
       {showChangePasswordModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0B0F1D] border border-white/10 zelect-card p-6 md:p-8 max-w-sm w-full space-y-5 fade-in rounded-3xl shadow-2xl">
+          <div className="bg-[#050816] border border-white/10 wrangler-card p-6 md:p-8 max-w-sm w-full space-y-5 fade-in rounded-3xl shadow-2xl">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-mono uppercase tracking-wider text-main flex items-center gap-2">
-                <KeyRound className="w-4 h-4 text-[#FF6422]" />
+                <KeyRound className="w-4 h-4 text-[#00C2FF]" />
                 CHANGE ACCOUNT PASSWORD
               </h3>
               <button
@@ -2836,20 +2838,206 @@ function App() {
         </div>
       )}
 
-      <main ref={mainContentRef} className="w-full max-w-6xl mx-auto pt-28 pb-20 px-6 overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-300">
+      <main ref={mainContentRef} className="w-full max-w-7xl mx-auto pt-28 pb-24 px-6 overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-500">
 
-        {/* SEMANTIC SEARCH & RAG TAB */}
+        {/* SEMANTIC SEARCH & LANDING HERO TAB */}
         {activeTab === 'search' && (
-          <div className="space-y-12 fade-in">
-            <div>
-              <span className="text-[10px] font-mono tracking-widest text-[#F59E0B] uppercase flex items-center gap-2 font-semibold">
-                <Sparkles className="w-3.5 h-3.5 text-[#A855F7]" />
-                01. ADVANCED VECTOR INTELLIGENCE
-              </span>
-              <h2 className="optirise-gradient-text text-4xl md:text-5xl font-outfit font-semibold tracking-tight mt-1.5">
-                RAG KNOWLEDGE SEARCH
-              </h2>
-            </div>
+          <div className="space-y-24 pb-16">
+            
+            {/* SECTION 1: WRANGLER ENTERPRISE SAAS HERO */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="relative text-center pt-8 md:pt-16 pb-12 max-w-4xl mx-auto space-y-8"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#5B7CFA]/10 border border-[#5B7CFA]/30 text-[#00C2FF] text-xs font-semibold uppercase tracking-wider shadow-[0_0_20px_rgba(91,124,250,0.2)]">
+                <Sparkles className="w-3.5 h-3.5 text-[#00C2FF] animate-spin" style={{ animationDuration: '6s' }} />
+                <span>Next-Gen Intellectual Property Architecture</span>
+              </div>
+
+              <h1 className="wrangler-gradient-text text-5xl sm:text-6xl md:text-7xl font-heading font-extrabold tracking-tight leading-[1.08]">
+                AI-Powered Patent Intelligence Platform
+              </h1>
+
+              <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-sans leading-relaxed">
+                Transform complex patent research into actionable engineering decisions. Powered by high-speed PaddleOCR text extraction, ChromaDB vector search, and custom Retrieval-Augmented Generation (RAG).
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <button
+                  onClick={() => setActiveTab('upload')}
+                  className="w-full sm:w-auto btn-theme px-8 py-4 rounded-full font-heading font-semibold text-sm tracking-wide flex items-center justify-center gap-3"
+                >
+                  <UploadCloud className="w-5 h-5 text-white" />
+                  <span>Upload Patent</span>
+                  <ArrowRight className="w-4 h-4 text-white/80" />
+                </button>
+                <a
+                  href="#live-rag-search"
+                  className="w-full sm:w-auto wrangler-pill px-8 py-4 rounded-full font-heading font-medium text-sm text-slate-200 flex items-center justify-center gap-3 hover:text-white hover:border-[#00C2FF]/50 transition-all duration-300"
+                >
+                  <Search className="w-4 h-4 text-[#00C2FF]" />
+                  <span>Try Live Search Demo</span>
+                </a>
+              </div>
+            </motion.div>
+
+            {/* SECTION 2: TRUSTED COMPANIES */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-center space-y-5 border-y border-white/[0.06] py-10 my-8"
+            >
+              <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-slate-400">
+                POWERING RESEARCH AT ENTERPRISE R&D LABS & PATENT DEFENSE TEAMS
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 md:gap-12 opacity-80">
+                <span className="text-sm font-heading font-bold text-slate-400 tracking-tight flex items-center gap-1.5 hover:text-white transition-colors">
+                  <span className="w-2 h-2 rounded-full bg-[#00C2FF]"></span> APPLE ADVANCED R&D
+                </span>
+                <span className="text-sm font-heading font-bold text-slate-400 tracking-tight flex items-center gap-1.5 hover:text-white transition-colors">
+                  <span className="w-2 h-2 rounded-full bg-[#5B7CFA]"></span> STRIPE IP VENTURES
+                </span>
+                <span className="text-sm font-heading font-bold text-slate-400 tracking-tight flex items-center gap-1.5 hover:text-white transition-colors">
+                  <span className="w-2 h-2 rounded-full bg-[#7B61FF]"></span> LINEAR DEEPSEARCH
+                </span>
+                <span className="text-sm font-heading font-bold text-slate-400 tracking-tight flex items-center gap-1.5 hover:text-white transition-colors">
+                  <span className="w-2 h-2 rounded-full bg-[#00C2FF]"></span> OPENAI IP SHIELD
+                </span>
+                <span className="text-sm font-heading font-bold text-slate-400 tracking-tight flex items-center gap-1.5 hover:text-white transition-colors">
+                  <span className="w-2 h-2 rounded-full bg-[#5B7CFA]"></span> ANTHROPIC TECH DEFENSE
+                </span>
+              </div>
+            </motion.div>
+
+            {/* SECTION 3: HOW IT WORKS (ANIMATED CONNECTED TIMELINE) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="space-y-10 max-w-7xl mx-auto"
+            >
+              <div className="text-center space-y-3">
+                <span className="wrangler-badge">Enterprise Pipeline Architecture</span>
+                <h2 className="text-3xl md:text-5xl font-heading font-bold text-white tracking-tight">
+                  How PatentMind AI Works
+                </h2>
+                <p className="text-sm md:text-base text-slate-400 max-w-2xl mx-auto">
+                  An automated multi-stage pipeline designed for extreme precision, security, and sub-second querying across complex PDF patent archives.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-5 relative">
+                {[
+                  { step: "01", title: "Upload", sub: "PDF Document", icon: UploadCloud, color: "from-[#5B7CFA] to-[#3B82F6]" },
+                  { step: "02", title: "OCR", sub: "PaddleOCR Engine", icon: FileCode, color: "from-[#3B82F6] to-[#7B61FF]" },
+                  { step: "03", title: "Embedding", sub: "768-dim Vectors", icon: Cpu, color: "from-[#7B61FF] to-[#A855F7]" },
+                  { step: "04", title: "Vector DB", sub: "ChromaDB Store", icon: Database, color: "from-[#A855F7] to-[#00C2FF]" },
+                  { step: "05", title: "LLM", sub: "Reasoning Matrix", icon: Network, color: "from-[#00C2FF] to-[#38BDF8]" },
+                  { step: "06", title: "AI Answer", sub: "Verified Citation", icon: CheckCircle2, color: "from-[#38BDF8] to-[#34D399]" },
+                ].map((item, index) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.step} className="relative flex flex-col items-center">
+                      <div className="wrangler-card w-full p-5 flex flex-col items-center text-center justify-between h-[180px] group hover:border-[#00C2FF]/60 relative z-10">
+                        <span className="text-[10px] font-mono text-[#00C2FF] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-white/5 border border-white/10">
+                          STEP {item.step}
+                        </span>
+                        <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${item.color} p-[1px] shadow-lg flex items-center justify-center my-2 group-hover:scale-110 transition-transform duration-300`}>
+                          <div className="w-full h-full bg-[#050816] rounded-[15px] flex items-center justify-center">
+                            <Icon className="w-5 h-5 text-[#00C2FF] group-hover:text-white transition-colors" />
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-heading font-bold text-sm text-white">{item.title}</h4>
+                          <p className="text-[11px] text-slate-400 font-mono mt-0.5">{item.sub}</p>
+                        </div>
+                      </div>
+
+                      {/* Connecting glowing timeline arrow between cards on large screens */}
+                      {index < 5 && (
+                        <div className="hidden lg:flex absolute -right-[18px] top-1/2 -translate-y-1/2 z-20 text-[#00C2FF] font-bold text-lg animate-pulse">
+                          →
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            {/* SECTION 4: ENTERPRISE FEATURES GRID */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="space-y-12 max-w-7xl mx-auto pt-8"
+            >
+              <div className="text-center space-y-3">
+                <span className="wrangler-badge">Stripe & Linear Inspired Precision</span>
+                <h2 className="text-3xl md:text-5xl font-heading font-bold text-white tracking-tight">
+                  Comprehensive IP Superpowers
+                </h2>
+                <p className="text-sm md:text-base text-slate-400 max-w-2xl mx-auto">
+                  Every tool required to dissect claims, synthesize Prior Art, and out-innovate the market in an enterprise glass UI.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { title: "Patent Chat", desc: "Interactive conversational interface for multi-claim reasoning and real-time legal scope interrogation.", icon: MessageSquare, tab: "chat", tag: "RAG ENGINE" },
+                  { title: "AI Summary", desc: "Generate instant executive briefs, technical abstracts, and risk profiles in clean markdown format.", icon: FileText, tab: "dashboard", tag: "SYNTHESIS" },
+                  { title: "OCR Extraction", desc: "High-accuracy PaddleOCR deep scanning for messy scanned patent PDFs and complex diagrams.", icon: Layers, tab: "upload", tag: "500+ LANG" },
+                  { title: "Semantic Search", desc: "High-dimensional embedding queries that capture inventive concepts beyond literal keyword matching.", icon: Search, tab: "search", tag: "VECTOR SPELL" },
+                  { title: "Patent Comparison", desc: "Side-by-side specification diffing and technical overlap matrix to benchmark competitor filing claims.", icon: Sliders, tab: "dashboard", tag: "DIFF MATRIX" },
+                  { title: "Citation Finder", desc: "Automatic extraction of backward Prior Art references and forward citation dependencies.", icon: Tag, tab: "dataset", tag: "CITATIONS" },
+                  { title: "Multi-PDF Chat", desc: "Interrogate entire patent clusters and corporate dataset archives simultaneously in a unified conversation.", icon: FolderOpen, tab: "chat", tag: "CROSS-DOC" },
+                  { title: "Vector Search", desc: "Sub-millisecond ChromaDB index queries with configurable similarity thresholds and visual scoring.", icon: Database, tab: "search", tag: "CHROMADB" }
+                ].map((feat, idx) => {
+                  const FeatIcon = feat.icon;
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => setActiveTab(feat.tab)}
+                      className="wrangler-card p-7 flex flex-col justify-between cursor-pointer group hover:border-[#00C2FF]/50 hover:bg-white/[0.08] transition-all"
+                    >
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="w-11 h-11 rounded-2xl bg-[#5B7CFA]/15 border border-[#5B7CFA]/30 flex items-center justify-center text-[#00C2FF] group-hover:bg-[#5B7CFA] group-hover:text-white transition-all shadow-md">
+                            <FeatIcon className="w-5 h-5" />
+                          </div>
+                          <span className="text-[10px] font-mono font-semibold text-[#7B61FF] bg-[#7B61FF]/10 border border-[#7B61FF]/30 px-2.5 py-1 rounded-full uppercase">
+                            {feat.tag}
+                          </span>
+                        </div>
+                        <h3 className="font-heading font-bold text-lg text-white group-hover:text-[#00C2FF] transition-colors">
+                          {feat.title}
+                        </h3>
+                        <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                          {feat.desc}
+                        </p>
+                      </div>
+
+                      <div className="pt-6 mt-4 border-t border-white/[0.06] flex items-center justify-between text-xs font-heading font-semibold text-slate-400 group-hover:text-white transition-colors">
+                        <span>Launch Module</span>
+                        <ArrowRight className="w-4 h-4 text-[#00C2FF] group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            {/* SECTION 5: LIVE RAG SEARCH MODULE */}
+            <div id="live-rag-search" className="pt-12 border-t border-white/[0.08]">
+              <div className="mb-6">
+                <span className="wrangler-badge">Real-Time IP Query Deck</span>
+                <h2 className="wrangler-gradient-text text-3xl md:text-4xl font-heading font-bold mt-2">
+                  Live Semantic Patent Search
+                </h2>
+              </div>
 
             <form onSubmit={handleSearch} className="space-y-6">
               <div className="glass-panel-sleek rounded-xl p-3 relative flex items-center shadow-lg transition-all focus-within:border-[#7C3AED]/60 focus-within:shadow-[0_0_25px_rgba(124,58,237,0.15)]">
@@ -3025,6 +3213,7 @@ function App() {
                 </div>
               </div>
             )}
+            </div>
           </div>
         )}
 
