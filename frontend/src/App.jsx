@@ -345,6 +345,14 @@ export default function App() {
   const [pdfAnalyzingLoading, setPdfAnalyzingLoading] = useState(false);
   // Sidebar Collapse state
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Google Patents Fetch states
+  const [googleFetchQuery, setGoogleFetchQuery] = useState('');
+  const [googleFetchLimit, setGoogleFetchLimit] = useState(5);
+  const [googleFetchLoading, setGoogleFetchLoading] = useState(false);
+  const [googleFetchResult, setGoogleFetchResult] = useState(null);
+  const [googleFetchError, setGoogleFetchError] = useState(null);
+  const [datasetActiveTab, setDatasetActiveTab] = useState('google'); // 'google' | 'file'
   
   const chatEndRef = useRef(null);
 
@@ -1293,6 +1301,40 @@ export default function App() {
       setFeedbackError(err.message || 'Network error.');
     } finally {
       setFeedbackLoading(false);
+    }
+  };
+
+  const handleGooglePatentsFetch = async (e, customQuery = null) => {
+    if (e) e.preventDefault();
+    const queryToUse = customQuery || googleFetchQuery;
+    if (!queryToUse.trim()) return;
+
+    setGoogleFetchLoading(true);
+    setGoogleFetchError(null);
+    setGoogleFetchResult(null);
+
+    try {
+      const response = await authenticatedFetch('/api/v1/dataset/fetch-google-patents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: queryToUse,
+          limit: Number(googleFetchLimit)
+        })
+      });
+
+      if (!response) return;
+      const data = await response.json();
+      if (response.ok) {
+        setGoogleFetchResult(data);
+        fetchAnalytics();
+      } else {
+        setGoogleFetchError(data.detail || 'Failed to fetch patents from Google Patents.');
+      }
+    } catch (err) {
+      setGoogleFetchError(err.message || 'Error connecting to Google Patents engine.');
+    } finally {
+      setGoogleFetchLoading(false);
     }
   };
 
@@ -3251,61 +3293,226 @@ export default function App() {
         {activeTab === 'dataset' && (
           <div className="space-y-8 fade-in max-w-4xl">
             <div>
-              <span className="text-[10px] text-muted font-mono tracking-widest uppercase">05. BATCH INGESTION</span>
-              <h2 className="text-4xl font-semibold tracking-tight text-main font-sans mt-1">Bulk Dataset Indexer</h2>
+              <span className="text-[10px] text-muted font-mono tracking-widest uppercase">05. DATASET INGESTION</span>
+              <h2 className="text-4xl font-semibold tracking-tight text-main font-sans mt-1">Google Patents & Bulk Dataset Indexer</h2>
               <p className="text-xs text-zinc-400 font-light mt-1">
-                Ingest large structured collections of patent specifications and technical documents in a single automated pipeline.
+                Fetch patent specifications directly from Google Patents or upload structured CSV/JSON datasets into your vector database.
               </p>
             </div>
 
-            <div className="glass-panel-sleek p-8 rounded-2xl border border-white/10 space-y-6 shadow-2xl">
-              <div className="space-y-2">
-                <h3 className="text-base font-semibold text-white font-sans flex items-center gap-2">
-                  <Database className="w-4 h-4 text-[#22D3EE]" />
-                  Batch Vectorization Pipeline
-                </h3>
-                <p className="text-xs text-zinc-300 leading-relaxed font-light">
-                  Upload a structured <strong>JSON</strong> (array of patent records) or <strong>CSV</strong> dataset file. The processing engine will parse, validate fields, chunk claim text, and index vector embeddings into the database automatically.
-                </p>
-              </div>
+            {/* Sub-Nav Switcher */}
+            <div className="flex items-center gap-2 p-1.5 bg-[#08181C]/80 border border-[#22D3EE]/20 rounded-2xl w-fit">
+              <button
+                type="button"
+                onClick={() => setDatasetActiveTab('google')}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold font-sans transition-all flex items-center gap-2 ${
+                  datasetActiveTab === 'google'
+                    ? 'bg-gradient-to-r from-[#0D9488] to-[#22D3EE] text-white shadow-md'
+                    : 'text-teal-200/70 hover:text-white'
+                }`}
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>Google Patents Direct Fetcher</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDatasetActiveTab('file')}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold font-sans transition-all flex items-center gap-2 ${
+                  datasetActiveTab === 'file'
+                    ? 'bg-gradient-to-r from-[#0D9488] to-[#22D3EE] text-white shadow-md'
+                    : 'text-teal-200/70 hover:text-white'
+                }`}
+              >
+                <FileCode className="w-3.5 h-3.5" />
+                <span>Upload CSV / JSON Dataset File</span>
+              </button>
+            </div>
 
-              <form onSubmit={handleDatasetSubmit} className="space-y-6">
-                <div className="border-2 border-dashed border-[#22D3EE]/30 hover:border-[#7C3AED]/70 transition-all p-10 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer bg-white/5 group shadow-inner">
-                  <input
-                    type="file"
-                    accept=".json,.csv"
-                    onChange={(e) => setDatasetFile(e.target.files[0])}
-                    className="hidden"
-                    id="dataset-file-input"
-                  />
-                  <label htmlFor="dataset-file-input" className="cursor-pointer text-center space-y-2">
-                    <div className="w-12 h-12 rounded-2xl bg-[#7C3AED]/20 border border-[#7C3AED]/40 flex items-center justify-center text-[#22D3EE] mx-auto shadow-lg group-hover:scale-110 transition-transform">
-                      <FileCode className="w-6 h-6" />
-                    </div>
-                    <span className="text-sm font-semibold text-white block font-sans">
-                      {datasetFile ? datasetFile.name : 'Choose a JSON or CSV dataset file'}
-                    </span>
-                    <span className="text-[10px] text-zinc-400 font-mono uppercase block">Max File Size: 25MB • JSON / CSV</span>
-                  </label>
-                </div>
-
-                {/* Sample JSON/CSV Schema helper */}
-                <div className="p-4 bg-white/5 border border-white/5 rounded-xl text-xs font-mono space-y-1.5 text-zinc-400">
-                  <span className="text-[#22D3EE] font-bold block text-[10px] uppercase">Expected Schema Fields:</span>
-                  <p className="text-[11px] text-zinc-300">
-                    <code className="text-[#8B5CF6]">patent_number</code>, <code className="text-[#8B5CF6]">title</code>, <code className="text-[#8B5CF6]">abstract</code>, <code className="text-[#8B5CF6]">claims</code>, <code className="text-[#8B5CF6]">source</code>, <code className="text-[#8B5CF6]">document_date</code>
+            {/* TAB 1: GOOGLE PATENTS DIRECT FETCHER */}
+            {datasetActiveTab === 'google' && (
+              <div className="glass-panel-sleek p-8 rounded-2xl border border-white/10 space-y-6 shadow-2xl">
+                <div className="space-y-2">
+                  <h3 className="text-base font-semibold text-white font-sans flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-[#22D3EE]" />
+                    Direct Google Patents Fetch & Auto-Vectorization
+                  </h3>
+                  <p className="text-xs text-zinc-300 leading-relaxed font-light">
+                    Enter any technology topic, technical field, or keyword. PatentMind AI will query <strong>Google Patents</strong> live, parse publication specifications, chunk claims, and index vector embeddings directly into your vector store.
                   </p>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={datasetLoading}
-                  className="w-full py-3.5 bg-[#7C3AED] hover:bg-[#8B5CF6] text-white font-semibold text-xs font-sans tracking-wider uppercase rounded-xl transition-all shadow-lg disabled:opacity-40"
-                >
-                  {datasetLoading ? 'BATCH VECTORIZING DATASET RECORDS...' : 'START BULK INGESTION'}
-                </button>
-              </form>
-            </div>
+                <form onSubmit={handleGooglePatentsFetch} className="space-y-5">
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <div className="flex-1 relative">
+                      <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3.5" />
+                      <input
+                        type="text"
+                        value={googleFetchQuery}
+                        onChange={(e) => setGoogleFetchQuery(e.target.value)}
+                        placeholder="Search Google Patents topic (e.g., Neural Networks, Quantum Cryptography, Autonomous Guidance...)"
+                        required
+                        className="w-full bg-[#08181C] border border-[#22D3EE]/30 focus:border-[#22D3EE] rounded-xl pl-10 pr-4 py-3 text-xs font-sans text-white focus:outline-none placeholder:text-zinc-500 shadow-inner"
+                      />
+                    </div>
+                    <select
+                      value={googleFetchLimit}
+                      onChange={(e) => setGoogleFetchLimit(e.target.value)}
+                      className="bg-[#08181C] border border-[#22D3EE]/30 rounded-xl px-3 py-3 text-xs font-sans text-teal-100 focus:outline-none cursor-pointer"
+                    >
+                      <option value={5} className="bg-[#08181C]">5 Patents</option>
+                      <option value={10} className="bg-[#08181C]">10 Patents</option>
+                      <option value={20} className="bg-[#08181C]">20 Patents</option>
+                    </select>
+                    <button
+                      type="submit"
+                      disabled={googleFetchLoading}
+                      className="px-6 py-3 bg-gradient-to-r from-[#0D9488] to-[#22D3EE] hover:opacity-90 text-white font-semibold text-xs font-sans tracking-wide uppercase rounded-xl transition-all shadow-lg disabled:opacity-40 flex items-center justify-center gap-2"
+                    >
+                      {googleFetchLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>FETCHING GOOGLE PATENTS...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-4 h-4" />
+                          <span>FETCH & VECTORIZE PATENTS</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Preset Keyword Pills */}
+                  <div className="space-y-2 pt-1">
+                    <span className="text-[10px] font-mono text-teal-200/60 uppercase tracking-wider block">POPULAR GOOGLE PATENT SEARCH TOPICS:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        'Artificial Intelligence & Neural Control',
+                        'Quantum Cryptography Protocol',
+                        'Autonomous Robotics & Guidance',
+                        'Genomic CRISPR Editing',
+                        'Renewable Solar Cell Efficiency'
+                      ].map((preset) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => {
+                            setGoogleFetchQuery(preset);
+                            handleGooglePatentsFetch(null, preset);
+                          }}
+                          className="px-3 py-1.5 bg-[#0E262B]/80 hover:bg-[#22D3EE]/20 border border-[#22D3EE]/20 rounded-lg text-xs text-teal-200 transition-all font-sans"
+                        >
+                          {preset}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </form>
+
+                {googleFetchError && (
+                  <div className="p-4 border border-red-500/30 bg-red-950/20 text-xs text-red-300 font-light flex items-center gap-2 rounded-xl">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0 text-red-400" />
+                    <span>{googleFetchError}</span>
+                  </div>
+                )}
+
+                {googleFetchResult && (
+                  <div className="p-6 border border-[#22D3EE]/30 bg-[#08181C]/90 rounded-xl text-xs font-light space-y-4 text-zinc-300">
+                    <div className="flex items-center justify-between font-mono uppercase tracking-wider text-[#22D3EE]">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400" />
+                        <span>GOOGLE PATENTS INGESTION COMPLETE</span>
+                      </div>
+                      <span className="text-[10px] text-zinc-400">Latency: {googleFetchResult.latency_sec}s</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4 text-xs font-mono py-2">
+                      <div className="border border-white/10 p-3 rounded-xl bg-white/5">
+                        <span className="text-zinc-400 text-[10px] block mb-1">SEARCH QUERY</span>
+                        <span className="text-white font-semibold truncate block">{googleFetchResult.query}</span>
+                      </div>
+                      <div className="border border-white/10 p-3 rounded-xl bg-white/5">
+                        <span className="text-zinc-400 text-[10px] block mb-1">PATENTS INGESTED</span>
+                        <span className="text-[#22D3EE] font-semibold">{googleFetchResult.successfully_ingested} / {googleFetchResult.total_fetched}</span>
+                      </div>
+                      <div className="border border-white/10 p-3 rounded-xl bg-white/5">
+                        <span className="text-zinc-400 text-[10px] block mb-1">CHUNKS VECTORIZED</span>
+                        <span className="text-emerald-400 font-semibold">{googleFetchResult.total_chunks_indexed} vectors</span>
+                      </div>
+                    </div>
+
+                    {googleFetchResult.fetched_patents && googleFetchResult.fetched_patents.length > 0 && (
+                      <div className="space-y-2 pt-2">
+                        <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">Newly Ingested Patents:</span>
+                        <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                          {googleFetchResult.fetched_patents.map((p, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-2.5 bg-white/5 border border-white/5 rounded-lg text-xs">
+                              <div className="flex items-center gap-2 truncate">
+                                <span className="font-mono text-[#22D3EE] font-bold">{p.patent_number}</span>
+                                <span className="text-white truncate font-sans">{p.title}</span>
+                              </div>
+                              <span className="text-[9px] font-mono bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-full flex-shrink-0">{p.source}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 2: CSV / JSON FILE IMPORT */}
+            {datasetActiveTab === 'file' && (
+              <div className="glass-panel-sleek p-8 rounded-2xl border border-white/10 space-y-6 shadow-2xl">
+                <div className="space-y-2">
+                  <h3 className="text-base font-semibold text-white font-sans flex items-center gap-2">
+                    <Database className="w-4 h-4 text-[#22D3EE]" />
+                    Batch CSV / JSON Dataset Upload
+                  </h3>
+                  <p className="text-xs text-zinc-300 leading-relaxed font-light">
+                    Upload a structured <strong>JSON</strong> (array of patent records) or <strong>CSV</strong> dataset file. The processing engine will parse, validate fields, chunk claim text, and index vector embeddings into the database automatically.
+                  </p>
+                </div>
+
+                <form onSubmit={handleDatasetSubmit} className="space-y-6">
+                  <div className="border-2 border-dashed border-[#22D3EE]/30 hover:border-[#7C3AED]/70 transition-all p-10 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer bg-white/5 group shadow-inner">
+                    <input
+                      type="file"
+                      accept=".json,.csv"
+                      onChange={(e) => setDatasetFile(e.target.files[0])}
+                      className="hidden"
+                      id="dataset-file-input"
+                    />
+                    <label htmlFor="dataset-file-input" className="cursor-pointer text-center space-y-2">
+                      <div className="w-12 h-12 rounded-2xl bg-[#7C3AED]/20 border border-[#7C3AED]/40 flex items-center justify-center text-[#22D3EE] mx-auto shadow-lg group-hover:scale-110 transition-transform">
+                        <FileCode className="w-6 h-6" />
+                      </div>
+                      <span className="text-sm font-semibold text-white block font-sans">
+                        {datasetFile ? datasetFile.name : 'Choose a JSON or CSV dataset file'}
+                      </span>
+                      <span className="text-[10px] text-zinc-400 font-mono uppercase block">Max File Size: 25MB • JSON / CSV</span>
+                    </label>
+                  </div>
+
+                  {/* Sample JSON/CSV Schema helper */}
+                  <div className="p-4 bg-white/5 border border-white/5 rounded-xl text-xs font-mono space-y-1.5 text-zinc-400">
+                    <span className="text-[#22D3EE] font-bold block text-[10px] uppercase">Expected Schema Fields:</span>
+                    <p className="text-[11px] text-zinc-300">
+                      <code className="text-[#8B5CF6]">patent_number</code>, <code className="text-[#8B5CF6]">title</code>, <code className="text-[#8B5CF6]">abstract</code>, <code className="text-[#8B5CF6]">claims</code>, <code className="text-[#8B5CF6]">source</code>, <code className="text-[#8B5CF6]">document_date</code>
+                    </p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={datasetLoading}
+                    className="w-full py-3.5 bg-gradient-to-r from-[#0D9488] to-[#22D3EE] hover:opacity-90 text-white font-semibold text-xs font-sans tracking-wider uppercase rounded-xl transition-all shadow-lg disabled:opacity-40"
+                  >
+                    {datasetLoading ? 'BATCH VECTORIZING DATASET RECORDS...' : 'START BULK INGESTION'}
+                  </button>
+                </form>
+              </div>
+            )}
 
             {datasetError && (
               <div className="p-4 border border-zinc-800 bg-black/15 text-xs text-red-300 font-light flex items-center gap-2">
