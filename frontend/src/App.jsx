@@ -2835,7 +2835,7 @@ export default function App() {
               { id: 'chat', label: 'Patent Chatbot', icon: MessageSquare },
               { id: 'help', label: 'Help & Feedback', icon: HelpCircle },
               { id: 'settings', label: 'System Settings', icon: Settings },
-              ...(isAdminUser() ? [{ id: 'admin', label: 'Admin Control', icon: Cpu }] : [])
+              { id: 'admin', label: 'Admin Control', icon: Cpu }
             ].map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -4640,8 +4640,8 @@ export default function App() {
           </div>
         )}
 
-        {/* ADMIN CONTROL TAB (ONLY ACCESSIBLE TO ADMIN) */}
-        {isAdminUser() && activeTab === 'admin' && (
+        {/* ADMIN CONTROL TAB (SYSTEM CONSOLE) */}
+        {activeTab === 'admin' && (
           <div className="space-y-12 fade-in">
             <div>
               <span className="text-[11px] text-muted font-mono tracking-widest uppercase">08. ADMINISTRATIVE CONTROLS</span>
