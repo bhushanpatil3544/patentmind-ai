@@ -1522,6 +1522,128 @@ function App() {
 
   // RENDER WELCOME SCREEN ON FIRST LOAD
   if (showWelcome) {
+    return (
+      <div className="kelly-welcome min-h-screen bg-[#fcfcfa] text-[#3a3a3a] overflow-x-hidden">
+        <header className="kelly-welcome-header">
+          <a href="#home" className="kelly-wordmark" aria-label="PatentMind AI home">
+            <span className="kelly-mark">P</span>
+            <span>PatentMind<span className="kelly-wordmark-accent">.ai</span></span>
+          </a>
+
+          <nav className="kelly-welcome-nav" aria-label="Main navigation">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#tools">Tools</a>
+            <a href="#workflow">Workflow</a>
+            <a href="#contact">Contact</a>
+          </nav>
+
+          <div className="kelly-welcome-socials" aria-label="Social links">
+            <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" title="Instagram"><Instagram size={18} /></a>
+            <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" title="LinkedIn"><Linkedin size={18} /></a>
+            <a href="https://x.com/" target="_blank" rel="noreferrer" title="X / Twitter"><Twitter size={18} /></a>
+          </div>
+        </header>
+
+        <main id="home">
+          <section className="kelly-hero">
+            <div className="kelly-hero-copy">
+              <p className="kelly-eyebrow"><span>✦</span> Patent intelligence, made human</p>
+              <h1>Research smarter.<br /><em>Invent boldly.</em></h1>
+              <p className="kelly-intro">
+                PatentMind turns dense patent data into clear research paths, evidence-backed answers, and your next best idea.
+              </p>
+              <div className="kelly-hero-actions">
+                <button type="button" className="kelly-primary-action" onClick={() => { setActiveTab('search'); setShowWelcome(false); }}>
+                  Enter workspace <ArrowRight size={17} />
+                </button>
+                <a href="#tools" className="kelly-secondary-action"><span>↓</span> Explore tools</a>
+              </div>
+              <div className="kelly-mini-stats" aria-label="PatentMind capabilities">
+                <span><b>AI</b> research partner</span>
+                <span><b>PDF</b> to insight</span>
+                <span><b>24/7</b> workspace</span>
+              </div>
+            </div>
+
+            <div className="kelly-hero-art" aria-label="Patent document illustration">
+              <div className="kelly-orbit kelly-orbit-one" />
+              <div className="kelly-orbit kelly-orbit-two" />
+              <div className="kelly-art-sticker">✨<span>Idea<br />found</span></div>
+              <div className="kelly-art-avatar">
+                <div className="kelly-avatar-hair" />
+                <div className="kelly-avatar-face"><span>•</span><span>•</span><i /></div>
+                <div className="kelly-avatar-body" />
+              </div>
+              <div className="kelly-patent-sheet">
+                <div className="kelly-sheet-top"><span>PM</span><i /><i /><i /></div>
+                <div className="kelly-sheet-title">Patent<br />brief</div>
+                <div className="kelly-sheet-lines"><i /><i /><i /><i /></div>
+                <div className="kelly-sheet-diagram"><span /><span /><span /></div>
+                <div className="kelly-sheet-footer">AI VERIFIED · 2026</div>
+              </div>
+              <div className="kelly-art-bubble">🔎<span>Search<br />clarity</span></div>
+            </div>
+          </section>
+
+          <section id="about" className="kelly-intro-section">
+            <p className="kelly-eyebrow"><span>01</span> The clear path through complexity</p>
+            <div>
+              <h2>Everything you need to understand a patent — without losing the thread.</h2>
+              <p>Upload a document, ask a question, compare related work, or start with a fresh invention idea. Every path leads to structured, explainable insight.</p>
+            </div>
+          </section>
+
+          <section id="tools" className="kelly-tools-section">
+            {[
+              { emoji: '🔍', title: 'Semantic search', text: 'Find relevant inventions by meaning, not just matching words.', tab: 'search', icon: Search },
+              { emoji: '📄', title: 'Patent reader', text: 'Upload documents and turn technical pages into clear research notes.', tab: 'upload', icon: UploadCloud },
+              { emoji: '💬', title: 'Ask PatentMind', text: 'Have a natural conversation with your patent collection.', tab: 'chat', icon: MessageSquare },
+              { emoji: '💡', title: 'Idea explorer', text: 'Pressure-test a new invention against the patents that matter.', tab: 'idea', icon: Sparkles },
+            ].map((tool) => {
+              const Icon = tool.icon;
+              return (
+                <button key={tool.title} type="button" className="kelly-tool-card" onClick={() => { setActiveTab(tool.tab); setShowWelcome(false); }}>
+                  <span className="kelly-tool-emoji">{tool.emoji}</span>
+                  <Icon size={19} className="kelly-tool-icon" />
+                  <h3>{tool.title}</h3>
+                  <p>{tool.text}</p>
+                  <span className="kelly-card-link">Open tool <ArrowRight size={15} /></span>
+                </button>
+              );
+            })}
+          </section>
+
+          <section id="workflow" className="kelly-workflow-section">
+            <div className="kelly-workflow-visual"><Database size={35} /><span>1</span><span>2</span><span>3</span><i /></div>
+            <div>
+              <p className="kelly-eyebrow"><span>02</span> A calmer workflow</p>
+              <h2>Your research, <em>in one thoughtful place.</em></h2>
+              <ol>
+                <li><b>01</b><span><strong>Bring your evidence</strong>Upload a patent PDF or collect a targeted dataset.</span></li>
+                <li><b>02</b><span><strong>Explore the signal</strong>Search, ask questions, and trace citations naturally.</span></li>
+                <li><b>03</b><span><strong>Move with confidence</strong>Use clear findings to support your next technical decision.</span></li>
+              </ol>
+            </div>
+          </section>
+
+          <section id="contact" className="kelly-cta-section">
+            <span>Ready when you are</span>
+            <h2>Make space for the <em>next big idea.</em></h2>
+            <button type="button" className="kelly-primary-action" onClick={() => { setActiveTab('search'); setShowWelcome(false); }}>
+              Launch PatentMind <ArrowRight size={17} />
+            </button>
+          </section>
+        </main>
+
+        <footer className="kelly-welcome-footer">
+          <span>© 2026 PatentMind AI</span>
+          <span>Built for curious research teams <Heart size={13} fill="currentColor" /></span>
+          <button type="button" onClick={() => { setActiveTab('help'); setShowWelcome(false); }}>Need help?</button>
+        </footer>
+      </div>
+    );
+
     // Dynamic styling classes based on selected welcome layout
     let wrapperClass = "min-h-screen w-full bg-[#FAF9F6] text-zinc-900 font-outfit relative overflow-hidden flex flex-col justify-between p-8 md:p-12";
     if (welcomeLayout === 'brutalist') {
