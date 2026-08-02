@@ -2250,7 +2250,7 @@ function App() {
     }
 
     return (
-      <div className={`app-wrapper bg-[#050816] ${theme} flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans`}>
+      <div className={`app-wrapper kelly-auth-page bg-[#050816] ${theme} flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans`}>
         
         {/* Wrangler Enterprise SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
@@ -2279,7 +2279,7 @@ function App() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className={`w-full max-w-sm bg-[#111111]/85 backdrop-blur-xl p-8 space-y-7 rounded-2xl shadow-2xl border ${
+          className={`kelly-auth-card w-full max-w-sm bg-[#111111]/85 backdrop-blur-xl p-8 space-y-7 rounded-2xl shadow-2xl border ${
             authRole === 'admin' 
               ? 'border-red-950/60 shadow-[0_0_50px_rgba(239,68,68,0.06)]' 
               : 'border-white/5 shadow-[0_0_50px_rgba(124,58,237,0.05)]'
@@ -2741,7 +2741,7 @@ function App() {
                   handleAuthSubmit(fakeEvent);
                 }, 50);
               }}
-              className="w-full py-2.5 bg-gradient-to-r from-[#0D9488]/30 to-[#22D3EE]/20 hover:from-[#0D9488]/50 hover:to-[#22D3EE]/40 border border-[#22D3EE]/40 rounded-full text-[11px] font-semibold font-sans text-[#22D3EE] transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+              className="kelly-auth-demo w-full py-2.5 bg-gradient-to-r from-[#0D9488]/30 to-[#22D3EE]/20 hover:from-[#0D9488]/50 hover:to-[#22D3EE]/40 border border-[#22D3EE]/40 rounded-full text-[11px] font-semibold font-sans text-[#22D3EE] transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
             >
               <Zap className="w-3.5 h-3.5" />
               <span>QUICK ENTER AS BHUSHAN (ADMIN ⚡)</span>
@@ -2788,7 +2788,7 @@ function App() {
 
   // CORE APPLICATION DASHBOARD (LOGGED IN)
   return (
-    <div className={`app-wrapper bg-[#050816] ${theme} flex flex-col md:flex-row transition-all duration-500 min-h-screen relative overflow-hidden font-sans`}>
+    <div className={`app-wrapper kelly-dashboard bg-[#050816] ${theme} flex flex-col md:flex-row transition-all duration-500 min-h-screen relative overflow-hidden font-sans`}>
       
       {/* Wrangler Enterprise SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
@@ -2798,12 +2798,12 @@ function App() {
       </div>
 
       {/* TOP FLOATING HORIZONTAL ENTERPRISE NAVBAR (WRANGLER DOCK) */}
-      <header className="fixed top-4 inset-x-0 z-50 px-4 md:px-6 flex justify-center pointer-events-none select-none">
-        <div className="wrangler-navbar pointer-events-auto max-w-7xl w-full px-5 py-2.5 md:py-3 rounded-full flex items-center justify-between gap-3 md:gap-6 border border-white/10 shadow-2xl transition-all duration-300">
+      <header className="kelly-dashboard-header fixed top-0 inset-x-0 z-50 px-4 md:px-7 flex justify-center pointer-events-none select-none">
+        <div className="kelly-dashboard-bar wrangler-navbar pointer-events-auto max-w-[1440px] w-full px-1 py-2 md:py-2 flex items-center justify-between gap-3 md:gap-6 border border-white/10 shadow-2xl transition-all duration-300">
           
           {/* Brand Header Badge */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] p-[1px] shadow-[0_0_20px_rgba(0,194,255,0.4)] flex-shrink-0">
+          <div className="kelly-dashboard-brand flex items-center gap-3 flex-shrink-0">
+            <div className="kelly-dashboard-monogram w-8 h-8 rounded-full bg-gradient-to-tr from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] p-[1px] shadow-[0_0_20px_rgba(0,194,255,0.4)] flex-shrink-0">
               <div className="w-full h-full bg-[#050816] rounded-full flex items-center justify-center text-[#00C2FF] font-bold text-sm">
                 ⚡
               </div>
@@ -2832,13 +2832,13 @@ function App() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   title={tab.label}
-                  className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 flex-shrink-0 ${
+                  className={`kelly-dashboard-navitem flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 flex-shrink-0 ${
                     isActive 
-                      ? 'bg-gradient-to-r from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] text-white font-semibold shadow-[0_0_25px_rgba(0,194,255,0.4)] scale-[1.03]' 
-                      : 'text-slate-300 hover:text-white hover:bg-white/5'
+                      ? 'kelly-dashboard-navitem-active'
+                      : ''
                   }`}
                 >
-                  <TabIcon className={`w-3.5 h-3.5 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <TabIcon className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -2848,7 +2848,7 @@ function App() {
           {/* Right Controls & Profile */}
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Language Dropdown Pill */}
-            <div className="relative flex items-center bg-white/5 border border-white/10 rounded-full px-2.5 py-1.5 hover:border-white/20 transition-all">
+            <div className="kelly-dashboard-language relative flex items-center bg-white/5 border border-white/10 rounded-full px-2.5 py-1.5 hover:border-white/20 transition-all">
               <Globe className="w-3.5 h-3.5 text-[#00C2FF] mr-1.5 flex-shrink-0" />
               <select
                 value={selectedLanguage}
@@ -2864,7 +2864,7 @@ function App() {
             </div>
 
             {/* User Profile & Password Modal Toggle */}
-            <div className="hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full py-1.5 px-3" title={`User: ${username}`}>
+            <div className="kelly-dashboard-user hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full py-1.5 px-3" title={`User: ${username}`}>
               <span className="w-2 h-2 rounded-full bg-[#00C2FF] animate-pulse shadow-[0_0_10px_rgba(0,194,255,0.9)]"></span>
               <span className="text-xs font-semibold text-white tracking-wide uppercase truncate max-w-[90px]">{username}</span>
               <button
@@ -2884,7 +2884,7 @@ function App() {
             <button
               onClick={() => setShowLogoutModal(true)}
               title="Log out"
-              className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-full transition-all border border-transparent hover:border-red-500/20"
+              className="kelly-dashboard-logout p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-full transition-all border border-transparent hover:border-red-500/20"
             >
               <LogOut className="w-4 h-4 text-red-500" />
             </button>
@@ -2972,7 +2972,7 @@ function App() {
         </div>
       )}
 
-      <main ref={mainContentRef} className="w-full max-w-7xl mx-auto pt-28 pb-24 px-6 overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-500">
+      <main ref={mainContentRef} className="kelly-dashboard-main w-full max-w-7xl mx-auto pt-28 pb-24 px-6 overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-500">
 
         {/* SEMANTIC SEARCH & LANDING HERO TAB */}
         {activeTab === 'search' && (
