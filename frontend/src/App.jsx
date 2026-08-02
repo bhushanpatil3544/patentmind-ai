@@ -52,7 +52,11 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Loader2,
-  Download
+  Download,
+  Instagram,
+  Linkedin,
+  Twitter,
+  Heart
 } from 'lucide-react';
 
 // Definitions for Theme switcher: Normal (Paperpillar Light) & Dark (Paperpillar Dark)
@@ -2683,7 +2687,7 @@ function App() {
               </div>
             </div>
             <span className="font-heading font-bold text-base md:text-lg text-white tracking-tight hidden md:inline-block">
-              PatentMind <span className="text-[10px] text-[#00C2FF] font-mono font-semibold ml-1 px-2.5 py-0.5 rounded-full bg-[#5B7CFA]/15 border border-[#5B7CFA]/40 shadow-[0_0_10px_rgba(91,124,250,0.2)]">AI Enterprise</span>
+              PatentMind <span className="text-[10px] text-[#00C2FF] font-mono font-semibold ml-1 px-2.5 py-0.5 rounded-full bg-[#5B7CFA]/15 border border-[#5B7CFA]/40 shadow-[0_0_10px_rgba(91,124,250,0.2)]">AI studio</span>
             </span>
           </div>
 
@@ -2766,6 +2770,14 @@ function App() {
 
         </div>
       </header>
+
+      {/* Kelly-inspired social rail: a small, friendly shortcut layer for the workspace. */}
+      <aside className="kelly-social-rail" aria-label="PatentMind social links">
+        <button type="button" title="Research inspiration" onClick={() => setActiveTab('idea')}><Heart size={17} /></button>
+        <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" title="Instagram"><Instagram size={17} /></a>
+        <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" title="LinkedIn"><Linkedin size={17} /></a>
+        <a href="https://x.com/" target="_blank" rel="noreferrer" title="X / Twitter"><Twitter size={17} /></a>
+      </aside>
 
       {/* Change Password Modal */}
       {showChangePasswordModal && (
