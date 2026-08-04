@@ -2632,61 +2632,7 @@ function App() {
               </div>
             </motion.div>
 
-            {/* SECTION 3: HOW IT WORKS (ANIMATED CONNECTED TIMELINE) */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="space-y-10 max-w-7xl mx-auto"
-            >
-              <div className="text-center space-y-3">
-                <span className="wrangler-badge">Enterprise Pipeline Architecture</span>
-                <h2 className="text-3xl md:text-5xl font-heading font-bold text-white tracking-tight">
-                  How PatentMind AI Works
-                </h2>
-                <p className="text-sm md:text-base text-slate-400 max-w-2xl mx-auto">
-                  An automated multi-stage pipeline designed for extreme precision, security, and sub-second querying across complex PDF patent archives.
-                </p>
-              </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-5 relative">
-                {[
-                  { step: "01", title: "Upload", sub: "PDF Document", icon: UploadCloud, color: "from-[#5B7CFA] to-[#3B82F6]" },
-                  { step: "02", title: "OCR", sub: "PaddleOCR Engine", icon: FileCode, color: "from-[#3B82F6] to-[#7B61FF]" },
-                  { step: "03", title: "Embedding", sub: "768-dim Vectors", icon: Cpu, color: "from-[#7B61FF] to-[#A855F7]" },
-                  { step: "04", title: "Vector DB", sub: "ChromaDB Store", icon: Database, color: "from-[#A855F7] to-[#00C2FF]" },
-                  { step: "05", title: "LLM", sub: "Reasoning Matrix", icon: Network, color: "from-[#00C2FF] to-[#38BDF8]" },
-                  { step: "06", title: "AI Answer", sub: "Verified Citation", icon: CheckCircle2, color: "from-[#38BDF8] to-[#34D399]" },
-                ].map((item, index) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={item.step} className="relative flex flex-col items-center">
-                      <div className="wrangler-card w-full p-5 flex flex-col items-center text-center justify-between h-[180px] group hover:border-[#00C2FF]/60 relative z-10">
-                        <span className="text-[10px] font-mono text-[#00C2FF] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-white/5 border border-white/10">
-                          STEP {item.step}
-                        </span>
-                        <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${item.color} p-[1px] shadow-lg flex items-center justify-center my-2 group-hover:scale-110 transition-transform duration-300`}>
-                          <div className="w-full h-full bg-[#050816] rounded-[15px] flex items-center justify-center">
-                            <Icon className="w-5 h-5 text-[#00C2FF] group-hover:text-white transition-colors" />
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="font-heading font-bold text-sm text-white">{item.title}</h4>
-                          <p className="text-[11px] text-slate-400 font-mono mt-0.5">{item.sub}</p>
-                        </div>
-                      </div>
-
-                      {/* Connecting glowing timeline arrow between cards on large screens */}
-                      {index < 5 && (
-                        <div className="hidden lg:flex absolute -right-[18px] top-1/2 -translate-y-1/2 z-20 text-[#00C2FF] font-bold text-lg animate-pulse">
-                          →
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
 
             {/* SECTION 4: ENTERPRISE FEATURES GRID */}
             <motion.div
