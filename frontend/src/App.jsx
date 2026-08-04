@@ -2922,9 +2922,47 @@ function App() {
                             "{chunk.text || ''}"
                           </p>
 
-                          <div className="flex flex-wrap gap-4 text-[9px] font-mono text-zinc-650 uppercase pt-2">
-                            <span>INVENTORS: {Array.isArray(chunk.metadata?.inventors) ? chunk.metadata.inventors.join(', ') : (chunk.metadata?.inventors || 'N/A')}</span>
-                            <span>CLASSES: {Array.isArray(chunk.metadata?.ipc_cpc_codes) ? chunk.metadata.ipc_cpc_codes.join(', ') : (chunk.metadata?.ipc_cpc_codes || 'N/A')}</span>
+                          <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                            <div className="flex flex-wrap gap-4 text-[9px] font-mono text-slate-400 uppercase">
+                              <span>INVENTORS: {Array.isArray(chunk.metadata?.inventors) ? chunk.metadata.inventors.join(', ') : (chunk.metadata?.inventors || 'N/A')}</span>
+                              <span>CLASSES: {Array.isArray(chunk.metadata?.ipc_cpc_codes) ? chunk.metadata.ipc_cpc_codes.join(', ') : (chunk.metadata?.ipc_cpc_codes || 'N/A')}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const patNum = chunk.metadata?.patent_number || 'US10922485B2';
+                                  const textContent = `PATENTMIND AI SEARCH RESULT DOSSIER\nPatent: ${patNum}\nTitle: ${chunk.metadata?.title || 'N/A'}\nExcerpt: ${chunk.text || ''}\nSection: ${chunk.metadata?.section || 'N/A'}`;
+                                  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+                                  const url = URL.createObjectURL(blob);
+                                  const a = document.createElement('a');
+                                  a.href = url;
+                                  a.download = `Patent_${patNum}_Result.txt`;
+                                  document.body.appendChild(a);
+                                  a.click();
+                                  document.body.removeChild(a);
+                                  URL.revokeObjectURL(url);
+                                }}
+                                className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-mono text-slate-300 hover:text-white flex items-center gap-1 transition-all"
+                                title="Download Patent to Device"
+                              >
+                                <Download className="w-3.5 h-3.5 text-[#38BDF8]" />
+                                <span>DOWNLOAD</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const patNum = chunk.metadata?.patent_number || 'US10922485B2';
+                                  setSelectedPatentNumber(patNum);
+                                  setActiveTab('compare');
+                                }}
+                                className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-mono text-slate-300 hover:text-white flex items-center gap-1 transition-all"
+                                title="Compare Patent"
+                              >
+                                <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                                <span>COMPARE</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -4973,6 +5011,7 @@ function App() {
         {activeTab === 'saved-patents' && (
           <SavedPatentsView 
             onSelectPatent={(num) => { setSelectedPatentNumber(num); setActiveTab('patent-details'); }}
+            onCompare={(num) => { setComparePatentB(num); setActiveTab('compare'); }}
           />
         )}
 

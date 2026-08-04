@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
 import { Bookmark, FolderOpen, Tag, Trash2, ArrowRight, Download, Search, Sparkles } from 'lucide-react';
 
-export default function SavedPatentsView({ onSelectPatent }) {
+export default function SavedPatentsView({ onSelectPatent, onCompare }) {
+
+  const handleDownloadPatent = (patentNumber, title, assignee) => {
+    const reportContent = `PATENTMIND AI SAVED PORTFOLIO DOSSIER\nPatent Number: ${patentNumber}\nTitle: ${title}\nAssignee: ${assignee}\nExported: ${new Date().toLocaleDateString()}`;
+    const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Patent_${patentNumber}_Saved_Dossier.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const [selectedFolder, setSelectedFolder] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -99,8 +113,24 @@ export default function SavedPatentsView({ onSelectPatent }) {
 
               <div className="flex items-center gap-2">
                 <button
+                  onClick={() => handleDownloadPatent(patent.number, patent.title, patent.assignee)}
+                  className="px-3.5 py-2 bg-white/5 border border-white/10 hover:border-blue-500/40 rounded-xl text-xs font-medium text-slate-200 hover:text-white flex items-center gap-1.5 transition-all"
+                  title="Download Patent to Device"
+                >
+                  <Download className="w-3.5 h-3.5 text-[#38BDF8]" />
+                  <span>Download</span>
+                </button>
+                <button
+                  onClick={() => onCompare && onCompare(patent.number)}
+                  className="px-3.5 py-2 bg-white/5 border border-white/10 hover:border-blue-500/40 rounded-xl text-xs font-medium text-slate-200 hover:text-white flex items-center gap-1.5 transition-all"
+                  title="Compare Patent"
+                >
+                  <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                  <span>Compare</span>
+                </button>
+                <button
                   onClick={() => onSelectPatent && onSelectPatent(patent.number)}
-                  className="btn-theme px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5"
+                  className="btn-theme px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5"
                 >
                   <span>Inspect</span>
                   <ArrowRight className="w-3.5 h-3.5" />
