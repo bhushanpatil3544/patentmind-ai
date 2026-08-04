@@ -2856,13 +2856,13 @@ function App() {
                 {/* RAG Synthesized Answer */}
                 <div className="panel-card p-8 rounded-none space-y-4">
                   <div className="flex justify-between items-center text-[10px] font-mono text-zinc-500 tracking-wider">
-                    <span>LLM CHAIN: {searchResults.active_llm.toUpperCase()}</span>
+                    <span>AI MODEL: {searchResults.active_llm.toUpperCase()}</span>
                     <span>LATENCY: {searchResults.latency_sec}s</span>
                   </div>
 
                   <div className="flex justify-between items-center">
                     <h3 className="text-serif-editorial text-xl text-main tracking-wide flex items-center gap-2">
-                      <span>🧠 </span> <span>SYNTHESIZED INSIGHTS</span>
+                      <span>🧠 </span> <span>AI Executive Summary</span>
                     </h3>
                     <button
                       onClick={() => handleSpeakText(searchResults.answer)}
@@ -2882,7 +2882,7 @@ function App() {
 
                   {searchResults.fallback_occurred && (
                     <div className="pt-2 text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
-                      FAILOVER COMPLETE
+                      
                     </div>
                   )}
                 </div>
@@ -2890,7 +2890,7 @@ function App() {
                 {/* Reference Attributions */}
                 <div className="space-y-6">
                   <h4 className="text-[11px] font-mono tracking-widest text-zinc-500 uppercase pb-2 border-b border-theme">
-                    ATTRIBUTED SOURCES ({searchResults.retrieved_chunks.length})
+                    Cited Patents & Sources ({searchResults.retrieved_chunks.length})
                   </h4>
 
                   <div className="space-y-10">
@@ -2981,9 +2981,9 @@ function App() {
             
             {/* Header */}
             <div>
-              <span className="text-[11px] text-muted font-mono tracking-widest uppercase">02. PATENT LANDSCAPE & TELEMETRY</span>
-              <h2 className="text-4xl font-semibold tracking-tight text-main font-sans mt-2">Technology Dashboard</h2>
-              <p className="text-xs text-zinc-400 font-light mt-1">Real-time patent creation density tracking and high-value IP white-space opportunity mapping.</p>
+              <span className="text-[11px] text-muted font-mono tracking-widest uppercase">PATENT OVERVIEW & ANALYTICS</span>
+              <h2 className="text-4xl font-semibold tracking-tight text-main font-sans mt-2">Patent Analytics & Overview</h2>
+              <p className="text-xs text-zinc-400 font-light mt-1">Track filing trends, key technologies, and market opportunities in real time.</p>
             </div>
 
             {analyticsLoading && !analytics ? (
@@ -3001,11 +3001,11 @@ function App() {
                         <FolderOpen className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className="text-base font-semibold text-white font-sans">Top Patent Creation Sectors</h3>
-                        <p className="text-[11px] text-zinc-400 font-light">Global filing density breakdown across technology fields</p>
+                        <h3 className="text-base font-semibold text-white font-sans">Top Technology Fields</h3>
+                        <p className="text-[11px] text-zinc-400 font-light">Overview of patent filings by industry sector</p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider bg-white/5 border border-white/5 px-3 py-1 rounded-full">CREATION DENSITY</span>
+                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider bg-white/5 border border-white/5 px-3 py-1 rounded-full">FILING VOLUME</span>
                   </div>
 
                   <div className="space-y-6 pt-2">
@@ -3039,8 +3039,8 @@ function App() {
                         <Tag className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className="text-base font-semibold text-white font-sans">Recommended White-Space Targets</h3>
-                        <p className="text-[11px] text-zinc-400 font-light">High-opportunity innovation sectors with low prior-art density for maximum IP moats</p>
+                        <h3 className="text-base font-semibold text-white font-sans">High-Opportunity Innovation Fields</h3>
+                        <p className="text-[11px] text-zinc-400 font-light">Technology areas with high growth potential and lower patent competition</p>
                       </div>
                     </div>
                     <span className="text-[10px] font-mono text-amber-400 uppercase tracking-wider bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full font-semibold">IDEAL TARGETS</span>
@@ -3096,7 +3096,7 @@ function App() {
         {activeTab === 'upload' && (
           <div className="space-y-12 fade-in">
             <div>
-              <span className="text-[11px] text-muted font-mono tracking-widest uppercase">04. CUSTOM INDEXING</span>
+              <span className="text-[11px] text-muted font-mono tracking-widest uppercase">DOCUMENT UPLOAD</span>
               <h2 className="text-serif-editorial text-4xl text-main tracking-wide mt-2">PATENT PDF UPLOADER</h2>
             </div>
 
@@ -3247,7 +3247,7 @@ function App() {
         {activeTab === 'dataset' && (
           <div className="space-y-8 fade-in max-w-4xl">
             <div>
-              <span className="text-[10px] text-muted font-mono tracking-widest uppercase">05. DATASET INGESTION</span>
+              <span className="text-[10px] text-muted font-mono tracking-widest uppercase">DATASET IMPORT</span>
               <h2 className="text-4xl font-semibold tracking-tight text-main font-sans mt-1">Google Patents & Bulk Dataset Indexer</h2>
               <p className="text-xs text-zinc-400 font-light mt-1">
                 Fetch patent specifications directly from Google Patents or upload structured CSV/JSON datasets into your vector database.
@@ -3847,7 +3847,7 @@ function App() {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-[11px] text-muted font-mono tracking-widest uppercase">07. PATENT STRATEGY</span>
+                <span className="text-[11px] text-muted font-mono tracking-widest uppercase">IDEA ANALYZER</span>
                 <h2 className="text-serif-editorial text-4xl text-main tracking-wide mt-2">IDEA ANALYZER</h2>
               </div>
               {ideaStep !== 'upload' && (

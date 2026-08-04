@@ -74,13 +74,13 @@ export default function KnowledgeGraphView({ onSelectPatent }) {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#5B7CFA]/10 border border-[#5B7CFA]/30 text-[#00C2FF] text-xs font-mono uppercase tracking-wider mb-2">
             <Network className="w-3.5 h-3.5" />
-            <span>Interactive Citation & Entity Mapping</span>
+            <span>Patent Connection Map</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-heading font-extrabold text-white tracking-tight">
             Patent Knowledge Graph
           </h1>
           <p className="text-sm text-slate-300 font-sans mt-1">
-            Visualize semantic links between patents, corporate assignees, inventors, and technology classifications.
+            Explore connections between patents, companies, inventors, and technology fields.
           </p>
         </div>
 
