@@ -5098,7 +5098,7 @@ class ErrorBoundary extends React.Component {
             <button
               onClick={() => {
                 this.setState({ hasError: false, error: null });
-                window.location.reload();
+                window.location.href = window.location.pathname + '?v=' + Date.now();
               }}
               className="w-full py-3 bg-gradient-to-r from-[#0D9488] to-[#22D3EE] text-black font-semibold text-xs font-mono tracking-widest rounded-xl uppercase hover:brightness-110 transition-all shadow-lg cursor-pointer"
             >
