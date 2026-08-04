@@ -443,8 +443,8 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   background: #7C3AED;
 }
 
-/* Kelly-inspired editorial skin — intentionally applied to existing modules so the app keeps all workflows. */
-:root, .theme-normal, .theme-dark, .theme-carbon, .theme-cyber, .theme-brutalist {
+/* Kelly-inspired editorial skin — applies only when the user explicitly chooses the Light Theme */
+.theme-light {
   --bg-app: #ffffff;
   --bg-panel: #ffffff;
   --bg-sidebar: #ffffff;
@@ -464,52 +464,53 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   --btn-text: #ffffff;
 }
 
-body { background: #fff; color: #3a3a3a; }
-.app-wrapper {
+.theme-light body { background: #fff; color: #3a3a3a; }
+.theme-light .app-wrapper {
   background: #fff !important;
   color: #3a3a3a;
 }
-.app-wrapper > .absolute.inset-0 { display: none; }
-.wrangler-navbar, .zelect-navbar, .ovo-dock, .optirise-dock {
+.theme-light .app-wrapper > .absolute.inset-0 { display: none; }
+.theme-light .wrangler-navbar, .theme-light .zelect-navbar, .theme-light .ovo-dock, .theme-light .optirise-dock {
   background: rgba(255,255,255,.96);
   border: 1px solid #e7e9e1;
   box-shadow: 0 4px 22px rgba(60,72,40,.08);
   border-radius: 4px;
 }
-.wrangler-card, .zelect-card, .ovo-card, .optirise-card, .panel-card, .glass-panel-sleek {
+.theme-light .wrangler-card, .theme-light .zelect-card, .theme-light .ovo-card, .theme-light .optirise-card, .theme-light .panel-card, .theme-light .glass-panel-sleek {
   background: #fff;
   border: 1px solid #e7e9e1;
   box-shadow: 0 7px 24px rgba(60,72,40,.05);
   border-radius: 4px;
 }
-.wrangler-card:hover, .zelect-card:hover, .ovo-card:hover, .optirise-card:hover, .glass-panel-sleek:hover {
+.theme-light .wrangler-card:hover, .theme-light .zelect-card:hover, .theme-light .ovo-card:hover, .theme-light .optirise-card:hover, .theme-light .glass-panel-sleek:hover {
   background: #fff;
   border-color: #a6b77d;
   box-shadow: 0 12px 28px rgba(72,88,44,.12);
   transform: translateY(-3px);
 }
-.wrangler-pill, .zelect-pill, .ovo-pill, .optirise-pill {
+.theme-light .wrangler-pill, .theme-light .zelect-pill, .theme-light .ovo-pill, .theme-light .optirise-pill {
   background: #fff;
   border: 1px solid #dce2d0;
   border-radius: 3px;
 }
-.wrangler-pill:hover, .zelect-pill:hover, .ovo-pill:hover, .optirise-pill:hover { border-color: #8ea65e; box-shadow: none; }
-.wrangler-badge, .zelect-badge { background: #f0f4e9; color: #7c9350; border-color: #dce5cc; box-shadow: none; border-radius: 3px; }
-.wrangler-gradient-text, .zelect-gradient-text, .ovo-gradient-text, .optirise-gradient-text { background: none; -webkit-text-fill-color: #3a3a3a; color: #3a3a3a; }
-.btn-theme { background: #8ea65e; border-color: #8ea65e; box-shadow: none; border-radius: 3px; }
-.btn-theme:hover { background: #778c4d; box-shadow: none; transform: translateY(-1px); }
-.kelly-social-rail { position: fixed; z-index: 45; right: 18px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 7px; }
-.kelly-social-rail a, .kelly-social-rail button { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #e2e7d7; border-radius: 50%; background: #fff; color: #718647; transition: .2s ease; }
-.kelly-social-rail a:hover, .kelly-social-rail button:hover { background: #8ea65e; color: #fff; border-color: #8ea65e; transform: translateX(-2px); }
-.app-wrapper h1, .app-wrapper h2, .app-wrapper h3, .app-wrapper h4, .app-wrapper h5, .app-wrapper h6 { color: #3a3a3a !important; }
-.app-wrapper .text-white { color: #3a3a3a !important; }
-.app-wrapper .text-slate-300, .app-wrapper .text-slate-400, .app-wrapper .text-zinc-400, .app-wrapper .text-zinc-500 { color: #747474 !important; }
-.app-wrapper .border-white\/10, .app-wrapper .border-white\/\[0\.06\], .app-wrapper .border-white\/\[0\.08\] { border-color: #e7e9e1 !important; }
-.app-wrapper .bg-white\/5, .app-wrapper .bg-white\/\[0\.08\] { background-color: #f8f9f5 !important; }
-.app-wrapper .bg-\[\#050816\], .app-wrapper .bg-\[\#0A0A0A\] { background-color: #ffffff !important; }
-.app-wrapper .text-\[\#00C2FF\], .app-wrapper .text-\[\#5B7CFA\], .app-wrapper .text-\[\#7B61FF\] { color: #8ea65e !important; }
-.app-wrapper .bg-gradient-to-r.from-\[\#5B7CFA\], .app-wrapper .bg-gradient-to-tr { background-image: none !important; background-color: #8ea65e !important; }
-@media (max-width: 700px) { .kelly-social-rail { display: none; } .wrangler-navbar { border-radius: 0; } }
+.theme-light .wrangler-pill:hover, .theme-light .zelect-pill:hover, .theme-light .ovo-pill:hover, .theme-light .optirise-pill:hover { border-color: #8ea65e; box-shadow: none; }
+.theme-light .wrangler-badge, .theme-light .zelect-badge { background: #f0f4e9; color: #7c9350; border-color: #dce5cc; box-shadow: none; border-radius: 3px; }
+.theme-light .wrangler-gradient-text, .theme-light .zelect-gradient-text, .theme-light .ovo-gradient-text, .theme-light .optirise-gradient-text { background: none; -webkit-text-fill-color: #3a3a3a; color: #3a3a3a; }
+.theme-light .btn-theme { background: #8ea65e; border-color: #8ea65e; box-shadow: none; border-radius: 3px; }
+.theme-light .btn-theme:hover { background: #778c4d; box-shadow: none; transform: translateY(-1px); }
+.theme-light .kelly-social-rail { position: fixed; z-index: 45; right: 18px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 7px; }
+.theme-light .kelly-social-rail a, .theme-light .kelly-social-rail button { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #e2e7d7; border-radius: 50%; background: #fff; color: #718647; transition: .2s ease; }
+.theme-light .kelly-social-rail a:hover, .theme-light .kelly-social-rail button:hover { background: #8ea65e; color: #fff; border-color: #8ea65e; transform: translateX(-2px); }
+.theme-light h1, .theme-light h2, .theme-light h3, .theme-light h4, .theme-light h5, .theme-light h6 { color: #3a3a3a !important; }
+.theme-light .text-white { color: #3a3a3a !important; }
+.theme-light .text-slate-300, .theme-light .text-slate-400, .theme-light .text-zinc-400, .theme-light .text-zinc-500 { color: #747474 !important; }
+.theme-light .border-white\/10, .theme-light .border-white\/\[0\.06\], .theme-light .border-white\/\[0\.08\] { border-color: #e7e9e1 !important; }
+.theme-light .bg-white\/5, .theme-light .bg-white\/\[0\.08\] { background-color: #f8f9f5 !important; }
+.theme-light .bg-\[\#050816\], .theme-light .bg-\[\#0A0A0A\] { background-color: #ffffff !important; }
+.theme-light .text-\[\#00C2FF\], .theme-light .text-\[\#5B7CFA\], .theme-light .text-\[\#7B61FF\] { color: #8ea65e !important; }
+.theme-light .bg-gradient-to-r.from-\[\#5B7CFA\], .theme-light .bg-gradient-to-tr { background-image: none !important; background-color: #8ea65e !important; }
+@media (max-width: 700px) { .theme-light .kelly-social-rail { display: none; } .theme-light .wrangler-navbar { border-radius: 0; } }
+
 
 /* The public face of PatentMind: a purpose-built, Kelly-inspired editorial landing page. */
 .kelly-welcome { font-family: 'Roboto', sans-serif; }
