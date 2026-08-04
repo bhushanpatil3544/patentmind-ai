@@ -359,8 +359,8 @@ function App() {
   const [chatModeDeepSearch, setChatModeDeepSearch] = useState(true);
   const [chatModeReasoning, setChatModeReasoning] = useState(false);
   const [pdfAnalyzingLoading, setPdfAnalyzingLoading] = useState(false);
-  // Sidebar Collapse state
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarNavMode, setIsSidebarNavMode] = useState(() => localStorage.getItem('sidebar_nav_mode') === 'true');
 
   // Google Patents Fetch states
   const [googleFetchQuery, setGoogleFetchQuery] = useState('');
@@ -2847,6 +2847,23 @@ function App() {
 
           {/* Right Controls & Profile */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Sidebar vs Top Navigation Mode Toggle */}
+            <button
+              onClick={() => {
+                const nextMode = !isSidebarNavMode;
+                setIsSidebarNavMode(nextMode);
+                localStorage.setItem('sidebar_nav_mode', nextMode.toString());
+              }}
+              title={isSidebarNavMode ? "Switch to Top Floating Navbar" : "Switch to Left Sidebar Navigation"}
+              className="p-2 text-slate-400 hover:text-[#00C2FF] hover:bg-white/5 border border-white/10 rounded-full transition-all flex items-center justify-center flex-shrink-0"
+            >
+              {isSidebarNavMode ? (
+                <PanelLeftClose className="w-3.5 h-3.5" />
+              ) : (
+                <PanelLeftOpen className="w-3.5 h-3.5" />
+              )}
+            </button>
+
             {/* Language Dropdown Pill */}
             <div className="kelly-dashboard-language relative flex items-center bg-white/5 border border-white/10 rounded-full px-2.5 py-1.5 hover:border-white/20 transition-all">
               <Globe className="w-3.5 h-3.5 text-[#00C2FF] mr-1.5 flex-shrink-0" />
