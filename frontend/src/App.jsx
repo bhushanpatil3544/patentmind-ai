@@ -2893,7 +2893,7 @@ function App() {
 
   // CORE APPLICATION DASHBOARD (LOGGED IN)
   return (
-    <div className={`app-wrapper kelly-dashboard bg-[#050816] ${theme} flex flex-col md:flex-row transition-all duration-500 min-h-screen relative overflow-hidden font-sans`}>
+    <div className={`app-wrapper bg-[#050816] ${theme} flex flex-col md:flex-row transition-all duration-500 min-h-screen relative overflow-hidden font-sans`}>
       
       {/* Wrangler Enterprise SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
