@@ -4125,28 +4125,61 @@ function App() {
                       }`}>
                         <div className="whitespace-pre-wrap">{msg.content}</div>
 
-                        {/* Citation attributions list */}
+                        {/* Perplexity-style citation card deck */}
                         {msg.role === 'assistant' && msg.citations && msg.citations.length > 0 && (
                           <div className="mt-4 pt-3 border-t border-white/10 space-y-2.5">
-                            <button
-                              onClick={() => setExpandedCitationIndex(expandedCitationIndex === idx ? null : idx)}
-                              className="flex items-center gap-1.5 text-[9px] font-mono text-[#22D3EE] hover:text-white transition-colors uppercase tracking-wider font-semibold"
-                            >
-                              <BookOpen className="w-3.5 h-3.5" />
-                              <span>CITED SOURCES ({msg.citations.length})</span>
-                              {expandedCitationIndex === idx ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                            </button>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest flex items-center gap-1">
+                                <Sparkles className="w-3.5 h-3.5 text-[#00C2FF]" />
+                                Sources Cited ({msg.citations.length})
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setExpandedCitationIndex(expandedCitationIndex === idx ? null : idx)}
+                                className="flex items-center gap-1 text-[9px] font-mono text-[#00C2FF] hover:text-white transition-colors uppercase font-semibold"
+                              >
+                                {expandedCitationIndex === idx ? 'Collapse' : 'Details'}
+                                {expandedCitationIndex === idx ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                              </button>
+                            </div>
 
+                            {/* Card Grid */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-1">
+                              {msg.citations.slice(0, 3).map((c, cIdx) => (
+                                <div
+                                  key={cIdx}
+                                  onClick={() => setExpandedCitationIndex(expandedCitationIndex === idx ? null : idx)}
+                                  className="p-3 bg-white/[0.03] border border-white/10 rounded-xl hover:border-[#00C2FF]/40 hover:bg-white/[0.06] transition-all cursor-pointer text-left space-y-1.5"
+                                >
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-[9px] font-mono text-[#00C2FF] bg-[#5B7CFA]/15 px-2 py-0.5 rounded border border-[#5B7CFA]/30 truncate max-w-[130px]">
+                                      {c.metadata.patent_number}
+                                    </span>
+                                    <span className="text-[9px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                                      {c.metadata.section}
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] font-medium text-white truncate">{c.metadata.title}</div>
+                                  <div className="flex items-center justify-between text-[9px] text-slate-400">
+                                    <span>Match</span>
+                                    <span className="font-mono font-bold">{(c.score * 100).toFixed(1)}%</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Expanded excerpts */}
                             {expandedCitationIndex === idx && (
-                              <div className="space-y-3.5 pl-1 pt-1.5 fade-in">
+                              <div className="space-y-2.5 pt-2 border-t border-white/5 fade-in">
+                                <span className="text-[9px] font-mono text-slate-400 uppercase tracking-widest block font-bold">Citation Excerpts</span>
                                 {msg.citations.map((c, cIdx) => (
                                   <div key={cIdx} className="space-y-1 bg-black/40 p-3 border border-white/5 rounded-lg text-[11px] text-zinc-400">
                                     <div className="flex justify-between font-mono text-[9px] text-zinc-400">
-                                      <span className="font-semibold text-[#22D3EE]">{c.metadata.patent_number} ({c.metadata.section})</span>
+                                      <span className="font-semibold text-[#00C2FF]">{c.metadata.patent_number} ({c.metadata.section})</span>
                                       <span>SIMILARITY: {(c.score * 100).toFixed(1)}%</span>
                                     </div>
                                     <div className="text-[11px] font-medium text-white mt-0.5">{c.metadata.title}</div>
-                                    <p className="text-[10px] text-zinc-400 italic mt-1.5 border-l-2 border-[#7C3AED] pl-2 leading-relaxed">
+                                    <p className="text-[10px] text-zinc-400 italic mt-1.5 border-l-2 border-[#7B61FF] pl-2 leading-relaxed">
                                       "{c.text}"
                                     </p>
                                   </div>
