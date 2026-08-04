@@ -2797,21 +2797,22 @@ function App() {
         <div className="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full bg-[#7B61FF]/12 blur-[150px]" />
       </div>
 
-      {/* TOP FLOATING HORIZONTAL ENTERPRISE NAVBAR (WRANGLER DOCK) */}
-      <header className="kelly-dashboard-header fixed top-0 inset-x-0 z-50 px-4 md:px-7 flex justify-center pointer-events-none select-none">
-        <div className="kelly-dashboard-bar wrangler-navbar pointer-events-auto max-w-[1440px] w-full px-1 py-2 md:py-2 flex items-center justify-between gap-3 md:gap-6 border border-white/10 shadow-2xl transition-all duration-300">
-          
-          {/* Brand Header Badge */}
-          <div className="kelly-dashboard-brand flex items-center gap-3 flex-shrink-0">
-            <div className="kelly-dashboard-monogram w-8 h-8 rounded-full bg-gradient-to-tr from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] p-[1px] shadow-[0_0_20px_rgba(0,194,255,0.4)] flex-shrink-0">
-              <div className="w-full h-full bg-[#050816] rounded-full flex items-center justify-center text-[#00C2FF] font-bold text-sm">
-                ⚡
+      {/* TOP FLOATING HORIZONTAL ENTERPRISE NAVBAR (WRANGLER DOCK) - Rendered only in Horizontal Navigation Mode */}
+      {!isSidebarNavMode && (
+        <header className="kelly-dashboard-header fixed top-0 inset-x-0 z-50 px-4 md:px-7 flex justify-center pointer-events-none select-none">
+          <div className="kelly-dashboard-bar wrangler-navbar pointer-events-auto max-w-[1440px] w-full px-1 py-2 md:py-2 flex items-center justify-between gap-3 md:gap-6 border border-white/10 shadow-2xl transition-all duration-300">
+            
+            {/* Brand Header Badge */}
+            <div className="kelly-dashboard-brand flex items-center gap-3 flex-shrink-0">
+              <div className="kelly-dashboard-monogram w-8 h-8 rounded-full bg-gradient-to-tr from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] p-[1px] shadow-[0_0_20px_rgba(0,194,255,0.4)] flex-shrink-0">
+                <div className="w-full h-full bg-[#050816] rounded-full flex items-center justify-center text-[#00C2FF] font-bold text-sm">
+                  ⚡
+                </div>
               </div>
+              <span className="font-heading font-bold text-base md:text-lg text-white tracking-tight hidden md:inline-block">
+                PatentMind <span className="text-[10px] text-[#00C2FF] font-mono font-semibold ml-1 px-2.5 py-0.5 rounded-full bg-[#5B7CFA]/15 border border-[#5B7CFA]/40 shadow-[0_0_10px_rgba(91,124,250,0.2)]">AI studio</span>
+              </span>
             </div>
-            <span className="font-heading font-bold text-base md:text-lg text-white tracking-tight hidden md:inline-block">
-              PatentMind <span className="text-[10px] text-[#00C2FF] font-mono font-semibold ml-1 px-2.5 py-0.5 rounded-full bg-[#5B7CFA]/15 border border-[#5B7CFA]/40 shadow-[0_0_10px_rgba(91,124,250,0.2)]">AI studio</span>
-            </span>
-          </div>
 
           {/* Center Horizontal Navigation Menu */}
           <nav className="flex items-center gap-1 md:gap-1.5 overflow-x-auto py-1 px-1 no-scrollbar">
@@ -2909,6 +2910,103 @@ function App() {
 
         </div>
       </header>
+      )}
+
+      {/* LEFT SIDEBAR NAVIGATION PANEL (Rendered only in Sidebar Navigation Mode) */}
+      {isSidebarNavMode && (
+        <aside className={`w-[260px] bg-[#050816] border-r border-white/15 h-screen flex flex-col justify-between flex-shrink-0 z-40 fixed md:sticky top-0 left-0 transition-transform duration-300 ${
+          isSidebarCollapsed ? '-translate-x-full md:translate-x-0 md:w-[76px]' : 'translate-x-0'
+        }`}>
+          {/* Top Branding Monogram Area */}
+          <div className="p-4 border-b border-white/10 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] p-[1px] shadow-[0_0_20px_rgba(0,194,255,0.4)] flex-shrink-0">
+                <div className="w-full h-full bg-[#050816] rounded-full flex items-center justify-center text-[#00C2FF] font-bold text-sm">
+                  ⚡
+                </div>
+              </div>
+              {!isSidebarCollapsed && (
+                <span className="font-heading font-bold text-sm text-white tracking-tight">
+                  PatentMind <span className="text-[9px] text-[#00C2FF] font-mono block">AI studio</span>
+                </span>
+              )}
+            </div>
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="text-slate-400 hover:text-white p-1 hover:bg-white/5 rounded hidden md:block"
+            >
+              <PanelLeftClose className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Center Nav List */}
+          <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
+            {[
+              { id: 'search', label: 'Search', icon: Search },
+              { id: 'dashboard', label: 'Analytics', icon: BarChart3 },
+              { id: 'upload', label: 'Upload', icon: UploadCloud },
+              { id: 'dataset', label: 'Dataset', icon: Database },
+              { id: 'chat', label: 'Chatbot', icon: MessageSquare },
+              { id: 'help', label: 'Help', icon: HelpCircle },
+              { id: 'settings', label: 'Settings', icon: Settings },
+              { id: 'admin', label: 'Admin', icon: Cpu }
+            ].map((tab) => {
+              const TabIcon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  title={tab.label}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all duration-250 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] text-white font-semibold shadow-[0_0_20px_rgba(0,194,255,0.35)]'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <TabIcon className="w-4 h-4 flex-shrink-0" />
+                  {!isSidebarCollapsed && <span>{tab.label}</span>}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Bottom Profile Details Row */}
+          <div className="p-4 border-t border-white/10 space-y-3 bg-[#03050F]/60">
+            {/* Sidebar toggle back to Horizontal Dock */}
+            <button
+              onClick={() => {
+                setIsSidebarNavMode(false);
+                localStorage.setItem('sidebar_nav_mode', 'false');
+              }}
+              className="w-full flex items-center justify-center gap-2 py-2 border border-white/10 hover:border-[#00C2FF]/40 rounded-lg text-[10px] font-mono text-slate-350 hover:text-white hover:bg-white/5 transition-all"
+            >
+              <Sliders className="w-3.5 h-3.5" />
+              {!isSidebarCollapsed && <span>TOP FLOATING NAV</span>}
+            </button>
+
+            {/* Profile User Status */}
+            <div className="flex items-center gap-3 truncate">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#00C2FF] animate-pulse shadow-[0_0_10px_rgba(0,194,255,0.9)] flex-shrink-0" />
+              {!isSidebarCollapsed && (
+                <div className="truncate text-left leading-none">
+                  <span className="text-xs font-semibold text-white block uppercase tracking-wide truncate">{username}</span>
+                  <span className="text-[9px] text-[#00C2FF] font-mono block tracking-widest mt-0.5">ONLINE</span>
+                </div>
+              )}
+            </div>
+
+            {/* Logout Row */}
+            <button
+              onClick={() => setShowLogoutModal(true)}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-colors"
+            >
+              <LogOut className="w-4 h-4 flex-shrink-0" />
+              {!isSidebarCollapsed && <span>LOGOUT</span>}
+            </button>
+          </div>
+        </aside>
+      )}
 
       {/* Kelly-inspired social rail: a small, friendly shortcut layer for the workspace. */}
       <aside className="kelly-social-rail" aria-label="PatentMind social links">
@@ -2989,7 +3087,9 @@ function App() {
         </div>
       )}
 
-      <main ref={mainContentRef} className="kelly-dashboard-main w-full max-w-7xl mx-auto pt-28 pb-24 px-6 overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-500">
+      <main ref={mainContentRef} className={`kelly-dashboard-main w-full max-w-7xl mx-auto pb-24 px-6 overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-500 ${
+        isSidebarNavMode ? 'pt-8' : 'pt-28'
+      }`}>
 
         {/* SEMANTIC SEARCH & LANDING HERO TAB */}
         {activeTab === 'search' && (
