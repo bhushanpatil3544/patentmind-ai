@@ -4971,16 +4971,7 @@ function App() {
             </div>
           </div>
         )}
-        {/* Developer Credit Footer */}
-        <footer className="mt-auto pt-16 border-t border-theme/35 flex flex-col md:flex-row items-center justify-between gap-4 pb-8 w-full">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">PatentMind System v2.1.0 Cloud</span>
-          </div>
-          <div className="text-[10px] font-mono text-zinc-400 hover:text-white transition-colors duration-200 text-right uppercase tracking-wider">
 
-          </div>
-        </footer>
 
       
         {/* PAGE 7: PATENT DETAILS */}
