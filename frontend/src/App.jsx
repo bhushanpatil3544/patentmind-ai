@@ -1,3 +1,18 @@
+import KnowledgeGraphView from './components/KnowledgeGraphView';
+import PatentDetailsView from './components/PatentDetailsView';
+import PatentComparisonView from './components/PatentComparisonView';
+import SavedPatentsView from './components/SavedPatentsView';
+import ProjectsView from './components/ProjectsView';
+import TeamWorkspaceView from './components/TeamWorkspaceView';
+import NotificationsView from './components/NotificationsView';
+import UserProfileView from './components/UserProfileView';
+import ApiKeysView from './components/ApiKeysView';
+import BillingView from './components/BillingView';
+import HelpCenterView from './components/HelpCenterView';
+import ContactView from './components/ContactView';
+import PrivacyPolicyView from './components/PrivacyPolicyView';
+import TermsOfServiceView from './components/TermsOfServiceView';
+import NotFoundView from './components/NotFoundView';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -289,6 +304,9 @@ function App() {
 
   // Navigation tab state
   const [activeTab, setActiveTab] = useState('search');
+  const [selectedPatentNumber, setSelectedPatentNumber] = useState('US10922485B2');
+  const [comparePatentB, setComparePatentB] = useState('US11450291B1');
+
   
   // Search state
   const [query, setQuery] = useState('');
@@ -1634,7 +1652,94 @@ function App() {
               Launch PatentMind <ArrowRight size={17} />
             </button>
           </section>
-        </main>
+        
+        {/* PAGE 7: PATENT DETAILS */}
+        {activeTab === 'patent-details' && (
+          <PatentDetailsView 
+            patentNumber={selectedPatentNumber} 
+            onBack={() => setActiveTab('search')}
+            onCompare={(num) => { setComparePatentB(num); setActiveTab('compare'); }}
+          />
+        )}
+
+        {/* PAGE 8: PATENT COMPARISON */}
+        {activeTab === 'compare' && (
+          <PatentComparisonView 
+            defaultPatentA={selectedPatentNumber}
+            defaultPatentB={comparePatentB}
+          />
+        )}
+
+        {/* PAGE 11: KNOWLEDGE GRAPH */}
+        {activeTab === 'knowledge-graph' && (
+          <KnowledgeGraphView 
+            onSelectPatent={(num) => { setSelectedPatentNumber(num); setActiveTab('patent-details'); }}
+          />
+        )}
+
+        {/* PAGE 13: SAVED PATENTS */}
+        {activeTab === 'saved-patents' && (
+          <SavedPatentsView 
+            onSelectPatent={(num) => { setSelectedPatentNumber(num); setActiveTab('patent-details'); }}
+          />
+        )}
+
+        {/* PAGE 14: PROJECTS */}
+        {activeTab === 'projects' && (
+          <ProjectsView />
+        )}
+
+        {/* PAGE 15: TEAM WORKSPACE */}
+        {activeTab === 'team' && (
+          <TeamWorkspaceView />
+        )}
+
+        {/* PAGE 16: NOTIFICATIONS */}
+        {activeTab === 'notifications' && (
+          <NotificationsView />
+        )}
+
+        {/* PAGE 17: USER PROFILE */}
+        {activeTab === 'profile' && (
+          <UserProfileView username={username} />
+        )}
+
+        {/* PAGE 19: API KEYS */}
+        {activeTab === 'api-keys' && (
+          <ApiKeysView />
+        )}
+
+        {/* PAGE 20: BILLING */}
+        {activeTab === 'billing' && (
+          <BillingView />
+        )}
+
+        {/* PAGE 21: HELP CENTER */}
+        {activeTab === 'help' && (
+          <HelpCenterView />
+        )}
+
+        {/* PAGE 22: CONTACT */}
+        {activeTab === 'contact' && (
+          <ContactView />
+        )}
+
+        {/* PAGE 23: PRIVACY POLICY */}
+        {activeTab === 'privacy' && (
+          <PrivacyPolicyView />
+        )}
+
+        {/* PAGE 24: TERMS OF SERVICE */}
+        {activeTab === 'terms' && (
+          <TermsOfServiceView />
+        )}
+
+        {/* PAGE 25: 404 PAGE */}
+        {activeTab === '404' && (
+          <NotFoundView onNavigateHome={() => setActiveTab('search')} />
+        )}
+
+      </main>
 
         <footer className="kelly-welcome-footer">
           <span>© 2026 PatentMind AI</span>
@@ -2818,13 +2923,19 @@ function App() {
           <nav className="flex items-center gap-1 md:gap-1.5 overflow-x-auto py-1 px-1 no-scrollbar">
             {[
               { id: 'search', label: 'Search', icon: Search },
-              { id: 'dashboard', label: 'Analytics', icon: BarChart3 },
+              { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+              { id: 'knowledge-graph', label: 'Graph', icon: Network },
+              { id: 'compare', label: 'Compare', icon: Layers },
               { id: 'upload', label: 'Upload', icon: UploadCloud },
-              { id: 'dataset', label: 'Dataset', icon: Database },
               { id: 'chat', label: 'Chatbot', icon: MessageSquare },
-              { id: 'help', label: 'Help', icon: HelpCircle },
+              { id: 'saved-patents', label: 'Saved', icon: Tag },
+              { id: 'projects', label: 'Projects', icon: FolderOpen },
+              { id: 'team', label: 'Team', icon: UserCheck },
+              { id: 'notifications', label: 'Alerts', icon: ShieldAlert },
+              { id: 'api-keys', label: 'API Keys', icon: KeyRound },
+              { id: 'billing', label: 'Billing', icon: Palette },
               { id: 'settings', label: 'Settings', icon: Settings },
-              { id: 'admin', label: 'Admin', icon: Cpu }
+              { id: 'help', label: 'Help', icon: HelpCircle }
             ].map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -2882,7 +2993,7 @@ function App() {
             </div>
 
             {/* User Profile & Password Modal Toggle */}
-            <div className="kelly-dashboard-user hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full py-1.5 px-3" title={`User: ${username}`}>
+            <div onClick={() => setActiveTab('profile')} className="kelly-dashboard-user hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full py-1.5 px-3 cursor-pointer hover:border-[#00C2FF]/40 transition-all" title={`User Profile: ${username}`}>
               <span className="w-2 h-2 rounded-full bg-[#00C2FF] animate-pulse shadow-[0_0_10px_rgba(0,194,255,0.9)]"></span>
               <span className="text-xs font-semibold text-white tracking-wide uppercase truncate max-w-[90px]">{username}</span>
               <button
@@ -2943,13 +3054,19 @@ function App() {
           <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
             {[
               { id: 'search', label: 'Search', icon: Search },
-              { id: 'dashboard', label: 'Analytics', icon: BarChart3 },
+              { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+              { id: 'knowledge-graph', label: 'Graph', icon: Network },
+              { id: 'compare', label: 'Compare', icon: Layers },
               { id: 'upload', label: 'Upload', icon: UploadCloud },
-              { id: 'dataset', label: 'Dataset', icon: Database },
               { id: 'chat', label: 'Chatbot', icon: MessageSquare },
-              { id: 'help', label: 'Help', icon: HelpCircle },
+              { id: 'saved-patents', label: 'Saved', icon: Tag },
+              { id: 'projects', label: 'Projects', icon: FolderOpen },
+              { id: 'team', label: 'Team', icon: UserCheck },
+              { id: 'notifications', label: 'Alerts', icon: ShieldAlert },
+              { id: 'api-keys', label: 'API Keys', icon: KeyRound },
+              { id: 'billing', label: 'Billing', icon: Palette },
               { id: 'settings', label: 'Settings', icon: Settings },
-              { id: 'admin', label: 'Admin', icon: Cpu }
+              { id: 'help', label: 'Help', icon: HelpCircle }
             ].map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -2986,7 +3103,7 @@ function App() {
             </button>
 
             {/* Profile User Status */}
-            <div className="flex items-center gap-3 truncate">
+            <div onClick={() => setActiveTab('profile')} className="flex items-center gap-3 truncate cursor-pointer hover:opacity-90 transition-opacity" title="View Profile">
               <span className="w-2.5 h-2.5 rounded-full bg-[#00C2FF] animate-pulse shadow-[0_0_10px_rgba(0,194,255,0.9)] flex-shrink-0" />
               {!isSidebarCollapsed && (
                 <div className="truncate text-left leading-none">
@@ -5474,6 +5591,93 @@ function App() {
             Developer: <span className="text-main font-semibold">Bhushan</span> // Contact: <span className="text-main font-semibold">+91 93590 83546</span>
           </div>
         </footer>
+
+      
+        {/* PAGE 7: PATENT DETAILS */}
+        {activeTab === 'patent-details' && (
+          <PatentDetailsView 
+            patentNumber={selectedPatentNumber} 
+            onBack={() => setActiveTab('search')}
+            onCompare={(num) => { setComparePatentB(num); setActiveTab('compare'); }}
+          />
+        )}
+
+        {/* PAGE 8: PATENT COMPARISON */}
+        {activeTab === 'compare' && (
+          <PatentComparisonView 
+            defaultPatentA={selectedPatentNumber}
+            defaultPatentB={comparePatentB}
+          />
+        )}
+
+        {/* PAGE 11: KNOWLEDGE GRAPH */}
+        {activeTab === 'knowledge-graph' && (
+          <KnowledgeGraphView 
+            onSelectPatent={(num) => { setSelectedPatentNumber(num); setActiveTab('patent-details'); }}
+          />
+        )}
+
+        {/* PAGE 13: SAVED PATENTS */}
+        {activeTab === 'saved-patents' && (
+          <SavedPatentsView 
+            onSelectPatent={(num) => { setSelectedPatentNumber(num); setActiveTab('patent-details'); }}
+          />
+        )}
+
+        {/* PAGE 14: PROJECTS */}
+        {activeTab === 'projects' && (
+          <ProjectsView />
+        )}
+
+        {/* PAGE 15: TEAM WORKSPACE */}
+        {activeTab === 'team' && (
+          <TeamWorkspaceView />
+        )}
+
+        {/* PAGE 16: NOTIFICATIONS */}
+        {activeTab === 'notifications' && (
+          <NotificationsView />
+        )}
+
+        {/* PAGE 17: USER PROFILE */}
+        {activeTab === 'profile' && (
+          <UserProfileView username={username} />
+        )}
+
+        {/* PAGE 19: API KEYS */}
+        {activeTab === 'api-keys' && (
+          <ApiKeysView />
+        )}
+
+        {/* PAGE 20: BILLING */}
+        {activeTab === 'billing' && (
+          <BillingView />
+        )}
+
+        {/* PAGE 21: HELP CENTER */}
+        {activeTab === 'help' && (
+          <HelpCenterView />
+        )}
+
+        {/* PAGE 22: CONTACT */}
+        {activeTab === 'contact' && (
+          <ContactView />
+        )}
+
+        {/* PAGE 23: PRIVACY POLICY */}
+        {activeTab === 'privacy' && (
+          <PrivacyPolicyView />
+        )}
+
+        {/* PAGE 24: TERMS OF SERVICE */}
+        {activeTab === 'terms' && (
+          <TermsOfServiceView />
+        )}
+
+        {/* PAGE 25: 404 PAGE */}
+        {activeTab === '404' && (
+          <NotFoundView onNavigateHome={() => setActiveTab('search')} />
+        )}
 
       </main>
 

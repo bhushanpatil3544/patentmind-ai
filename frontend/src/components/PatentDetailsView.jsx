@@ -1,0 +1,246 @@
+import React, { useState } from 'react';
+import { 
+  FileText, 
+  Download, 
+  Share2, 
+  Bookmark, 
+  ShieldAlert, 
+  Sparkles, 
+  CheckCircle2, 
+  Building2, 
+  Calendar, 
+  Tag, 
+  Layers, 
+  ArrowLeft,
+  ChevronRight,
+  Zap,
+  BarChart2
+} from 'lucide-react';
+
+export default function PatentDetailsView({ patentNumber, onBack, onCompare }) {
+  const [activeTab, setActiveTab] = useState('summary');
+  const [isSaved, setIsSaved] = useState(false);
+
+  // Mock patent data
+  const patent = {
+    number: patentNumber || 'US10922485B2',
+    title: 'Neural Network Vector Embedding Search Architecture for Intellectual Property Datasets',
+    assignee: 'Google LLC (Mountain View, CA)',
+    inventors: 'Dr. Aris Thorne, Dr. Elena Rostova, Marcus Vance',
+    filingDate: '2022-03-14',
+    issueDate: '2024-02-15',
+    status: 'ACTIVE / GRANTED',
+    cpcCode: 'G06F 16/9035 (Deep Semantic Indexing)',
+    similarityScore: 94.2,
+    infringementRiskScore: 28, // Low risk 28%
+    abstract: `A computer-implemented method and deep learning system for extracting semantic vector embeddings from multi-page patent document structures. The system utilizes a multi-stage PaddleOCR pipeline coupled with high-dimensional transformer embedding models to parse unstructured claim text, calculate cosine similarities against ChromaDB vector indices, and output high-precision prior art match probabilities in real time.`,
+    claims: [
+      { id: 1, type: 'Independent', text: '1. A neural vector search system comprising: a document ingestion engine configured to receive a PDF patent specification; a high-speed optical character recognition (OCR) processor operating on GPU acceleration; and a vector embedding generator configured to transform text chunks into 1536-dimensional dense vector embeddings.' },
+      { id: 2, type: 'Dependent', text: '2. The system of claim 1, wherein said vector embedding generator is coupled to a vector database executing approximate nearest neighbor (ANN) search over an HNSW index graph.' },
+      { id: 3, type: 'Dependent', text: '3. The system of claim 1, further comprising a Retrieval-Augmented Generation (RAG) synthesis module configured to generate natural language explanations referencing specific claim numbers.' }
+    ],
+    priorArtMatches: [
+      { number: 'US11450291B1', title: 'Transformer Embedding Extraction Engine', score: 88.5, assignee: 'OpenAI Inc' },
+      { number: 'EP3894012A1', title: 'PaddleOCR High-Speed PDF Parser', score: 81.2, assignee: 'Baidu Tech' }
+    ]
+  };
+
+  return (
+    <div className="space-y-8 pb-16">
+      {/* Top Action Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>BACK TO SEARCH RESULTS</span>
+        </button>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsSaved(!isSaved)}
+            className={`px-4 py-2 rounded-full text-xs font-medium border flex items-center gap-2 transition-all ${
+              isSaved
+                ? 'bg-[#00C2FF]/15 border-[#00C2FF] text-[#00C2FF]'
+                : 'bg-white/5 border-white/10 text-slate-300 hover:text-white hover:border-white/20'
+            }`}
+          >
+            <Bookmark className="w-3.5 h-3.5" />
+            <span>{isSaved ? 'Saved to Portfolio' : 'Bookmark Patent'}</span>
+          </button>
+
+          <button
+            onClick={() => onCompare && onCompare(patent.number)}
+            className="px-4 py-2 bg-white/5 border border-white/10 hover:border-[#00C2FF]/40 rounded-full text-xs font-medium text-slate-200 hover:text-white flex items-center gap-2 transition-all"
+          >
+            <BarChart2 className="w-3.5 h-3.5 text-[#00C2FF]" />
+            <span>Compare Patent</span>
+          </button>
+
+          <button className="btn-theme px-5 py-2 rounded-full text-xs font-semibold flex items-center gap-2 shadow-lg">
+            <Download className="w-3.5 h-3.5" />
+            <span>Export AI Dossier PDF</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Patent Main Banner */}
+      <div className="wrangler-card p-6 md:p-8 space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-mono font-bold px-3 py-1 rounded-full bg-[#5B7CFA]/15 text-[#00C2FF] border border-[#5B7CFA]/40 shadow-[0_0_15px_rgba(91,124,250,0.2)]">
+              {patent.number}
+            </span>
+            <span className="text-xs font-mono font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30">
+              {patent.status}
+            </span>
+          </div>
+
+          <div className="text-xs font-mono text-slate-400">
+            Filing Date: <span className="text-white font-medium">{patent.filingDate}</span>
+          </div>
+        </div>
+
+        <h1 className="text-2xl md:text-3xl font-heading font-extrabold text-white leading-tight">
+          {patent.title}
+        </h1>
+
+        {/* Metadata Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-white/10 text-xs">
+          <div className="space-y-1">
+            <span className="text-slate-400 font-mono block">Assignee & Owner</span>
+            <span className="font-semibold text-white flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5 text-[#00C2FF]" />
+              {patent.assignee}
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="text-slate-400 font-mono block">Inventors</span>
+            <span className="font-medium text-slate-200">{patent.inventors}</span>
+          </div>
+          <div className="space-y-1">
+            <span className="text-slate-400 font-mono block">Classification Code</span>
+            <span className="font-mono text-[#00C2FF]">{patent.cpcCode}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* AI Risk & Match Score Gauges */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Match Score Card */}
+        <div className="wrangler-card p-6 flex items-center gap-6">
+          <div className="w-20 h-20 rounded-full border-4 border-[#00C2FF] bg-[#00C2FF]/10 flex flex-col items-center justify-center font-mono font-bold text-[#00C2FF] text-xl shadow-[0_0_20px_rgba(0,194,255,0.3)]">
+            {patent.similarityScore}%
+            <span className="text-[8px] text-slate-400 font-sans">RELEVANCE</span>
+          </div>
+          <div className="space-y-1">
+            <h4 className="text-sm font-bold text-white font-heading">High Semantic Similarity</h4>
+            <p className="text-xs text-slate-300">
+              Matches your active research vector embeddings across 12 claims with 94.2% cosine confidence.
+            </p>
+          </div>
+        </div>
+
+        {/* Infringement Risk Gauge */}
+        <div className="wrangler-card p-6 flex items-center gap-6">
+          <div className="w-20 h-20 rounded-full border-4 border-emerald-400 bg-emerald-500/10 flex flex-col items-center justify-center font-mono font-bold text-emerald-400 text-xl shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+            {patent.infringementRiskScore}%
+            <span className="text-[8px] text-slate-400 font-sans">RISK</span>
+          </div>
+          <div className="space-y-1">
+            <h4 className="text-sm font-bold text-white font-heading">Low Overlap Risk</h4>
+            <p className="text-xs text-slate-300">
+              Clear freedom-to-operate (FTO) vector gap detected in independent claim clause #3.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Details Sub-Tabs */}
+      <div className="wrangler-card p-6 space-y-6">
+        <div className="flex items-center gap-3 border-b border-white/10 pb-4 overflow-x-auto no-scrollbar">
+          {[
+            { id: 'summary', label: 'AI Executive Summary' },
+            { id: 'claims', label: 'Claims Structure (3)' },
+            { id: 'prior-art', label: 'Prior-Art Similarity' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-[#5B7CFA] to-[#00C2FF] text-white shadow-lg'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab 1: Executive Summary */}
+        {activeTab === 'summary' && (
+          <div className="space-y-4 fade-in">
+            <h3 className="text-sm font-bold text-white font-heading flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#00C2FF]" />
+              Patent Abstract & Core Technical Contribution
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed font-sans bg-white/5 p-4 rounded-xl border border-white/10">
+              {patent.abstract}
+            </p>
+
+            <div className="p-4 bg-[#5B7CFA]/10 border border-[#5B7CFA]/30 rounded-xl space-y-2">
+              <span className="text-xs font-mono font-bold text-[#00C2FF] block uppercase">Key Engineering Takeaways:</span>
+              <ul className="text-xs text-slate-300 space-y-1.5 list-disc list-inside font-sans">
+                <li>Demonstrates high-speed GPU PaddleOCR extraction on multi-page PDF schemas.</li>
+                <li>Uses ChromaDB ANN vector graphs for sub-50ms similarity search latency.</li>
+                <li>Differentiates by attaching explicit line-number citation metadata to generated text outputs.</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 2: Claims Breakdown */}
+        {activeTab === 'claims' && (
+          <div className="space-y-4 fade-in">
+            <h3 className="text-sm font-bold text-white font-heading">Patent Claims Hierarchy</h3>
+            <div className="space-y-3">
+              {patent.claims.map(claim => (
+                <div key={claim.id} className="p-4 bg-white/5 border border-white/10 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-white/10 text-slate-300">
+                      {claim.type} Claim #{claim.id}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-200 font-mono leading-relaxed">{claim.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Prior Art */}
+        {activeTab === 'prior-art' && (
+          <div className="space-y-4 fade-in">
+            <h3 className="text-sm font-bold text-white font-heading">Top Similar Prior-Art References</h3>
+            <div className="space-y-3">
+              {patent.priorArtMatches.map((m, idx) => (
+                <div key={idx} className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <span className="text-xs font-mono font-bold text-[#00C2FF]">{m.number}</span>
+                    <h4 className="text-xs font-semibold text-white font-heading">{m.title}</h4>
+                    <span className="text-[10px] text-slate-400 font-mono">{m.assignee}</span>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30">
+                    {m.score}% Match
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
