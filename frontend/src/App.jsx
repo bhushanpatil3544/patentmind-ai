@@ -4198,11 +4198,11 @@ function App() {
                   </div>
 
                   <p className="text-xs font-sans text-zinc-300 font-light">
-                    Direct developer hotline: <strong className="text-white font-mono">+91 9359082546</strong>
+
                   </p>
 
                   <a
-                    href="https://wa.me/919359082546"
+                    
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-black font-bold rounded-xl text-xs font-sans tracking-wide uppercase transition-all shadow-lg"
@@ -4978,7 +4978,7 @@ function App() {
             <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">PatentMind System v2.1.0 Cloud</span>
           </div>
           <div className="text-[10px] font-mono text-zinc-400 hover:text-white transition-colors duration-200 text-right uppercase tracking-wider">
-            Developer: <span className="text-main font-semibold">Bhushan</span> // Contact: <span className="text-main font-semibold">+91 93590 83546</span>
+
           </div>
         </footer>
 
