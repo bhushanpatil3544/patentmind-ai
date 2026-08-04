@@ -32,7 +32,7 @@ export default function NotificationsView() {
               <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 ${
                 n.priority === 'HIGH' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-[#00C2FF]/20 text-[#00C2FF] border border-[#00C2FF]/30'
               }`}>
-                {n.type === 'alert' ? '⚠️' : '⚡'}
+                {n.type === 'alert' ? '' : ''}
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-3">

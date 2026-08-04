@@ -128,7 +128,7 @@ export default function PatentComparisonView({ defaultPatentA, defaultPatentB })
         </div>
 
         <span className="text-xs font-mono font-bold px-4 py-2 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
-          ⚠️ {comparisonData.overlapRisk}
+           {comparisonData.overlapRisk}
         </span>
       </div>
 

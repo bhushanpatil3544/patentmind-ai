@@ -378,7 +378,7 @@ function App() {
   const [chatModeReasoning, setChatModeReasoning] = useState(false);
   const [pdfAnalyzingLoading, setPdfAnalyzingLoading] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isSidebarNavMode, setIsSidebarNavMode] = useState(() => localStorage.getItem('sidebar_nav_mode') === 'true');
+  const [isSidebarNavMode, setIsSidebarNavMode] = useState(() => localStorage.getItem('sidebar_nav_mode') !== 'false');
 
   // Google Patents Fetch states
   const [googleFetchQuery, setGoogleFetchQuery] = useState('');
@@ -1151,14 +1151,14 @@ function App() {
       } else {
         setChatMessages(prev => [...prev, {
           role: 'assistant',
-          content: `⚠️ Error: ${data.detail || 'Failed to generate chat response.'}`,
+          content: ` Error: ${data.detail || 'Failed to generate chat response.'}`,
           citations: []
         }]);
       }
     } catch (err) {
       setChatMessages(prev => [...prev, {
         role: 'assistant',
-        content: `⚠️ Connection Error: ${err.message || 'Could not communicate with backend.'}`,
+        content: ` Connection Error: ${err.message || 'Could not communicate with backend.'}`,
         citations: []
       }]);
     } finally {
@@ -1172,7 +1172,7 @@ function App() {
     setAttachedPdfName(file.name);
     setChatLoading(true);
 
-    const userMsg = { role: 'user', content: `📄 Attached PDF Document: ${file.name} [Extracting Text & Analyzing...]` };
+    const userMsg = { role: 'user', content: ` Attached PDF Document: ${file.name} [Extracting Text & Analyzing...]` };
     setChatMessages(prev => [...prev, userMsg]);
 
     const formData = new FormData();
@@ -1202,14 +1202,14 @@ function App() {
       } else {
         setChatMessages(prev => [...prev, {
           role: 'assistant',
-          content: `⚠️ PDF Analysis Error: ${data.detail || 'Failed to extract text from PDF.'}`,
+          content: ` PDF Analysis Error: ${data.detail || 'Failed to extract text from PDF.'}`,
           citations: []
         }]);
       }
     } catch (err) {
       setChatMessages(prev => [...prev, {
         role: 'assistant',
-        content: `⚠️ Error uploading PDF: ${err.message || 'Connection error'}`,
+        content: ` Error uploading PDF: ${err.message || 'Connection error'}`,
         citations: []
       }]);
     } finally {
@@ -1301,13 +1301,13 @@ function App() {
       } else {
         setIdeaChatMessages(prev => [...prev, {
           role: 'assistant',
-          content: `⚠️ Error: ${data.detail || 'Failed to generate response.'}`
+          content: ` Error: ${data.detail || 'Failed to generate response.'}`
         }]);
       }
     } catch (err) {
       setIdeaChatMessages(prev => [...prev, {
         role: 'assistant',
-        content: `⚠️ Connection Error: ${err.message || 'Could not communicate with backend.'}`
+        content: ` Connection Error: ${err.message || 'Could not communicate with backend.'}`
       }]);
     } finally {
       setIdeaChatLoading(false);
@@ -1538,822 +1538,180 @@ function App() {
     }
   };
 
-  // RENDER WELCOME SCREEN ON FIRST LOAD
+  // RENDER ENTERPRISE LANDING PAGE ON FIRST LOAD
   if (showWelcome) {
     return (
-      <div className="kelly-welcome min-h-screen bg-[#fcfcfa] text-[#3a3a3a] overflow-x-hidden">
-        <header className="kelly-welcome-header">
-          <a href="#home" className="kelly-wordmark" aria-label="PatentMind AI home">
-            <span className="kelly-mark">P</span>
-            <span>PatentMind<span className="kelly-wordmark-accent">.ai</span></span>
-          </a>
-
-          <nav className="kelly-welcome-nav" aria-label="Main navigation">
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            <a href="#tools">Tools</a>
-            <a href="#workflow">Workflow</a>
-            <a href="#contact">Contact</a>
-          </nav>
-
-          <div className="kelly-welcome-socials" aria-label="Social links">
-            <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" title="Instagram"><Instagram size={18} /></a>
-            <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" title="LinkedIn"><Linkedin size={18} /></a>
-            <a href="https://x.com/" target="_blank" rel="noreferrer" title="X / Twitter"><Twitter size={18} /></a>
-          </div>
-        </header>
-
-        <main id="home">
-          <section className="kelly-hero">
-            <div className="kelly-hero-copy">
-              <p className="kelly-eyebrow"><span>✦</span> Patent intelligence, made human</p>
-              <h1>Research smarter.<br /><em>Invent boldly.</em></h1>
-              <p className="kelly-intro">
-                PatentMind turns dense patent data into clear research paths, evidence-backed answers, and your next best idea.
-              </p>
-              <div className="kelly-hero-actions">
-                <button type="button" className="kelly-primary-action" onClick={() => { setActiveTab('search'); setShowWelcome(false); }}>
-                  Enter workspace <ArrowRight size={17} />
-                </button>
-                <a href="#tools" className="kelly-secondary-action"><span>↓</span> Explore tools</a>
-              </div>
-              <div className="kelly-mini-stats" aria-label="PatentMind capabilities">
-                <span><b>AI</b> research partner</span>
-                <span><b>PDF</b> to insight</span>
-                <span><b>24/7</b> workspace</span>
-              </div>
+      <div className="min-h-screen bg-[#070913] text-white font-sans overflow-x-hidden selection:bg-[#2563EB] selection:text-white">
+        {/* Header Dock */}
+        <header className="sticky top-0 z-50 bg-[#070913]/80 backdrop-blur-xl border-b border-white/10 px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold font-heading text-lg shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+              
             </div>
-
-            <div className="kelly-hero-art" aria-label="Patent document illustration">
-              <div className="kelly-orbit kelly-orbit-one" />
-              <div className="kelly-orbit kelly-orbit-two" />
-              <div className="kelly-art-sticker">✨<span>Idea<br />found</span></div>
-              <div className="kelly-art-avatar">
-                <div className="kelly-avatar-hair" />
-                <div className="kelly-avatar-face"><span>•</span><span>•</span><i /></div>
-                <div className="kelly-avatar-body" />
-              </div>
-              <div className="kelly-patent-sheet">
-                <div className="kelly-sheet-top"><span>PM</span><i /><i /><i /></div>
-                <div className="kelly-sheet-title">Patent<br />brief</div>
-                <div className="kelly-sheet-lines"><i /><i /><i /><i /></div>
-                <div className="kelly-sheet-diagram"><span /><span /><span /></div>
-                <div className="kelly-sheet-footer">AI VERIFIED · 2026</div>
-              </div>
-              <div className="kelly-art-bubble">🔎<span>Search<br />clarity</span></div>
-            </div>
-          </section>
-
-          <section id="about" className="kelly-intro-section">
-            <p className="kelly-eyebrow"><span>01</span> The clear path through complexity</p>
-            <div>
-              <h2>Everything you need to understand a patent — without losing the thread.</h2>
-              <p>Upload a document, ask a question, compare related work, or start with a fresh invention idea. Every path leads to structured, explainable insight.</p>
-            </div>
-          </section>
-
-          <section id="tools" className="kelly-tools-section">
-            {[
-              { emoji: '🔍', title: 'Semantic search', text: 'Find relevant inventions by meaning, not just matching words.', tab: 'search', icon: Search },
-              { emoji: '📄', title: 'Patent reader', text: 'Upload documents and turn technical pages into clear research notes.', tab: 'upload', icon: UploadCloud },
-              { emoji: '💬', title: 'Ask PatentMind', text: 'Have a natural conversation with your patent collection.', tab: 'chat', icon: MessageSquare },
-              { emoji: '💡', title: 'Idea explorer', text: 'Pressure-test a new invention against the patents that matter.', tab: 'idea', icon: Sparkles },
-            ].map((tool) => {
-              const Icon = tool.icon;
-              return (
-                <button key={tool.title} type="button" className="kelly-tool-card" onClick={() => { setActiveTab(tool.tab); setShowWelcome(false); }}>
-                  <span className="kelly-tool-emoji">{tool.emoji}</span>
-                  <Icon size={19} className="kelly-tool-icon" />
-                  <h3>{tool.title}</h3>
-                  <p>{tool.text}</p>
-                  <span className="kelly-card-link">Open tool <ArrowRight size={15} /></span>
-                </button>
-              );
-            })}
-          </section>
-
-          <section id="workflow" className="kelly-workflow-section">
-            <div className="kelly-workflow-visual"><Database size={35} /><span>1</span><span>2</span><span>3</span><i /></div>
-            <div>
-              <p className="kelly-eyebrow"><span>02</span> A calmer workflow</p>
-              <h2>Your research, <em>in one thoughtful place.</em></h2>
-              <ol>
-                <li><b>01</b><span><strong>Bring your evidence</strong>Upload a patent PDF or collect a targeted dataset.</span></li>
-                <li><b>02</b><span><strong>Explore the signal</strong>Search, ask questions, and trace citations naturally.</span></li>
-                <li><b>03</b><span><strong>Move with confidence</strong>Use clear findings to support your next technical decision.</span></li>
-              </ol>
-            </div>
-          </section>
-
-          <section id="contact" className="kelly-cta-section">
-            <span>Ready when you are</span>
-            <h2>Make space for the <em>next big idea.</em></h2>
-            <button type="button" className="kelly-primary-action" onClick={() => { setActiveTab('search'); setShowWelcome(false); }}>
-              Launch PatentMind <ArrowRight size={17} />
-            </button>
-          </section>
-        
-        {/* PAGE 7: PATENT DETAILS */}
-        {activeTab === 'patent-details' && (
-          <PatentDetailsView 
-            patentNumber={selectedPatentNumber} 
-            onBack={() => setActiveTab('search')}
-            onCompare={(num) => { setComparePatentB(num); setActiveTab('compare'); }}
-          />
-        )}
-
-        {/* PAGE 8: PATENT COMPARISON */}
-        {activeTab === 'compare' && (
-          <PatentComparisonView 
-            defaultPatentA={selectedPatentNumber}
-            defaultPatentB={comparePatentB}
-          />
-        )}
-
-        {/* PAGE 11: KNOWLEDGE GRAPH */}
-        {activeTab === 'knowledge-graph' && (
-          <KnowledgeGraphView 
-            onSelectPatent={(num) => { setSelectedPatentNumber(num); setActiveTab('patent-details'); }}
-          />
-        )}
-
-        {/* PAGE 13: SAVED PATENTS */}
-        {activeTab === 'saved-patents' && (
-          <SavedPatentsView 
-            onSelectPatent={(num) => { setSelectedPatentNumber(num); setActiveTab('patent-details'); }}
-          />
-        )}
-
-        {/* PAGE 14: PROJECTS */}
-        {activeTab === 'projects' && (
-          <ProjectsView />
-        )}
-
-        {/* PAGE 15: TEAM WORKSPACE */}
-        {activeTab === 'team' && (
-          <TeamWorkspaceView />
-        )}
-
-        {/* PAGE 16: NOTIFICATIONS */}
-        {activeTab === 'notifications' && (
-          <NotificationsView />
-        )}
-
-        {/* PAGE 17: USER PROFILE */}
-        {activeTab === 'profile' && (
-          <UserProfileView username={username} />
-        )}
-
-        {/* PAGE 19: API KEYS */}
-        {activeTab === 'api-keys' && (
-          <ApiKeysView />
-        )}
-
-        {/* PAGE 20: BILLING */}
-        {activeTab === 'billing' && (
-          <BillingView />
-        )}
-
-        {/* PAGE 21: HELP CENTER */}
-        {activeTab === 'help' && (
-          <HelpCenterView />
-        )}
-
-        {/* PAGE 22: CONTACT */}
-        {activeTab === 'contact' && (
-          <ContactView />
-        )}
-
-        {/* PAGE 23: PRIVACY POLICY */}
-        {activeTab === 'privacy' && (
-          <PrivacyPolicyView />
-        )}
-
-        {/* PAGE 24: TERMS OF SERVICE */}
-        {activeTab === 'terms' && (
-          <TermsOfServiceView />
-        )}
-
-        {/* PAGE 25: 404 PAGE */}
-        {activeTab === '404' && (
-          <NotFoundView onNavigateHome={() => setActiveTab('search')} />
-        )}
-
-      </main>
-
-        <footer className="kelly-welcome-footer">
-          <span>© 2026 PatentMind AI</span>
-          <span>Built for curious research teams <Heart size={13} fill="currentColor" /></span>
-          <button type="button" onClick={() => { setActiveTab('help'); setShowWelcome(false); }}>Need help?</button>
-        </footer>
-      </div>
-    );
-
-    // Dynamic styling classes based on selected welcome layout
-    let wrapperClass = "min-h-screen w-full bg-[#FAF9F6] text-zinc-900 font-outfit relative overflow-hidden flex flex-col justify-between p-8 md:p-12";
-    if (welcomeLayout === 'brutalist') {
-      wrapperClass = "min-h-screen w-full bg-[#FFFBEB] text-black font-mono relative overflow-hidden flex flex-col justify-between p-8 md:p-12 border-[5px] border-black";
-    } else if (welcomeLayout === 'cyber') {
-      wrapperClass = "min-h-screen w-full bg-[#05050A] text-[#10B981] font-mono relative overflow-hidden flex flex-col justify-between p-8 md:p-12";
-    } else if (welcomeLayout === 'aurora') {
-      wrapperClass = "min-h-screen w-full bg-[#0A0915] text-white font-outfit relative overflow-hidden flex flex-col justify-between p-8 md:p-12";
-    }
-
-    return (
-      <div className={wrapperClass}>
-        {/* Ambient blurred backdrop shapes for Claymation and Aurora styles */}
-        {welcomeLayout === 'claymation' && (
-          <>
-            <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-amber-200/40 to-transparent blur-[120px] pointer-events-none" />
-            <div className="absolute bottom-[-10%] left-[-5%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-tr from-violet-200/30 to-transparent blur-[100px] pointer-events-none" />
-          </>
-        )}
-        {welcomeLayout === 'aurora' && (
-          <>
-            <div className="absolute top-[-20%] right-[-20%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-br from-[#7C3AED]/25 to-transparent blur-[150px] pointer-events-none" />
-            <div className="absolute bottom-[-25%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[#312E81]/30 to-transparent blur-[130px] pointer-events-none" />
-          </>
-        )}
-
-        {/* Top Header Row */}
-        <div className="flex items-center justify-between z-10 w-full">
-          <div className="flex items-center gap-2">
-            {welcomeLayout === 'brutalist' ? (
-              <div className="bg-black text-[#FFFBEB] px-2 py-1 font-black text-xs border border-black uppercase tracking-widest shadow-[2px_2px_0px_#000]">
-                T3
-              </div>
-            ) : welcomeLayout === 'cyber' ? (
-              <div className="border border-[#10B981] text-[#10B981] px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest bg-[#10B981]/10">
-                [SYS_T3]
-              </div>
-            ) : (
-              <div className={`w-7.5 h-7.5 rounded-full bg-[#6366F1] flex items-center justify-center text-white font-extrabold text-[10px]`}>
-                T3
-              </div>
-            )}
-            <span className={`font-outfit font-black text-[10px] md:text-xs tracking-wider uppercase ${
-              welcomeLayout === 'cyber' ? 'text-[#10B981]' : 'text-zinc-950'
-            }`}>
-              BHUSHAN SHREYA OMKAR SOHAM ASTA TAWARI JI
+            <span className="font-heading font-extrabold text-lg tracking-tight text-white">
+              PatentMind <span className="text-xs font-mono text-[#38BDF8] ml-1 font-semibold">AI SaaS</span>
             </span>
           </div>
 
-          <div className="hidden lg:flex items-center gap-8 text-[10px] font-mono tracking-widest uppercase">
-            <span className="hover:text-[#6366F1] cursor-pointer transition-colors">Home</span>
-            <span className="hover:text-[#6366F1] cursor-pointer transition-colors">Features</span>
-            <span className="hover:text-[#6366F1] cursor-pointer transition-colors">Database</span>
-            <span className="hover:text-[#6366F1] cursor-pointer transition-colors">Documentation</span>
-          </div>
+          <nav className="hidden md:flex items-center gap-8 text-xs font-medium text-slate-300">
+            <a href="#features" className="hover:text-white transition-colors">Features</a>
+            <a href="#preview" className="hover:text-white transition-colors">Interactive Previews</a>
+            <a href="#workflow" className="hover:text-white transition-colors">Workflow</a>
+            <a href="#pricing" className="hover:text-white transition-colors">Enterprise Pricing</a>
+            <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+          </nav>
 
-          {/* Style & Theme Selectors inside Welcome */}
-          <div className="flex items-center gap-2 z-20">
-            {/* Design Style Selector */}
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-sm border ${
-              welcomeLayout === 'cyber' 
-                ? 'bg-zinc-950 border-emerald-950 text-[#10B981]' 
-                : welcomeLayout === 'brutalist'
-                ? 'bg-[#FFFBEB] border-black text-black'
-                : 'bg-white border-zinc-200 text-zinc-700'
-            }`}>
-              <span className="text-[8px] font-mono text-zinc-400 font-bold uppercase tracking-wider">Style:</span>
-              <select 
-                value={welcomeLayout} 
-                onChange={(e) => setWelcomeLayout(e.target.value)}
-                className="bg-transparent text-[9px] font-mono border-none focus:outline-none uppercase cursor-pointer text-inherit"
-              >
-                <option value="claymation">Claymation</option>
-                <option value="brutalist">Brutalist</option>
-                <option value="cyber">Cyber HUD</option>
-                <option value="aurora">Aurora Glass</option>
-              </select>
-            </div>
-
-            {/* Accent Theme Selector */}
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-sm border ${
-              welcomeLayout === 'cyber' 
-                ? 'bg-zinc-950 border-emerald-950 text-[#10B981]' 
-                : welcomeLayout === 'brutalist'
-                ? 'bg-[#FFFBEB] border-black text-black'
-                : 'bg-white border-zinc-200 text-zinc-700'
-            }`}>
-              <Palette className="w-3.5 h-3.5 text-zinc-400" />
-              <select 
-                value={theme} 
-                onChange={(e) => setTheme(e.target.value)}
-                className="bg-transparent text-[9px] font-mono border-none focus:outline-none uppercase cursor-pointer text-inherit"
-              >
-                {themesList.map((t) => (
-                  <option key={t.id} value={t.id} className="bg-zinc-900 text-zinc-300">
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Split Column */}
-        <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-12 max-w-5xl mx-auto w-full z-10 py-4">
-          {/* Left Hero Column */}
-          <div className="flex-1 space-y-6 text-left max-w-lg">
-            {welcomeLayout === 'claymation' && (
-              <div className="space-y-3">
-                <span className="text-[10px] font-mono tracking-[4px] text-zinc-400 uppercase font-semibold block">
-                  Digital Experiences
-                </span>
-                <h1 className="font-outfit font-black text-5xl md:text-6xl text-zinc-900 leading-[1.05] tracking-tight">
-                  Hello
-                </h1>
-                <p className="text-zinc-500 font-light text-sm max-w-sm mt-4 leading-relaxed uppercase tracking-wider text-[11px] font-mono">
-                  WELCOME TO THE TEAM NO 3 APPLICATION WINDOW
-                </p>
-                <p className="text-zinc-450 font-light text-xs max-w-sm leading-relaxed">
-                  Advanced patent semantic intelligence workspace. Process complex technical structures with automated vector RAG orchestration.
-                </p>
-              </div>
-            )}
-
-            {welcomeLayout === 'brutalist' && (
-              <div className="space-y-4">
-                <span className="bg-black text-[#FFFBEB] text-[10px] px-2 py-1 font-bold inline-block border-2 border-black">
-                  [ SYSTEM BOOT PROTOCOL ]
-                </span>
-                <h1 className="font-black text-5xl md:text-6xl text-black leading-none tracking-normal uppercase">
-                  TEAM_3_SYS
-                </h1>
-                <p className="text-black font-bold text-sm uppercase">
-                  === WELCOME TO THE TEAM NO 3 APPLICATION WINDOW ===
-                </p>
-                <p className="text-black text-xs leading-relaxed max-w-md border-l-4 border-black pl-3 py-1 bg-yellow-100/50">
-                  No-nonsense knowledge acquisition and relational analysis core. Secure database seed verified. Ready for query mapping.
-                </p>
-              </div>
-            )}
-
-            {welcomeLayout === 'cyber' && (
-              <div className="space-y-4 text-[#10B981]">
-                <span className="text-[10px] tracking-[4px] animate-pulse font-bold block">
-                  &gt; ESTABLISHING INTERRUPT
-                </span>
-                <h1 className="font-bold text-4xl md:text-5xl leading-none uppercase tracking-widest text-[#10B981] drop-shadow-[0_0_10px_rgba(16,185,129,0.3)]">
-                  SYS_OPERATOR
-                </h1>
-                <p className="text-emerald-500/70 text-xs font-mono uppercase">
-                  Logical Kernel Registered. Ready for command ingestion.
-                </p>
-                <p className="text-emerald-500/60 text-xs leading-relaxed max-w-md font-mono bg-zinc-950/80 p-3 border border-emerald-950 rounded">
-                  WELCOME TO THE TEAM NO 3 APPLICATION WINDOW. INDEXING USPTO RAW DATABASES. BOOT PARITY ACTIVE.
-                </p>
-              </div>
-            )}
-
-            {welcomeLayout === 'aurora' && (
-              <div className="space-y-4">
-                <span className="text-[10px] font-mono tracking-[6px] text-zinc-400 uppercase font-semibold block">
-                  Aesthetic Intelligence
-                </span>
-                <h1 className="font-outfit font-light text-5xl md:text-6xl text-white leading-none tracking-wide">
-                  Intellect <strong className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">Core</strong>
-                </h1>
-                <p className="text-zinc-400 font-light text-xs max-w-sm leading-relaxed uppercase tracking-wider text-[11px] font-mono">
-                  WELCOME TO THE TEAM NO 3 APPLICATION WINDOW
-                </p>
-                <p className="text-zinc-350 font-light text-xs max-w-sm leading-relaxed">
-                  Experience seamless semantic context rendering, multi-constraint mathematical RAG queries, and neural knowledge discovery.
-                </p>
-              </div>
-            )}
-
-            {/* Launch Form fields */}
-            <div className="flex flex-col sm:flex-row items-stretch gap-2.5 max-w-md w-full pt-2">
-              {welcomeLayout === 'brutalist' ? (
-                <>
-                  <div className="flex-1 bg-white border-[3px] border-black px-4 py-3.5 shadow-[4px_4px_0px_#000] flex items-center gap-2">
-                    <input
-                      type="text"
-                      placeholder="TEAM_3_GATEWAY"
-                      disabled
-                      className="bg-transparent w-full focus:outline-none text-xs font-mono font-bold tracking-widest text-black/50"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowWelcome(false)}
-                    className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white border-[3px] border-black text-xs font-mono tracking-widest uppercase px-8 py-4 font-black shadow-[4px_4px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-[1px_1px_0px_#000] transition-all cursor-pointer"
-                  >
-                    LAUNCH PLATFORM
-                  </button>
-                </>
-              ) : welcomeLayout === 'cyber' ? (
-                <>
-                  <div className="flex-1 bg-zinc-950 border border-emerald-950 px-4 py-3.5 flex items-center gap-2">
-                    <span className="text-emerald-500 font-mono text-xs animate-pulse">&gt;</span>
-                    <input
-                      type="text"
-                      value="run_gateway --role guest"
-                      disabled
-                      className="bg-transparent w-full focus:outline-none text-xs font-mono tracking-wider text-emerald-400"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowWelcome(false)}
-                    className="bg-emerald-950/20 border border-emerald-500 hover:bg-emerald-500 hover:text-black text-emerald-500 text-xs font-mono tracking-widest uppercase px-8 py-4 rounded transition-all cursor-pointer font-bold animate-pulse"
-                  >
-                    BOOT KERNEL
-                  </button>
-                </>
-              ) : welcomeLayout === 'aurora' ? (
-                <>
-                  <div className="flex-1 bg-white/5 border border-white/10 backdrop-blur-md px-4 py-3.5 rounded-2xl flex items-center gap-2">
-                    <input
-                      type="text"
-                      placeholder="neural_gate_03"
-                      disabled
-                      className="bg-transparent w-full focus:outline-none text-xs font-mono tracking-widest text-white/30"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowWelcome(false)}
-                    className="bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white text-xs font-mono tracking-widest uppercase px-8 py-4 rounded-2xl font-semibold hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] transition-all cursor-pointer"
-                  >
-                    ENTER PORTAL
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div className="flex-1 bg-white border border-zinc-200 px-4 py-3.5 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.02)] flex items-center gap-2">
-                    <input
-                      type="text"
-                      placeholder="TEAM_3_GATEWAY"
-                      disabled
-                      className="bg-transparent w-full focus:outline-none text-xs font-mono tracking-widest text-zinc-400"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowWelcome(false)}
-                    className="bg-[#6366F1] hover:bg-[#4F46E5] text-white text-xs font-mono tracking-widest uppercase px-8 py-4 rounded-2xl font-bold shadow-[0_10px_25px_rgba(99,102,241,0.25)] hover:scale-102 transition-all cursor-pointer"
-                  >
-                    LAUNCH PLATFORM
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Right Hero Column Graphic Switcher */}
-          <div className="flex-1 flex items-center justify-center relative w-full max-w-md h-[340px] md:h-[420px]">
-            {welcomeLayout === 'claymation' && (
-              <>
-                <div className="absolute w-[280px] h-[280px] rounded-full border border-amber-300/40 animate-pulse pointer-events-none" />
-                <div className="absolute w-[320px] h-[320px] rounded-full border border-amber-200/20 animate-spin [animation-duration:20s] pointer-events-none" />
-                <svg className="w-full h-full drop-shadow-[0_20px_40px_rgba(0,0,0,0.08)]" viewBox="0 0 400 400" fill="none">
-                  <defs>
-                    <radialGradient id="beanbag-grad" cx="50%" cy="40%" r="60%">
-                      <stop offset="0%" stopColor="#FCD34D"/>
-                      <stop offset="70%" stopColor="#F59E0B"/>
-                      <stop offset="100%" stopColor="#D97706"/>
-                    </radialGradient>
-                    <linearGradient id="body-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#818CF8"/>
-                      <stop offset="100%" stopColor="#4F46E5"/>
-                    </linearGradient>
-                    <radialGradient id="bulb-grad" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stopColor="#FFF"/>
-                      <stop offset="30%" stopColor="#FCD34D"/>
-                      <stop offset="100%" stopColor="#F59E0B"/>
-                    </radialGradient>
-                  </defs>
-                  <circle cx="160" cy="50" r="16" fill="url(#bulb-grad)" className="animate-bounce" style={{ animationDuration: '4s' }} />
-                  <rect x="156" y="65" width="8" height="10" rx="1" fill="#4B5563" />
-                  <ellipse cx="200" cy="220" rx="110" ry="75" fill="url(#beanbag-grad)" />
-                  <path d="M165 170 C165 140 180 120 200 120 C220 120 235 140 235 170 C235 210 165 210 165 170 Z" fill="url(#body-grad)" />
-                  <path d="M180 195 C180 250 160 275 160 275" stroke="#EF4444" strokeWidth="22" strokeLinecap="round" />
-                  <path d="M160 275 C160 275 140 282 145 292 C150 302 165 292 165 292" stroke="#60A5FA" strokeWidth="16" strokeLinecap="round" />
-                  <path d="M220 195 C220 250 240 275 240 275" stroke="#EF4444" strokeWidth="22" strokeLinecap="round" />
-                  <path d="M240 275 C240 275 260 282 255 292 C250 302 235 292 235 292" stroke="#60A5FA" strokeWidth="16" strokeLinecap="round" />
-                  <path d="M170 145 C150 135 145 100 150 90" stroke="#4F46E5" strokeWidth="18" strokeLinecap="round" />
-                  <circle cx="150" cy="85" r="10" fill="#FBBF24" />
-                  <path d="M230 145 C250 135 255 100 250 90" stroke="#4F46E5" strokeWidth="18" strokeLinecap="round" />
-                  <circle cx="250" cy="85" r="10" fill="#FBBF24" />
-                  <circle cx="200" cy="95" r="22" fill="#FBBF24" />
-                  <circle cx="192" cy="92" r="6" stroke="#0284C7" strokeWidth="3.5" fill="none" />
-                  <circle cx="208" cy="92" r="6" stroke="#0284C7" strokeWidth="3.5" fill="none" />
-                  <line x1="198" y1="92" x2="202" y2="92" stroke="#0284C7" strokeWidth="3.5" />
-                </svg>
-              </>
-            )}
-
-            {welcomeLayout === 'brutalist' && (
-              <div className="w-full h-full border-[4px] border-black bg-white p-6 shadow-[8px_8px_0px_#000] flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute right-[-20px] top-[-20px] w-24 h-24 bg-yellow-400 border-[3px] border-black rotate-12 z-0" />
-                <div className="z-10 space-y-4">
-                  <div className="text-xs font-black uppercase border-b-2 border-black pb-2 flex items-center justify-between">
-                    <span>SYS DIAGNOSTIC</span>
-                    <span className="animate-pulse">●</span>
-                  </div>
-                  <h3 className="font-black text-3xl leading-none">NO_3_NODE</h3>
-                  <div className="grid grid-cols-2 gap-2 text-[10px] font-bold">
-                    <div className="border border-black p-2 bg-purple-200">PORT: 8000</div>
-                    <div className="border border-black p-2 bg-orange-200">DB: MYSQL</div>
-                    <div className="border border-black p-2 bg-green-200">INDEX: ACTIVE</div>
-                    <div className="border border-black p-2 bg-blue-200">JWT: SIGNED</div>
-                  </div>
-                </div>
-                <div className="border-[3px] border-black bg-yellow-300 p-3 font-black text-center text-xs tracking-wider uppercase">
-                  SEEDED IN WORKSPACE
-                </div>
-              </div>
-            )}
-
-            {welcomeLayout === 'cyber' && (
-              <div className="w-full h-full flex flex-col items-center justify-center relative">
-                {/* Glowing Matrix scanning radar HUD */}
-                <div className="absolute inset-0 bg-[#10B981]/5 rounded border border-[#10B981]/20 pointer-events-none" />
-                <svg className="w-4/5 h-4/5 drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]" viewBox="0 0 400 400" fill="none" stroke="#10B981" strokeWidth="1.5">
-                  <circle cx="200" cy="200" r="140" strokeDasharray="6,6" className="animate-spin [animation-duration:25s]" />
-                  <circle cx="200" cy="200" r="100" />
-                  <circle cx="200" cy="200" r="60" strokeDasharray="3,3" />
-                  <line x1="50" y1="200" x2="350" y2="200" strokeOpacity="0.4" />
-                  <line x1="200" y1="50" x2="200" y2="350" strokeOpacity="0.4" />
-                  {/* Sweeping hand line */}
-                  <line x1="200" y1="200" x2="280" y2="120" strokeWidth="2.5" className="animate-pulse" />
-                  <circle cx="280" cy="120" r="4" fill="#10B981" />
-                </svg>
-                <div className="absolute bottom-4 font-mono text-[9px] text-[#10B981]/80 tracking-widest uppercase animate-pulse">
-                  System diagnostic sweep in progress...
-                </div>
-              </div>
-            )}
-
-            {welcomeLayout === 'aurora' && (
-              <div className="w-full h-full flex items-center justify-center relative">
-                {/* Floating radial abstract donut */}
-                <div className="absolute w-[240px] h-[240px] rounded-full bg-indigo-500/10 blur-xl animate-pulse" />
-                <svg className="w-4/5 h-4/5" viewBox="0 0 400 400" fill="none">
-                  <defs>
-                    <radialGradient id="aurora-donut-grad" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stopColor="#C084FC" stopOpacity="0.8"/>
-                      <stop offset="50%" stopColor="#818CF8" stopOpacity="0.4"/>
-                      <stop offset="100%" stopColor="transparent"/>
-                    </radialGradient>
-                  </defs>
-                  <circle cx="200" cy="200" r="110" fill="url(#aurora-donut-grad)" className="animate-float" />
-                  <circle cx="200" cy="200" r="75" stroke="rgba(255, 255, 255, 0.12)" strokeWidth="6" strokeDasharray="10,5" className="animate-spin [animation-duration:40s]" />
-                </svg>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Footer Row */}
-        <div className={`flex flex-col md:flex-row items-center justify-between w-full z-10 pt-4 max-w-5xl mx-auto border-t ${
-          welcomeLayout === 'cyber' 
-            ? 'border-emerald-950' 
-            : welcomeLayout === 'brutalist'
-            ? 'border-black border-t-[3px]'
-            : 'border-zinc-200/60'
-        }`}>
-          {/* Bottom Left Status/Character segment */}
-          {welcomeLayout === 'brutalist' ? (
-            <div className="border-2 border-black bg-yellow-250 p-2.5 shadow-[2px_2px_0px_#000] text-[10px] font-bold uppercase">
-              STATUS: <span className="text-green-700 animate-pulse">ONLINE</span> // MEMORY: SEEDED // COMPILER: OK
-            </div>
-          ) : welcomeLayout === 'cyber' ? (
-            <div className="font-mono text-[9px] text-[#10B981]/70 leading-relaxed text-left uppercase">
-              <div>&gt; local_ollama_model: qwen2.5:latest [FOUND]</div>
-              <div>&gt; chroma_vector_db: chroma_db [ACTIVE]</div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <svg className="w-24 h-20 drop-shadow-md" viewBox="0 0 160 120" fill="none">
-                <defs>
-                  <radialGradient id="beanbag-grad-small" cx="50%" cy="40%" r="60%">
-                    <stop offset="0%" stopColor="#FCD34D"/>
-                    <stop offset="70%" stopColor="#F59E0B"/>
-                    <stop offset="100%" stopColor="#D97706"/>
-                  </radialGradient>
-                  <linearGradient id="body-grad-small" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#818CF8"/>
-                    <stop offset="100%" stopColor="#4F46E5"/>
-                  </linearGradient>
-                </defs>
-                <ellipse cx="60" cy="80" rx="45" ry="30" fill="url(#beanbag-grad-small)" />
-                <path d="M48 60 C48 45 58 35 70 35 C82 35 92 45 92 60 C92 75 48 75 48 60 Z" fill="url(#body-grad-small)" />
-                <path d="M55 75 C55 95 65 105 65 105" stroke="#EF4444" strokeWidth="14" strokeLinecap="round" />
-                <path d="M85 75 C85 95 95 105 95 105" stroke="#EF4444" strokeWidth="14" strokeLinecap="round" />
-                <circle cx="70" cy="20" r="12" fill="#FBBF24" />
-                <circle cx="66" cy="18" r="3.5" stroke="#0284C7" strokeWidth="2" fill="none" />
-                <circle cx="74" cy="18" r="3.5" stroke="#0284C7" strokeWidth="2" fill="none" />
-                <path d="M80 65 L96 65 L102 75 L86 75 Z" fill="#0EA5E9" />
-                <path d="M96 65 L96 55 L80 55 L80 65 Z" fill="#38BDF8" />
-              </svg>
-              <div className="text-left">
-                <span className="text-[10px] font-mono tracking-widest text-zinc-400 block uppercase">Workspace Status</span>
-                <span className={`text-xs font-bold uppercase flex items-center gap-1.5 ${
-                  welcomeLayout === 'aurora' ? 'text-zinc-300' : 'text-zinc-800'
-                }`}>
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  SYSTEM ONLINE
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Right Motto segment */}
-          <div className="mt-4 md:mt-0 text-center md:text-right space-y-1">
-            {welcomeLayout === 'brutalist' ? (
-              <h4 className="font-black text-sm uppercase tracking-wide">
-                BUILD AWESOME THINGS TOGETHER
-              </h4>
-            ) : welcomeLayout === 'cyber' ? (
-              <h4 className="font-mono text-[10px] text-[#10B981] uppercase tracking-wider animate-pulse">
-                // SYSTEM_PROTOCOL_ESTABLISHED_SUCCESSFULLY //
-              </h4>
-            ) : (
-              <h4 className={`font-outfit font-black text-lg tracking-tight ${
-                welcomeLayout === 'aurora' ? 'text-zinc-200' : 'text-zinc-800'
-              }`}>
-                Build Awesome Things <span className="text-[#6366F1]">Together</span>
-              </h4>
-            )}
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setShowWelcome(false)}
-              className={`text-[9px] font-mono tracking-widest uppercase transition-colors ${
-                welcomeLayout === 'cyber' 
-                  ? 'text-[#10B981]/50 hover:text-[#10B981]' 
-                  : welcomeLayout === 'aurora' 
-                  ? 'text-zinc-500 hover:text-[#6366F1]' 
-                  : 'text-zinc-450 hover:text-[#6366F1]'
-              }`}
+              onClick={() => { setShowWelcome(false); setActiveTab('search'); }}
+              className="btn-theme px-5 py-2.5 rounded-xl font-semibold text-xs flex items-center gap-2"
             >
-              Get In Touch &rarr;
+              <span>Launch Platform</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
-        </div>
+        </header>
+
+        {/* Hero Section */}
+        <section className="relative pt-20 pb-16 px-6 max-w-6xl mx-auto text-center space-y-8">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/10 border border-blue-500/20 text-[#38BDF8] text-xs font-mono font-semibold uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Next-Gen Enterprise IP Intelligence</span>
+          </div>
+
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-heading font-extrabold text-white tracking-tight leading-[1.08] max-w-4xl mx-auto">
+            AI-Powered Patent Intelligence
+          </h1>
+
+          <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            Transform complex patent research into actionable engineering decisions. Powered by high-speed PaddleOCR text extraction, ChromaDB vector search, and custom Retrieval-Augmented Generation (RAG).
+          </p>
+
+          {/* AI Search & Action Bar */}
+          <div className="max-w-2xl mx-auto space-y-4">
+            <div className="relative p-2 bg-white/[0.03] border border-white/10 rounded-2xl flex items-center gap-2 shadow-2xl">
+              <Search className="w-5 h-5 text-slate-400 ml-3 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Search by natural language, patent number, inventor, or technical keywords..."
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setQuery(e.target.value);
+                    setShowWelcome(false);
+                    setActiveTab('search');
+                  }
+                }}
+                className="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none py-2 font-sans"
+              />
+              <button
+                onClick={() => { setShowWelcome(false); setActiveTab('search'); }}
+                className="btn-theme px-6 rounded-xl font-medium text-xs flex-shrink-0 flex items-center gap-2"
+              >
+                <span>Search Patents</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-center gap-4 text-xs font-medium">
+              <button
+                onClick={() => { setShowWelcome(false); setActiveTab('upload'); }}
+                className="btn-secondary-outline px-6 flex items-center gap-2"
+              >
+                <UploadCloud className="w-4 h-4 text-[#38BDF8]" />
+                <span>Upload Patent PDF</span>
+              </button>
+              <button
+                onClick={() => { setShowWelcome(false); setActiveTab('chat'); }}
+                className="btn-secondary-outline px-6 flex items-center gap-2"
+              >
+                <MessageSquare className="w-4 h-4 text-[#8B5CF6]" />
+                <span>Ask AI Assistant</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Statistics Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-12 max-w-4xl mx-auto border-t border-white/10 text-center font-mono">
+            <div className="p-4 wrangler-card">
+              <span className="text-3xl font-extrabold text-white block font-heading">50M+</span>
+              <span className="text-xs text-slate-400 uppercase tracking-wider">Patents Indexed</span>
+            </div>
+            <div className="p-4 wrangler-card">
+              <span className="text-3xl font-extrabold text-[#38BDF8] block font-heading">120+</span>
+              <span className="text-xs text-slate-400 uppercase tracking-wider">Countries Covered</span>
+            </div>
+            <div className="p-4 wrangler-card">
+              <span className="text-3xl font-extrabold text-[#8B5CF6] block font-heading">Millions</span>
+              <span className="text-xs text-slate-400 uppercase tracking-wider">AI Queries Run</span>
+            </div>
+            <div className="p-4 wrangler-card">
+              <span className="text-3xl font-extrabold text-emerald-400 block font-heading">98%</span>
+              <span className="text-xs text-slate-400 uppercase tracking-wider">Semantic Precision</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Interactive Previews Section */}
+        <section id="preview" className="py-16 px-6 max-w-6xl mx-auto space-y-8">
+          <div className="text-center space-y-3">
+            <h2 className="text-3xl font-heading font-extrabold text-white">Enterprise Workspace Modules</h2>
+            <p className="text-sm text-slate-300 max-w-xl mx-auto">
+              Explore four powerful AI modules built for legal attorneys, patent analysts, and R&D engineers.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[
+              { id: 'dashboard', title: 'Stripe-Style Dashboard', icon: BarChart3, desc: 'Filing trends, inventor rankings, company insights, and live activity feeds.' },
+              { id: 'knowledge-graph', title: 'Interactive Graph', icon: Network, desc: 'SVG network nodes linking patents, assignees, inventors, and CPC classes.' },
+              { id: 'chat', title: 'Perplexity AI Assistant', icon: MessageSquare, desc: 'Cited sources 3-column card deck with match scores and line-level excerpts.' },
+              { id: 'analytics', title: 'Patent Analytics', icon: Layers, desc: 'Global country heatmaps, technology velocity charts, and competitor rankings.' }
+            ].map(mod => {
+              const Icon = mod.icon;
+              return (
+                <div
+                  key={mod.id}
+                  onClick={() => { setShowWelcome(false); setActiveTab(mod.id); }}
+                  className="wrangler-card p-6 space-y-3 cursor-pointer hover:border-blue-500/40 group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-[#38BDF8] flex items-center justify-center">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-white font-heading group-hover:text-[#38BDF8] transition-colors">{mod.title}</h3>
+                  <p className="text-xs text-slate-300 leading-relaxed font-sans">{mod.desc}</p>
+                  <div className="flex items-center gap-1 text-xs font-semibold text-blue-400 pt-2">
+                    <span>Open Module</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Corporate Footer */}
+        <footer className="border-t border-white/10 py-12 px-6 bg-[#050711] text-xs text-slate-400 font-sans">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xs font-heading"></div>
+              <span className="font-heading font-bold text-white text-sm">PatentMind AI Corporation</span>
+            </div>
+
+            <div className="flex items-center gap-6 font-mono">
+              <button onClick={() => { setShowWelcome(false); setActiveTab('privacy'); }} className="hover:text-white">Privacy Policy</button>
+              <button onClick={() => { setShowWelcome(false); setActiveTab('terms'); }} className="hover:text-white">Terms of Service</button>
+              <button onClick={() => { setShowWelcome(false); setActiveTab('contact'); }} className="hover:text-white">Contact Sales</button>
+              <button onClick={() => { setShowWelcome(false); setActiveTab('help'); }} className="hover:text-white">Help Center</button>
+            </div>
+
+            <span className="font-mono text-[11px] text-slate-500">© 2026 PatentMind AI Inc. All rights reserved.</span>
+          </div>
+        </footer>
       </div>
     );
   }
 
-  // RENDER AUTHENTICATION VIEW IF NOT LOGGED IN
-  if (!token) {
-    if (showOnboarding) {
-      return (
-        <div className={`app-wrapper bg-grain ${theme} flex items-center justify-center p-6 transition-all duration-300 relative`}>
-          {/* Top-Right Theme Selector */}
-          <div className="absolute top-6 right-6 flex items-center gap-3 bg-black/40 backdrop-blur-md px-4 py-2 border border-theme rounded-full">
-            <Palette className="w-3.5 h-3.5 text-zinc-500" />
-            <select 
-              value={theme} 
-              onChange={(e) => setTheme(e.target.value)}
-              className="bg-transparent text-[10px] font-mono border-none focus:outline-none text-main uppercase cursor-pointer"
-            >
-              {themesList.map((t) => (
-                <option key={t.id} value={t.id} className="bg-zinc-950 text-zinc-400">
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="w-full max-w-sm panel-card p-8 rounded-[32px] md:rounded-[36px] min-h-[440px] flex flex-col justify-between space-y-8 shadow-[0_20px_50px_rgba(0,0,0,0.35)] border border-theme/60 transition-all duration-500 transform scale-100 slide-enter">
-            {/* Carousel Header */}
-            <div className="text-center space-y-2">
-              <h2 className="font-outfit font-light text-2xl tracking-wider text-main uppercase">
-                {onboardingSlide === 0 && "PATENTMIND AI"}
-                {onboardingSlide === 1 && "INTELLIGENT INGEST"}
-                {onboardingSlide === 2 && "SEMANTIC CHAT"}
-              </h2>
-              <p className="text-[10px] text-muted font-mono tracking-widest uppercase">
-                {onboardingSlide === 0 && "KNOWLEDGE ANALYSIS PLATFORM"}
-                {onboardingSlide === 1 && "RAW DOCUMENT VECTORIZATION"}
-                {onboardingSlide === 2 && "DYNAMIC RAG PIPELINES"}
-              </p>
-            </div>
-
-            {/* Slide Interactive Animated Parallax Viewport */}
-            <div className="w-full space-y-4">
-              <div className={`relative w-full h-[180px] bg-[#090514] overflow-hidden rounded-[24px] border border-theme/40 state-${onboardingSlide}`}>
-                {/* Layer 1: Sky */}
-                <div className="parallax-layer parallax-sky">
-                  <svg className="w-full h-full" viewBox="0 0 400 300" fill="none">
-                    <rect width="400" height="300" fill="url(#sky-grad)"/>
-                    <circle cx="50" cy="40" r="1" fill="#fff" opacity="0.6"/>
-                    <circle cx="150" cy="80" r="1.5" fill="#fff" opacity="0.8"/>
-                    <circle cx="280" cy="50" r="1" fill="#fff" opacity="0.5"/>
-                    <circle cx="340" cy="90" r="1.2" fill="#fff" opacity="0.7"/>
-                    <defs>
-                      <radialGradient id="sky-grad" cx="50%" cy="50%" r="50%">
-                        <stop stopColor="#1E1233"/>
-                        <stop offset="100%" stopColor="#090514"/>
-                      </radialGradient>
-                    </defs>
-                  </svg>
-                </div>
-
-                {/* Layer 2: Mountains */}
-                <div className="parallax-layer parallax-mountains">
-                  <svg className="w-full h-full" viewBox="0 0 400 300" fill="none">
-                    <path d="M 0 300 L 0 170 L 90 120 L 180 190 L 260 110 L 330 160 L 400 100 L 400 300 Z" fill="#130B24" opacity="0.95"/>
-                    <path d="M 0 300 L 0 220 L 110 160 L 210 230 L 300 150 L 400 210 L 400 300 Z" fill="#0C0617"/>
-                  </svg>
-                </div>
-
-                {/* Layer 3: Clouds */}
-                <div className="parallax-layer parallax-clouds">
-                  <svg className="w-full h-full" viewBox="0 0 400 300" fill="none">
-                    <path d="M50,130 Q100,80 180,120 T320,110 Q370,160 300,200 H90 Z" fill="#fff" opacity="0.08"/>
-                  </svg>
-                </div>
-
-                {/* Layer 4: Title */}
-                <div className="parallax-layer parallax-title flex flex-col items-center justify-center">
-                  <h3 className="font-outfit font-bold text-2xl tracking-[10px] text-main/90 uppercase pl-[10px]">
-                    {onboardingSlide === 0 && "DISCOVER"}
-                    {onboardingSlide === 1 && "NAVIGATE"}
-                    {onboardingSlide === 2 && "REVEAL"}
-                  </h3>
-                </div>
-
-                {/* Layer 5: Explorer */}
-                <div className="parallax-layer parallax-explorer">
-                  <svg className="w-full h-full" viewBox="0 0 70 95" fill="none">
-                    <path d="M35 15 C20 40 20 85 20 85 L50 85 C50 85 50 40 35 15 Z" fill="#06030B" stroke="#8A5CF6" strokeWidth="1.5" />
-                    <circle cx="35" cy="22" r="7" fill="#06030B" stroke="#8A5CF6" strokeWidth="1.5"/>
-                    <path d="M42 42 L55 35 L55 48" stroke="#8A5CF6" strokeWidth="1.5" strokeLinecap="round"/>
-                    <circle cx="55" cy="52" r="5" fill="#FBBF24" className="animate-pulse"/>
-                    <rect x="52" y="47" width="6" height="10" rx="1" stroke="#8A5CF6" strokeWidth="1.5"/>
-                  </svg>
-                </div>
-
-                {/* Layer 6: Cave foreground */}
-                <div className="parallax-layer parallax-cave">
-                  <svg className="w-full h-full" viewBox="0 0 400 300" fill="none">
-                    <path d="M0,0 H400 V300 H0 Z M100,240 C140,240 120,80 200,80 C270,80 260,245 300,245 C350,245 370,300 370,300 H30 Z" fill="#05030A" fillRule="evenodd" stroke="#1F153F" strokeWidth="2"/>
-                  </svg>
-                </div>
-              </div>
-
-              {/* Caption Text Box */}
-              <div className="text-center min-h-[54px] flex items-center justify-center">
-                <p className="text-[11px] text-muted font-light leading-relaxed max-w-[270px] uppercase tracking-wide">
-                  {onboardingSlide === 0 && "Next-generation semantic knowledge analysis for complex patent architectures and technical databases."}
-                  {onboardingSlide === 1 && "Process raw patent PDFs, run automatic OCR scanned page extractions, and structure vector indices."}
-                  {onboardingSlide === 2 && "Ask natural language questions, retrieve segments, and get citations with confidence scoring."}
-                </p>
-              </div>
-            </div>
-
-            {/* Carousel Navigation Footer */}
-            <div className="flex items-center justify-between pt-4 border-t border-theme/40">
-              <button
-                type="button"
-                onClick={() => {
-                  localStorage.setItem('onboarding_done', 'true');
-                  setShowOnboarding(false);
-                }}
-                className="text-[10px] font-mono tracking-widest text-zinc-500 hover:text-zinc-350 uppercase transition-colors"
-              >
-                SKIP
-              </button>
-
-              {/* Dots Indicators */}
-              <div className="flex gap-2">
-                {[0, 1, 2].map((idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setOnboardingSlide(idx)}
-                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                      onboardingSlide === idx ? 'bg-main w-3.5' : 'bg-zinc-700'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (onboardingSlide < 2) {
-                    setOnboardingSlide(onboardingSlide + 1);
-                  } else {
-                    localStorage.setItem('onboarding_done', 'true');
-                    setShowOnboarding(false);
-                  }
-                }}
-                className="text-[10px] font-mono tracking-widest text-main hover:text-white uppercase transition-colors font-semibold flex items-center gap-1"
-              >
-                <span>{onboardingSlide === 2 ? 'START' : 'NEXT'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
+  if (!isAuthenticated) {
     return (
       <div className={`app-wrapper kelly-auth-page bg-[#050816] ${theme} flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans`}>
         
@@ -2849,7 +2207,7 @@ function App() {
               className="kelly-auth-demo w-full py-2.5 bg-gradient-to-r from-[#0D9488]/30 to-[#22D3EE]/20 hover:from-[#0D9488]/50 hover:to-[#22D3EE]/40 border border-[#22D3EE]/40 rounded-full text-[11px] font-semibold font-sans text-[#22D3EE] transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
             >
               <Zap className="w-3.5 h-3.5" />
-              <span>QUICK ENTER AS BHUSHAN (ADMIN ⚡)</span>
+              <span>QUICK ENTER AS BHUSHAN (ADMIN )</span>
             </button>
 
             <button
@@ -2911,7 +2269,7 @@ function App() {
             <div className="kelly-dashboard-brand flex items-center gap-3 flex-shrink-0">
               <div className="kelly-dashboard-monogram w-8 h-8 rounded-full bg-gradient-to-tr from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] p-[1px] shadow-[0_0_20px_rgba(0,194,255,0.4)] flex-shrink-0">
                 <div className="w-full h-full bg-[#050816] rounded-full flex items-center justify-center text-[#00C2FF] font-bold text-sm">
-                  ⚡
+                  
                 </div>
               </div>
               <span className="font-heading font-bold text-base md:text-lg text-white tracking-tight hidden md:inline-block">
@@ -3033,7 +2391,7 @@ function App() {
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] p-[1px] shadow-[0_0_20px_rgba(0,194,255,0.4)] flex-shrink-0">
                 <div className="w-full h-full bg-[#050816] rounded-full flex items-center justify-center text-[#00C2FF] font-bold text-sm">
-                  ⚡
+                  
                 </div>
               </div>
               {!isSidebarCollapsed && (
@@ -3125,13 +2483,7 @@ function App() {
         </aside>
       )}
 
-      {/* Kelly-inspired social rail: a small, friendly shortcut layer for the workspace. */}
-      <aside className="kelly-social-rail" aria-label="PatentMind social links">
-        <button type="button" title="Research inspiration" onClick={() => setActiveTab('idea')}><Heart size={17} /></button>
-        <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" title="Instagram"><Instagram size={17} /></a>
-        <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" title="LinkedIn"><Linkedin size={17} /></a>
-        <a href="https://x.com/" target="_blank" rel="noreferrer" title="X / Twitter"><Twitter size={17} /></a>
-      </aside>
+
 
       {/* Change Password Modal */}
       {showChangePasswordModal && (
@@ -3146,7 +2498,7 @@ function App() {
                 onClick={() => setShowChangePasswordModal(false)}
                 className="text-zinc-500 hover:text-white font-mono text-xs"
               >
-                ✕
+                
               </button>
             </div>
 
@@ -3510,7 +2862,7 @@ function App() {
 
                   <div className="flex justify-between items-center">
                     <h3 className="text-serif-editorial text-xl text-main tracking-wide flex items-center gap-2">
-                      <span>🧠 ✨</span> <span>SYNTHESIZED INSIGHTS</span>
+                      <span>🧠 </span> <span>SYNTHESIZED INSIGHTS</span>
                     </h3>
                     <button
                       onClick={() => handleSpeakText(searchResults.answer)}
@@ -4672,7 +4024,7 @@ function App() {
                         >
                           <div className="flex items-center justify-between gap-2 w-full px-1">
                              <span className="text-[9px] font-mono text-zinc-550 uppercase tracking-widest flex items-center gap-1">
-                               {msg.role === 'user' ? `👤 ${username}` : '💡 ✨ STRATEGY ADVISOR'}
+                               {msg.role === 'user' ? `👤 ${username}` : '  STRATEGY ADVISOR'}
                              </span>
                             {msg.role === 'assistant' && (
                               <button
@@ -4949,7 +4301,7 @@ function App() {
             {settingsSavedMsg && (
               <div className="p-3 bg-emerald-950/40 border border-emerald-800 text-emerald-300 text-xs font-mono rounded flex justify-between items-center">
                 <span>{settingsSavedMsg}</span>
-                <button onClick={() => setSettingsSavedMsg('')} className="text-zinc-500 hover:text-white text-xs font-bold">✕</button>
+                <button onClick={() => setSettingsSavedMsg('')} className="text-zinc-500 hover:text-white text-xs font-bold"></button>
               </div>
             )}
 
@@ -5737,7 +5089,7 @@ class ErrorBoundary extends React.Component {
         <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col items-center justify-center p-6 space-y-6 font-sans">
           <div className="max-w-md w-full bg-[#141417] border border-cyan-500/40 p-6 rounded-2xl shadow-2xl space-y-4 text-center">
             <div className="w-12 h-12 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto text-xl font-bold">
-              ⚡
+              
             </div>
             <h2 className="text-lg font-mono text-[#22D3EE] font-semibold uppercase">SYSTEM RECOVERY INTERFACE</h2>
             <p className="text-xs text-zinc-400 leading-relaxed font-mono">

@@ -7,7 +7,7 @@ export default function TeamWorkspaceView() {
   const [inviteRole, setInviteRole] = useState('Patent Attorney');
 
   const members = [
-    { name: 'Bhushan Patil', email: 'bhushan@patentmind.ai', role: 'Enterprise Admin', status: 'ACTIVE', avatar: '⚡' },
+    { name: 'Bhushan Patil', email: 'bhushan@patentmind.ai', role: 'Enterprise Admin', status: 'ACTIVE', avatar: '' },
     { name: 'Dr. Aris Thorne', email: 'aris.t@patentmind.ai', role: 'Lead Patent Attorney', status: 'ACTIVE', avatar: 'AT' },
     { name: 'Elena Rostova', email: 'elena.r@patentmind.ai', role: 'Senior AI Researcher', status: 'ACTIVE', avatar: 'ER' },
     { name: 'Marcus Vance', email: 'marcus.v@patentmind.ai', role: 'IP Analyst', status: 'INVITED', avatar: 'MV' }
@@ -89,7 +89,7 @@ export default function TeamWorkspaceView() {
                 <UserPlus className="w-4 h-4 text-[#00C2FF]" />
                 INVITE TEAM MEMBER
               </h3>
-              <button onClick={() => setShowInviteModal(false)} className="text-slate-400 hover:text-white font-mono text-xs">✕</button>
+              <button onClick={() => setShowInviteModal(false)} className="text-slate-400 hover:text-white font-mono text-xs"></button>
             </div>
 
             <div className="space-y-4 text-xs font-sans">
