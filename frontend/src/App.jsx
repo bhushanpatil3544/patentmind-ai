@@ -1711,7 +1711,7 @@ function App() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!token) {
     return (
       <div className={`app-wrapper kelly-auth-page bg-[#050816] ${theme} flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans`}>
         
