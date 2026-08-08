@@ -141,7 +141,7 @@ function App() {
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingSlide, setOnboardingSlide] = useState(0);
-  const [showWelcome, setShowWelcome] = useState(() => !getValidStorageItem('token'));
+  const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeLayout, setWelcomeLayout] = useState('claymation'); // claymation / brutalist / cyber / aurora
 
   // Voice Assistance & Multi-Language & Platform Settings states
