@@ -2036,25 +2036,20 @@ function App() {
         <div className="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full bg-[#7B61FF]/12 blur-[150px]" />
       </div>
 
-      {/* TOP FLOATING HORIZONTAL ENTERPRISE NAVBAR (WRANGLER DOCK) - Rendered only in Horizontal Navigation Mode */}
-      {!isSidebarNavMode && (
-        <header className="kelly-dashboard-header fixed top-0 inset-x-0 z-50 px-4 md:px-7 flex justify-center pointer-events-none select-none">
-          <div className="kelly-dashboard-bar wrangler-navbar pointer-events-auto max-w-[1440px] w-full px-1 py-2 md:py-2 flex items-center justify-between gap-3 md:gap-6 border border-white/10 shadow-2xl transition-all duration-300">
-            
-            {/* Brand Header Badge */}
-            <div className="kelly-dashboard-brand flex items-center gap-3 flex-shrink-0">
-              <div className="kelly-dashboard-monogram w-8 h-8 rounded-full bg-gradient-to-tr from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] p-[1px] shadow-[0_0_20px_rgba(0,194,255,0.4)] flex-shrink-0">
-                <div className="w-full h-full bg-[#050816] rounded-full flex items-center justify-center text-[#00C2FF] font-bold text-sm">
-                  
-                </div>
-              </div>
-              <span className="font-heading font-bold text-base md:text-lg text-white tracking-tight hidden md:inline-block">
-                PatentMind <span className="text-[10px] text-[#00C2FF] font-mono font-semibold ml-1 px-2.5 py-0.5 rounded-full bg-[#5B7CFA]/15 border border-[#5B7CFA]/40 shadow-[0_0_10px_rgba(91,124,250,0.2)]">AI studio</span>
-              </span>
-            </div>
+      {/* TEMPLATE ULTRA-COMPACT ICON SIDEBAR */}
+      <aside className="w-[72px] bg-[#050609] border-r border-white/10 h-screen flex flex-col justify-between items-center py-6 flex-shrink-0 z-40 fixed md:sticky top-0 left-0">
+        {/* Top Logo Badge */}
+        <div className="flex flex-col items-center gap-6">
+          <div 
+            onClick={() => setActiveTab('chat')}
+            className="w-10 h-10 rounded-xl bg-[#00F2FE] flex items-center justify-center text-[#050609] font-bold text-lg shadow-[0_0_20px_rgba(0,242,254,0.4)] cursor-pointer hover:scale-105 transition-transform"
+            title="PatentMind AI Workspace"
+          >
+            <ArrowUp className="w-5 h-5 rotate-45 stroke-[2.5]" />
+          </div>
 
-          {/* Center Horizontal Navigation Menu */}
-          <nav className="flex items-center gap-1 md:gap-1.5 overflow-x-auto py-1 px-1 no-scrollbar">
+          {/* Navigation Icon List */}
+          <nav className="flex flex-col items-center gap-4">
             {(() => {
               const userTabs = [
                 { id: 'chat', label: 'AI Chat', icon: MessageSquare },
@@ -2073,7 +2068,6 @@ function App() {
                 { id: 'analytics', label: 'Analytics', icon: Activity },
                 { id: 'settings', label: 'Settings', icon: Settings },
                 { id: 'admin', label: 'Admin Panel', icon: ShieldAlert },
-                { id: 'help', label: 'Help', icon: HelpCircle },
               ];
               return (userRole === 'admin' ? adminTabs : userTabs);
             })().map((tab) => {
@@ -2084,182 +2078,64 @@ function App() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   title={tab.label}
-                  className={`kelly-dashboard-navitem flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 flex-shrink-0 ${
-                    isActive 
-                      ? 'kelly-dashboard-navitem-active'
-                      : ''
-                  }`}
-                >
-                  <TabIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Right Controls & Profile */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Sidebar vs Top Navigation Mode Toggle */}
-            <button
-              onClick={() => {
-                const nextMode = !isSidebarNavMode;
-                setIsSidebarNavMode(nextMode);
-                localStorage.setItem('sidebar_nav_mode', nextMode.toString());
-              }}
-              title={isSidebarNavMode ? "Switch to Top Floating Navbar" : "Switch to Left Sidebar Navigation"}
-              className="p-2 text-slate-400 hover:text-[#00C2FF] hover:bg-white/5 border border-white/10 rounded-full transition-all flex items-center justify-center flex-shrink-0"
-            >
-              {isSidebarNavMode ? (
-                <PanelLeftClose className="w-3.5 h-3.5" />
-              ) : (
-                <PanelLeftOpen className="w-3.5 h-3.5" />
-              )}
-            </button>
-
-            {/* Language Dropdown Pill */}
-            <div className="kelly-dashboard-language relative flex items-center bg-white/5 border border-white/10 rounded-full px-2.5 py-1.5 hover:border-white/20 transition-all">
-              <Globe className="w-3.5 h-3.5 text-[#00C2FF] mr-1.5 flex-shrink-0" />
-              <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="bg-transparent text-[11px] font-sans text-slate-200 focus:outline-none border-none cursor-pointer w-[45px] md:w-[70px] truncate"
-              >
-                <option value="English" className="bg-[#050816] text-slate-200">En 🇺🇸</option>
-                <option value="Hindi" className="bg-[#050816] text-slate-200">Hi 🇮🇳</option>
-                <option value="Spanish" className="bg-[#050816] text-slate-200">Es 🇪🇸</option>
-                <option value="French" className="bg-[#050816] text-slate-200">Fr 🇫🇷</option>
-                <option value="German" className="bg-[#050816] text-slate-200">De 🇩🇪</option>
-              </select>
-            </div>
-
-            {/* User Profile & Password Modal Toggle */}
-            <div onClick={() => setActiveTab('profile')} className="kelly-dashboard-user hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full py-1.5 px-3 cursor-pointer hover:border-[#00C2FF]/40 transition-all" title={`User Profile: ${username}`}>
-              <span className="w-2 h-2 rounded-full bg-[#00C2FF] animate-pulse shadow-[0_0_10px_rgba(0,194,255,0.9)]"></span>
-              <span className="text-xs font-semibold text-white tracking-wide uppercase truncate max-w-[90px]">{username}</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowChangePasswordModal(true);
-                  setChangePasswordMsg('');
-                }}
-                className="text-slate-400 hover:text-[#00C2FF] transition-all ml-1 p-0.5 rounded"
-                title="Change Account Password"
-              >
-                <KeyRound className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* Logout Button */}
-            <button
-              onClick={() => setShowLogoutModal(true)}
-              title="Log out"
-              className="kelly-dashboard-logout p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-full transition-all border border-transparent hover:border-red-500/20"
-            >
-              <LogOut className="w-4 h-4 text-red-500" />
-            </button>
-          </div>
-
-        </div>
-      </header>
-      )}
-
-      {/* LEFT SIDEBAR NAVIGATION PANEL (Rendered only in Sidebar Navigation Mode) */}
-      {isSidebarNavMode && (
-        <aside className={`w-[260px] bg-[#050816] border-r border-white/15 h-screen flex flex-col justify-between flex-shrink-0 z-40 fixed md:sticky top-0 left-0 transition-transform duration-300 ${
-          isSidebarCollapsed ? '-translate-x-full md:translate-x-0 md:w-[76px]' : 'translate-x-0'
-        }`}>
-          {/* Top Branding Monogram Area */}
-          <div className="p-4 border-b border-white/10 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] p-[1px] shadow-[0_0_20px_rgba(0,194,255,0.4)] flex-shrink-0">
-                <div className="w-full h-full bg-[#050816] rounded-full flex items-center justify-center text-[#00C2FF] font-bold text-sm">
-                  
-                </div>
-              </div>
-              {!isSidebarCollapsed && (
-                <span className="font-heading font-bold text-sm text-white tracking-tight">
-                  PatentMind <span className="text-[9px] text-[#00C2FF] font-mono block">AI studio</span>
-                </span>
-              )}
-            </div>
-            <button
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="text-slate-400 hover:text-white p-1 hover:bg-white/5 rounded hidden md:block"
-            >
-              <PanelLeftClose className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Center Nav List */}
-          <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
-            {(() => {
-              const userTabs = [
-                { id: 'chat', label: 'AI Chat', icon: MessageSquare },
-                { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
-                { id: 'saved-patents', label: 'My Documents', icon: FolderOpen },
-              ];
-              const adminTabs = [
-                { id: 'chat', label: 'AI Chat', icon: MessageSquare },
-                { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
-                { id: 'saved-patents', label: 'My Documents', icon: FolderOpen },
-                { id: 'search', label: 'Patent Search', icon: Search },
-                { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-                { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
-                { id: 'compare', label: 'Compare Patents', icon: Layers },
-                { id: 'projects', label: 'Projects', icon: FolderOpen },
-                { id: 'analytics', label: 'Analytics', icon: Activity },
-                { id: 'settings', label: 'Settings', icon: Settings },
-                { id: 'admin', label: 'Admin Panel', icon: ShieldAlert },
-                { id: 'help', label: 'Help', icon: HelpCircle },
-              ];
-              return (userRole === 'admin' ? adminTabs : userTabs);
-            })().map((tab) => {
-              const TabIcon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  title={tab.label}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all duration-250 ${
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#5B7CFA] via-[#7B61FF] to-[#00C2FF] text-white font-semibold shadow-[0_0_20px_rgba(0,194,255,0.35)]'
+                      ? 'bg-white/10 text-[#00F2FE] border border-[#00F2FE]/40 shadow-[0_0_15px_rgba(0,242,254,0.2)]'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <TabIcon className="w-4 h-4 flex-shrink-0" />
-                  {!isSidebarCollapsed && <span>{tab.label}</span>}
+                  <TabIcon className="w-5 h-5" />
                 </button>
               );
             })}
           </nav>
+        </div>
 
-          {/* Bottom Profile Details Row */}
-          <div className="p-4 border-t border-white/10 space-y-3 bg-[#03050F]/60">
+        {/* Bottom Actions */}
+        <div className="flex flex-col items-center gap-4">
+          <button
+            onClick={() => setActiveTab('knowledge-graph')}
+            title="Knowledge Graph"
+            className={`w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/5 transition-all ${activeTab === 'knowledge-graph' ? 'text-[#00F2FE] bg-white/10' : ''}`}
+          >
+            <Network className="w-5 h-5" />
+          </button>
 
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            title="Log Out"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-500/10 transition-all"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
+      </aside>
 
-            {/* Profile User Status */}
-            <div onClick={() => setActiveTab('profile')} className="flex items-center gap-3 truncate cursor-pointer hover:opacity-90 transition-opacity" title="View Profile">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#00C2FF] animate-pulse shadow-[0_0_10px_rgba(0,194,255,0.9)] flex-shrink-0" />
-              {!isSidebarCollapsed && (
-                <div className="truncate text-left leading-none">
-                  <span className="text-xs font-semibold text-white block uppercase tracking-wide truncate">{username}</span>
-                  <span className="text-[9px] text-[#00C2FF] font-mono block tracking-widest mt-0.5">ONLINE</span>
-                </div>
-              )}
-            </div>
+      {/* MAIN CONTENT COLUMN */}
+      <div className="flex-1 flex flex-col min-h-screen bg-[#08090D] relative overflow-x-hidden">
+        {/* Background Grid Texture */}
+        <div className="absolute inset-0 bg-grid-overlay pointer-events-none z-0"></div>
 
-            {/* Logout Row */}
-            <button
-              onClick={() => setShowLogoutModal(true)}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-colors"
-            >
-              <LogOut className="w-4 h-4 flex-shrink-0" />
-              {!isSidebarCollapsed && <span>LOGOUT</span>}
-            </button>
+        {/* TOP BAR WITH USER PROFILE PILL */}
+        <header className="sticky top-0 z-30 bg-[#08090D]/80 backdrop-blur-md px-8 py-4 flex items-center justify-between border-b border-white/5 relative z-10">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400 font-sans tracking-wide">PatentMind AI Workspace</span>
           </div>
-        </aside>
-      )}
+
+          <div className="flex items-center gap-3">
+            <div 
+              onClick={() => setActiveTab('profile')}
+              className="flex items-center gap-2.5 px-3.5 py-1.5 bg-[#12141C] border border-white/10 rounded-full cursor-pointer hover:border-white/20 transition-all"
+              title="View Profile"
+            >
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#00F2FE] to-[#38BDF8] flex items-center justify-center text-[#050609] font-bold text-[10px]">
+                {(username || 'U')[0].toUpperCase()}
+              </div>
+              <span className="text-xs font-medium text-slate-200">{username || 'Researcher'}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </div>
+          </div>
+        </header>
 
 
 
@@ -3264,59 +3140,50 @@ function App() {
             <div className="flex-1 space-y-6 flex flex-col justify-center my-auto">
               
               {chatMessages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center text-center p-4 space-y-6 max-w-xl mx-auto my-auto">
-                  <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-main font-sans">
-                    What can I help with?
-                  </h2>
-                  <p className="text-xs text-zinc-400 font-light leading-relaxed">
-                    Ask any question, analyze patent claims, or attach a PDF specification directly using the paperclip 📎 button below.
-                  </p>
+                <div className="relative flex flex-col items-center justify-center text-center p-4 space-y-8 max-w-3xl mx-auto my-auto pt-8">
+                  {/* Liquid Backdrop Orb & Metallic Sphere */}
+                  <div className="liquid-orb-bg"></div>
+                  
+                  <div className="space-y-2 relative z-10 text-left w-full max-w-2xl">
+                    <h1 className="text-4xl md:text-5xl font-heading font-medium tracking-tight text-white leading-tight">
+                      Hey! {username || 'Researcher'}
+                    </h1>
+                    <h2 className="text-4xl md:text-5xl font-heading font-medium tracking-tight text-slate-300 leading-tight">
+                      What can I help with?
+                    </h2>
+                  </div>
 
-                  {/* Quick Action Suggestion Cards */}
-                  <div className="grid grid-cols-2 gap-3 w-full pt-2">
-                    <button
+                  {/* Quick Category Suggestion Cards matching Template */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl relative z-10">
+                    <div 
+                      onClick={() => setChatInput("Perform semantic prior-art patent search for neural network hardware acceleration")}
+                      className="wrangler-card p-5 text-left space-y-3 cursor-pointer hover:scale-[1.02] transition-transform"
+                    >
+                      <span className="badge-chip-teal">Patent Search</span>
+                      <p className="text-xs text-slate-300 font-sans leading-relaxed">
+                        Search 50M+ patents with AI semantic vector matching
+                      </p>
+                    </div>
+
+                    <div 
                       onClick={() => pdfInputRef.current?.click()}
-                      className="p-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left space-y-1 transition-all group"
+                      className="wrangler-card p-5 text-left space-y-3 cursor-pointer hover:scale-[1.02] transition-transform"
                     >
-                      <div className="flex items-center gap-2 text-xs font-mono text-[#22D3EE] font-semibold">
-                        <Paperclip className="w-3.5 h-3.5" />
-                        <span>ANALYZE PDF</span>
-                      </div>
-                      <p className="text-[10px] text-zinc-400 font-light">Upload PDF for instant AI prior-art analysis</p>
-                    </button>
+                      <span className="badge-chip-coral">Compare Docs</span>
+                      <p className="text-xs text-slate-300 font-sans leading-relaxed">
+                        Upload & compare PDF specification claims
+                      </p>
+                    </div>
 
-                    <button
-                      onClick={() => setChatInput("Search for recent AI prior-art patents in USPTO database")}
-                      className="p-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left space-y-1 transition-all group"
+                    <div 
+                      onClick={() => setChatInput("Analyze freedom-to-operate strategy and patent infringement risk")}
+                      className="wrangler-card p-5 text-left space-y-3 cursor-pointer hover:scale-[1.02] transition-transform"
                     >
-                      <div className="flex items-center gap-2 text-xs font-mono text-[#8B5CF6] font-semibold">
-                        <Globe className="w-3.5 h-3.5" />
-                        <span>DEEP SEARCH</span>
-                      </div>
-                      <p className="text-[10px] text-zinc-400 font-light">Query dense vector store for claim matches</p>
-                    </button>
-
-                    <button
-                      onClick={() => setChatInput("Study claim differentiations for my invention idea")}
-                      className="p-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left space-y-1 transition-all group"
-                    >
-                      <div className="flex items-center gap-2 text-xs font-mono text-amber-400 font-semibold">
-                        <Lightbulb className="w-3.5 h-3.5" />
-                        <span>REASON & STRATEGY</span>
-                      </div>
-                      <p className="text-[10px] text-zinc-400 font-light">Consult AI Patent Strategy Advisor persona</p>
-                    </button>
-
-                    <button
-                      onClick={() => setChatInput("Explain CPC classification codes G06F and H04L")}
-                      className="p-3.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left space-y-1 transition-all group"
-                    >
-                      <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 font-semibold">
-                        <Tag className="w-3.5 h-3.5" />
-                        <span>STUDY CODES</span>
-                      </div>
-                      <p className="text-[10px] text-zinc-400 font-light">Decode IPC/CPC technology classifications</p>
-                    </button>
+                      <span className="badge-chip-lime">Idea Strategy</span>
+                      <p className="text-xs text-slate-300 font-sans leading-relaxed">
+                        Analyze white-space opportunities & FTO strategy
+                      </p>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -4819,6 +4686,7 @@ function App() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

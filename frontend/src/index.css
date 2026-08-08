@@ -5,31 +5,27 @@
 @tailwind utilities;
 
 /* ==========================================
-   PATENTMIND AI ENTERPRISE SAAS DESIGN SYSTEM
-   Inspired by Linear, Vercel, Stripe, OpenAI Platform
+   PATENTMIND AI — TEMPLATE DESIGN SYSTEM
+   Ultra-sleek Obsidian AI Workspace
    ========================================== */
 
-:root, .theme-normal, .theme-dark, .theme-carbon, .theme-cyber {
-  --bg-app: #070913;
-  --bg-panel: rgba(255, 255, 255, 0.03);
-  --bg-sidebar: #050711;
-  --bg-card: rgba(255, 255, 255, 0.03);
-  --bg-hover: rgba(255, 255, 255, 0.06);
-  --border-panel: 1px solid rgba(255, 255, 255, 0.06);
+:root {
+  --bg-app: #08090D;
+  --bg-sidebar: #050609;
+  --bg-card: #12141C;
+  --bg-card-hover: #181B26;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --accent-teal: #00F2FE;
+  --accent-cyan: #00D2C2;
   --text-main: #FFFFFF;
   --text-muted: #94A3B8;
-  --text-label: #64748B;
-  --border-color: rgba(255, 255, 255, 0.06);
-  --accent-blue: #2563EB;
-  --accent-cyan: #38BDF8;
-  --accent-purple: #8B5CF6;
-  --font-heading: 'Space Grotesk', system-ui, sans-serif;
+  --font-heading: 'Inter', 'Space Grotesk', system-ui, sans-serif;
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 body {
   font-family: var(--font-family);
-  background-color: #070913;
+  background-color: #08090D;
   color: var(--text-main);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -37,78 +33,157 @@ body {
 
 h1, h2, h3, h4, h5, h6, .font-heading {
   font-family: var(--font-heading);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .app-wrapper {
-  background: radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.08) 0%, transparent 60%),
-              radial-gradient(circle at 90% 20%, rgba(56, 189, 248, 0.06) 0%, transparent 55%),
-              linear-gradient(180deg, #070913 0%, #050711 100%) !important;
+  background-color: #08090D !important;
   color: var(--text-main);
   font-family: var(--font-family);
   min-height: 100vh;
+  position: relative;
 }
 
-/* ==========================================
-   ENTERPRISE CARDS & BUTTONS
-   ========================================== */
-
-.wrangler-card, .panel-card, .glass-panel-sleek {
-  background: rgba(255, 255, 255, 0.03) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-radius: 16px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+/* Background Subtle Grid Texture */
+.bg-grid-overlay {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
-.wrangler-card:hover, .panel-card:hover, .glass-panel-sleek:hover {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(56, 189, 248, 0.3) !important;
+/* Liquid Backdrop Orb */
+.liquid-orb-bg {
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.18) 0%, rgba(0, 210, 194, 0.08) 40%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Liquid Sphere Graphic SVG Container */
+.liquid-sphere-container {
+  position: relative;
+  width: 240px;
+  height: 180px;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+/* Template Cards & Panels */
+.wrangler-card, .panel-card, .glass-panel-sleek, .template-card {
+  background: #12141C !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.wrangler-card:hover, .panel-card:hover, .glass-panel-sleek:hover, .template-card:hover {
+  background: #161924 !important;
+  border-color: rgba(0, 242, 254, 0.3) !important;
   transform: translateY(-2px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.08);
 }
 
-.wrangler-pill {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 9999px;
-  transition: all 0.2s ease;
+/* Category Badge Chips (Teal, Coral/Pink, Lime/Green) */
+.badge-chip-teal {
+  background-color: rgba(198, 246, 213, 0.15);
+  border: 1px solid rgba(198, 246, 213, 0.3);
+  color: #C6F6D5;
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
 }
-.wrangler-pill:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(56, 189, 248, 0.4);
+
+.badge-chip-coral {
+  background-color: rgba(254, 215, 215, 0.15);
+  border: 1px solid rgba(254, 215, 215, 0.3);
+  color: #FED7D7;
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.badge-chip-lime {
+  background-color: rgba(214, 188, 250, 0.15);
+  border: 1px solid rgba(214, 188, 250, 0.3);
+  color: #D6BCFA;
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Floating AI Prompt Container */
+.template-prompt-container {
+  background: #12141D;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 20px 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  transition: border-color 0.2s ease;
+}
+
+.template-prompt-container:focus-within {
+  border-color: rgba(0, 242, 254, 0.4);
+}
+
+.template-send-btn {
+  background: #00F2FE;
+  color: #050609;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+}
+
+.template-send-btn:hover {
+  background: #38BDF8;
+  transform: scale(1.05);
 }
 
 .btn-theme {
-  background: #2563EB !important;
-  color: #FFFFFF !important;
-  border: 1px solid #3B82F6 !important;
-  border-radius: 12px !important;
-  min-height: 48px !important;
-  font-weight: 500 !important;
+  background: #00F2FE !important;
+  color: #050609 !important;
+  border: none !important;
+  border-radius: 14px !important;
+  min-height: 44px !important;
+  font-weight: 600 !important;
   transition: all 0.2s ease !important;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25);
 }
 .btn-theme:hover {
-  background: #1D4ED8 !important;
-  border-color: #60A5FA !important;
+  background: #38BDF8 !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
 }
 
 .btn-secondary-outline {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  min-height: 48px;
+  border-radius: 14px;
+  min-height: 44px;
   color: #E2E8F0;
   font-weight: 500;
   transition: all 0.2s ease;
 }
 .btn-secondary-outline:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
   color: #FFFFFF;
 }
@@ -130,7 +205,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #050711;
+  background: #050609;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
@@ -139,20 +214,3 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25);
 }
-
-/* Light Theme Override Scope */
-.theme-light {
-  --bg-app: #F8FAFC;
-  --text-main: #0F172A;
-}
-.theme-light .app-wrapper {
-  background: #F8FAFC !important;
-  color: #0F172A !important;
-}
-.theme-light .wrangler-card, .theme-light .panel-card {
-  background: #FFFFFF !important;
-  border-color: #E2E8F0 !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
-.theme-light .text-white { color: #0F172A !important; }
-.theme-light .text-slate-300, .theme-light .text-slate-400 { color: #475569 !important; }
