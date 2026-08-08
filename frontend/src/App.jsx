@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  MessageSquare, UploadCloud, Layers, Search, Download, FileText, Settings, ShieldCheck, Sparkles, 
+  MessageSquare, UploadCloud, Network, Layers, Search, Download, FileText, Settings, ShieldCheck, Sparkles, 
   ArrowUp, Volume2, User, Lightbulb, Zap, CheckCircle2, ChevronDown, LogOut 
 } from 'lucide-react';
 
@@ -72,6 +72,14 @@ export default function App() {
               title="Semantic Patent Search"
             >
               <Search className="w-5 h-5" />
+            </button>
+
+            <button
+              onClick={() => setActiveTab('graph')}
+              className={`p-3 rounded-xl transition-all ${activeTab === 'graph' ? 'bg-[#00F2FE]/15 text-[#00F2FE] border border-[#00F2FE]/30' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+              title="Citation Knowledge Graph"
+            >
+              <Network className="w-5 h-5" />
             </button>
 
             <button
@@ -412,6 +420,33 @@ export default function App() {
                 <div className="p-4 bg-[#00F2FE]/10 border border-[#00F2FE]/30 rounded-xl text-xs text-slate-200">
                   <strong className="text-[#00F2FE] block mb-1">Strategic Recommendation:</strong>
                   Modify Claim 1 to emphasize the asynchronous memory controller to avoid prior-art rejection by patent examiners.
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: KNOWLEDGE GRAPH EXPLORER */}
+          {activeTab === 'graph' && (
+            <div className="space-y-6 max-w-4xl mx-auto w-full py-6">
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl font-bold text-white">Interactive Patent Citation Knowledge Graph</h2>
+                <p className="text-xs text-slate-400">Visualize prior-art lineage tree, parent disclosures, and forward citation clusters.</p>
+              </div>
+
+              <div className="bg-[#12141D] border border-white/10 rounded-2xl p-8 h-[400px] flex flex-col items-center justify-center relative overflow-hidden">
+                <Network className="w-16 h-16 text-[#00F2FE] animate-pulse mb-4" />
+                <h3 className="text-sm font-semibold text-white">Citation Graph Cluster: US10922485B2</h3>
+                <p className="text-xs text-slate-400 max-w-md text-center mt-1">
+                  12 Forward Citations • 8 Backward Prior Art References • 3 Assignee Family Networks
+                </p>
+
+                <div className="flex gap-4 mt-6">
+                  <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-slate-300">
+                    Parent Patent: <span className="text-[#00F2FE] font-mono">US9842101B1</span>
+                  </div>
+                  <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-slate-300">
+                    Child Application: <span className="text-[#38BDF8] font-mono">US2024018291A1</span>
+                  </div>
                 </div>
               </div>
             </div>
