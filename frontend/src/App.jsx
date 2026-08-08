@@ -262,20 +262,72 @@ export default function App() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4 flex-1 overflow-y-auto">
-                  {chatMessages.map((msg, idx) => (
-                    <div key={idx} className={`p-4 rounded-2xl max-w-2xl text-xs leading-relaxed ${msg.role === 'user' ? 'bg-[#00F2FE]/10 text-white border border-[#00F2FE]/30 ml-auto' : 'bg-[#12141D] text-slate-200 border border-white/10'}`}>
-                      <div className="font-semibold text-[10px] text-slate-400 uppercase tracking-wider mb-1">
-                        {msg.role === 'user' ? 'You' : 'PatentMind AI Bot'}
+                <div className="flex-1 flex flex-col justify-between space-y-4 min-h-[75vh]">
+                  {/* Top Bar with Clear Chat / New Conversation button */}
+                  <div className="flex justify-between items-center pb-2 border-b border-white/10 text-xs">
+                    <span className="font-mono text-slate-400 text-[11px] uppercase tracking-wider">Active Patent Conversation Thread</span>
+                    <button
+                      onClick={() => setChatMessages([])}
+                      className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-slate-300 text-[11px] flex items-center gap-1.5 transition-all"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-[#00F2FE]" />
+                      <span>New Chat</span>
+                    </button>
+                  </div>
+
+                  {/* Scrollable Messages Container */}
+                  <div className="space-y-4 flex-1 overflow-y-auto pr-2 max-h-[58vh]">
+                    {chatMessages.map((msg, idx) => (
+                      <div key={idx} className={`p-4 rounded-2xl max-w-2xl text-xs leading-relaxed ${msg.role === 'user' ? 'bg-[#00F2FE]/10 text-white border border-[#00F2FE]/30 ml-auto' : 'bg-[#12141D] text-slate-200 border border-white/10 shadow-lg'}`}>
+                        <div className="font-semibold text-[10px] text-slate-400 uppercase tracking-wider mb-1">
+                          {msg.role === 'user' ? 'You' : 'PatentMind AI Bot'}
+                        </div>
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
                       </div>
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
-                    </div>
-                  ))}
-                  {chatLoading && (
-                    <div className="p-4 bg-[#12141D] rounded-2xl border border-white/10 text-xs text-[#00F2FE] animate-pulse">
-                      Analyzing patent vectors and generating RAG response...
-                    </div>
-                  )}
+                    ))}
+                    {chatLoading && (
+                      <div className="p-4 bg-[#12141D] rounded-2xl border border-white/10 text-xs text-[#00F2FE] animate-pulse">
+                        Analyzing patent vectors and generating RAG response...
+                      </div>
+                    )}
+                    <div ref={chatEndRef} />
+                  </div>
+
+                  {/* STICKY BOTTOM PROMPT INPUT CONTAINER FOR CONTINUOUS QUESTIONS */}
+                  <div className="w-full bg-[#12141D] border border-white/10 rounded-2xl p-3 shadow-2xl relative z-10 text-left space-y-2">
+                    <form onSubmit={handleChatSubmit} className="flex items-center gap-3 bg-black/30 border border-white/5 rounded-xl px-3 py-2">
+                      <button
+                        type="button"
+                        onClick={() => pdfInputRef.current?.click()}
+                        className="text-slate-400 hover:text-white text-lg font-light px-1"
+                        title="Attach PDF Document"
+                      >
+                        +
+                      </button>
+                      <input
+                        type="text"
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        placeholder="Ask follow-up question or analyze another patent..."
+                        className="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none py-1"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setIsListening(!isListening)}
+                        className={`p-1 transition-colors ${isListening ? 'text-red-400 animate-pulse' : 'text-slate-400 hover:text-[#00F2FE]'}`}
+                        title="Voice Input"
+                      >
+                        {isListening ? <Mic className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={!chatInput.trim() || chatLoading}
+                        className="w-8 h-8 rounded-lg bg-[#00F2FE] text-[#050609] flex items-center justify-center font-bold hover:scale-105 transition-transform disabled:opacity-40"
+                      >
+                        <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+                      </button>
+                    </form>
+                  </div>
                 </div>
               )}
             </div>
