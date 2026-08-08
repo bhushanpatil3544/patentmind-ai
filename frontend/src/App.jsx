@@ -1766,7 +1766,7 @@ function App() {
           <div className="absolute bottom-[-10%] right-[15%] w-[600px] h-[600px] rounded-full bg-[#00C2FF]/15 blur-[150px] animate-pulse" />
         </div>
 
-        <motion.div 
+        <div 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
@@ -2023,7 +2023,7 @@ function App() {
           <p className="text-[10px] text-slate-600 text-center font-sans">
             © 2026 PatentMind AI. All rights reserved.
           </p>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -2221,7 +2221,7 @@ function App() {
           <div className="space-y-24 pb-16">
             
             {/* SECTION 1: WRANGLER ENTERPRISE SAAS HERO */}
-            <motion.div 
+            <div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
@@ -2257,10 +2257,10 @@ function App() {
                   <span>Try Live Search Demo</span>
                 </a>
               </div>
-            </motion.div>
+            </div>
 
             {/* SECTION 2: TRUSTED COMPANIES */}
-            <motion.div
+            <div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
@@ -2286,12 +2286,12 @@ function App() {
                   <span className="w-2 h-2 rounded-full bg-[#5B7CFA]"></span> ANTHROPIC TECH DEFENSE
                 </span>
               </div>
-            </motion.div>
+            </div>
 
 
 
             {/* SECTION 4: ENTERPRISE FEATURES GRID */}
-            <motion.div
+            <div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
@@ -2350,7 +2350,7 @@ function App() {
                   );
                 })}
               </div>
-            </motion.div>
+            </div>
 
             {/* SECTION 5: LIVE RAG SEARCH MODULE */}
             <div id="live-rag-search" className="pt-12 border-t border-white/[0.08]">
