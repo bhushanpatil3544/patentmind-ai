@@ -105,7 +105,7 @@ function App() {
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [authRole, setAuthRole] = useState(() => getValidStorageItem('authRole') || 'client'); // client / admin
-  const [userRole, setUserRole] = useState(() => getValidStorageItem('userRole') || 'user');
+  const [userRole, setUserRole] = useState(() => getValidStorageItem('userRole') || 'admin');
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [usernameSuggestions, setUsernameSuggestions] = useState([]);
   const [usernameCheckLoading, setUsernameCheckLoading] = useState(false);
