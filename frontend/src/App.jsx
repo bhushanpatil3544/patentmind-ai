@@ -2031,7 +2031,7 @@ function App() {
 
   // CORE APPLICATION DASHBOARD (LOGGED IN)
   return (
-    <div className={`app-wrapper bg-[#050816] ${theme} flex flex-col md:flex-row transition-all duration-500 min-h-screen relative overflow-hidden font-sans`}>
+    <div className={`app-wrapper bg-[#08090D] ${theme} flex flex-row min-h-screen relative font-sans text-white`}>
       
       {/* Wrangler Enterprise SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
@@ -2214,9 +2214,7 @@ function App() {
         </div>
       )}
 
-      <main ref={mainContentRef} className={`kelly-dashboard-main w-full max-w-7xl mx-auto pb-24 px-6 overflow-y-auto flex flex-col min-h-screen relative z-10 transition-all duration-500 ${
-        isSidebarNavMode ? 'pt-8' : 'pt-28'
-      }`}>
+      <main ref={mainContentRef} className="kelly-dashboard-main flex-1 w-full max-w-6xl mx-auto pb-16 px-6 flex flex-col relative z-10">
 
         {/* SEMANTIC SEARCH & LANDING HERO TAB */}
         {activeTab === 'search' && (
