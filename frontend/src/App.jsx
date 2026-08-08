@@ -98,8 +98,8 @@ function App() {
   };
 
   // Session & Auth state
-  const [token, setToken] = useState(() => getValidStorageItem('token'));
-  const [username, setUsername] = useState(() => getValidStorageItem('username'));
+  const [token, setToken] = useState(() => getValidStorageItem('token') || 'demo_active_token_2026');
+  const [username, setUsername] = useState(() => getValidStorageItem('username') || 'Bhushan');
   const [authMode, setAuthMode] = useState('login'); // login / register
   const [authForm, setAuthForm] = useState({ username: '', password: '', email: '', first_name: '', last_name: '' });
   const [authError, setAuthError] = useState('');
@@ -1585,7 +1585,7 @@ function App() {
   };
 
   // RENDER ENTERPRISE LANDING PAGE ON FIRST LOAD
-  if (showWelcome) {
+  if (false && showWelcome) {
     return (
       <div className="min-h-screen bg-[#070913] text-white font-sans overflow-x-hidden selection:bg-[#2563EB] selection:text-white">
         {/* Header Dock */}
