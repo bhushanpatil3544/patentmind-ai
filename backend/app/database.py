@@ -158,7 +158,11 @@ class DatabaseManager:
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         username VARCHAR(128) UNIQUE NOT NULL,
                         password VARCHAR(256) NOT NULL,
-                        email VARCHAR(256) NULL
+                        email VARCHAR(256) NULL,
+                        first_name VARCHAR(128) NULL,
+                        last_name VARCHAR(128) NULL,
+                        role VARCHAR(32) DEFAULT 'user',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
                 # 2. Patents Table
@@ -205,7 +209,11 @@ class DatabaseManager:
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         username TEXT UNIQUE NOT NULL,
                         password TEXT NOT NULL,
-                        email TEXT NULL
+                        email TEXT NULL,
+                        first_name TEXT NULL,
+                        last_name TEXT NULL,
+                        role TEXT DEFAULT 'user',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
                 cursor.execute("""
@@ -256,6 +264,18 @@ class DatabaseManager:
             except Exception:
                 pass # Column already exists
             
+            for col_def in [
+                ("first_name", "VARCHAR(128) NULL" if self.is_mysql else "TEXT NULL"),
+                ("last_name", "VARCHAR(128) NULL" if self.is_mysql else "TEXT NULL"),
+                ("role", "VARCHAR(32) DEFAULT 'user'" if self.is_mysql else "TEXT DEFAULT 'user'"),
+                ("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP" if self.is_mysql else "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+            ]:
+                try:
+                    cursor.execute(f"ALTER TABLE users ADD COLUMN {col_def[0]} {col_def[1]}")
+                    conn.commit()
+                except Exception:
+                    pass
+            
             # Seed/Ensure BHUSHAN admin account exists with password '3544' and email 'bhushan3544@gmail.com'
             import bcrypt
             def hash_pwd(password: str) -> str:
@@ -268,15 +288,15 @@ class DatabaseManager:
             row = cursor.fetchone()
             if row:
                 cursor.execute(
-                    "UPDATE users SET password = %s, email = %s WHERE LOWER(username) = %s" if self.is_mysql else
-                    "UPDATE users SET password = ?, email = ? WHERE LOWER(username) = ?",
-                    (bhushan_pw, "bhushan3544@gmail.com", "bhushan")
+                    "UPDATE users SET password = %s, email = %s, first_name = %s, last_name = %s, role = %s WHERE LOWER(username) = %s" if self.is_mysql else
+                    "UPDATE users SET password = ?, email = ?, first_name = ?, last_name = ?, role = ? WHERE LOWER(username) = ?",
+                    (bhushan_pw, "bhushan3544@gmail.com", "Bhushan", "Shelke", "admin", "bhushan")
                 )
             else:
                 cursor.execute(
-                    "INSERT INTO users (username, password, email) VALUES (%s, %s, %s)" if self.is_mysql else
-                    "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
-                    ("BHUSHAN", bhushan_pw, "bhushan3544@gmail.com")
+                    "INSERT INTO users (username, password, email, first_name, last_name, role) VALUES (%s, %s, %s, %s, %s, %s)" if self.is_mysql else
+                    "INSERT INTO users (username, password, email, first_name, last_name, role) VALUES (?, ?, ?, ?, ?, ?)",
+                    ("BHUSHAN", bhushan_pw, "bhushan3544@gmail.com", "Bhushan", "Shelke", "admin")
                 )
             # Seed default system client accounts
             demo_users = [
@@ -357,13 +377,13 @@ class DatabaseManager:
 
     # --- DATABASE OPERATIONS INTERFACE ---
 
-    def register_user(self, username: str, hashed_pw: str, email: Optional[str] = None) -> bool:
+    def register_user(self, username: str, hashed_pw: str, email: Optional[str] = None, first_name: Optional[str] = None, last_name: Optional[str] = None) -> bool:
         conn, cursor = self._get_connection()
         try:
             cursor.execute(
-                "INSERT INTO users (username, password, email) VALUES (%s, %s, %s)" if self.is_mysql else
-                "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
-                (username, hashed_pw, email)
+                "INSERT INTO users (username, password, email, first_name, last_name, role) VALUES (%s, %s, %s, %s, %s, %s)" if self.is_mysql else
+                "INSERT INTO users (username, password, email, first_name, last_name, role) VALUES (?, ?, ?, ?, ?, ?)",
+                (username, hashed_pw, email, first_name, last_name, 'user')
             )
             conn.commit()
             return True
@@ -832,3 +852,40 @@ class DatabaseManager:
         finally:
             conn.close()
         return export
+
+    def check_username_exists(self, username: str) -> bool:
+        conn, cursor = self._get_connection()
+        try:
+            cursor.execute(
+                "SELECT id FROM users WHERE LOWER(username) = %s" if self.is_mysql else
+                "SELECT id FROM users WHERE LOWER(username) = ?",
+                (username.lower(),)
+            )
+            return cursor.fetchone() is not None
+        finally:
+            conn.close()
+
+    def get_all_users(self) -> list:
+        conn, cursor = self._get_connection()
+        try:
+            cursor.execute("SELECT id, username, email, first_name, last_name, role, created_at FROM users ORDER BY id")
+            rows = cursor.fetchall()
+            if self.is_mysql:
+                return [dict(r) for r in rows]
+            else:
+                return [dict(r) for r in rows]
+        finally:
+            conn.close()
+
+    def get_user_by_username(self, username: str) -> dict:
+        conn, cursor = self._get_connection()
+        try:
+            cursor.execute(
+                "SELECT id, username, email, first_name, last_name, role, created_at FROM users WHERE LOWER(username) = %s" if self.is_mysql else
+                "SELECT id, username, email, first_name, last_name, role, created_at FROM users WHERE LOWER(username) = ?",
+                (username.lower(),)
+            )
+            row = cursor.fetchone()
+            return dict(row) if row else None
+        finally:
+            conn.close()

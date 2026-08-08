@@ -179,6 +179,8 @@ class AuthCredentials(BaseModel):
     username: str
     password: str
     email: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
 
 class ResetPasswordRequest(BaseModel):
     target_username: str
@@ -298,8 +300,8 @@ def send_account_email(email: str, username: str, password_plain: str) -> bool:
         f"• Password: {password_plain}\n"
         f"• Registered Email: {email}\n\n"
         f"You can now log in using your password or mobile OTP at any time.\n\n"
-        f"Best regards,\n"
-        f"Team No 3 (BHUSHAN SHREYA OMKAR SOHAM ASTA TAWARI JI)"
+        f"Regards,\n"
+        f"Bhushan Shelke"
     )
     return send_email_smtp(email, subject, body)
             
@@ -313,8 +315,8 @@ def send_otp_email(email: str, otp_code: str, purpose: str = "Registration") -> 
         f"Your verification OTP for PatentMind AI {purpose} is:\n\n"
         f"   {otp_code}\n\n"
         f"Please enter this 6-digit OTP code in the application to complete verification.\n\n"
-        f"Best regards,\n"
-        f"Team No 3 (BHUSHAN SHREYA OMKAR SOHAM ASTA TAWARI JI)"
+        f"Regards,\n"
+        f"Bhushan Shelke"
     )
     logger.info(f"[GMAIL DISPATCH] Dispatching OTP {otp_code} to: {email}")
     return send_email_smtp(email, subject, body)
@@ -493,8 +495,8 @@ def verify_forgot_username_otp(request: ForgotUsernameVerify):
         f"Your registered username for PatentMind AI is:\n\n"
         f"   Username: {recovered_username}\n\n"
         f"Registered Email: {email}\n\n"
-        f"Best regards,\n"
-        f"Team No 3 (BHUSHAN SHREYA OMKAR SOHAM ASTA TAWARI JI)"
+        f"Regards,\n"
+        f"Bhushan Shelke"
     )
     
     sender_email = (Config.GMAIL_USER or "").strip()
@@ -550,6 +552,8 @@ def register_user(credentials: AuthCredentials):
     username = credentials.username.strip()
     password = credentials.password
     email = credentials.email.strip() if credentials.email else None
+    first_name = credentials.first_name.strip() if credentials.first_name else None
+    last_name = credentials.last_name.strip() if credentials.last_name else None
     
     if len(username) < 3 or len(password) < 4:
         raise HTTPException(status_code=400, detail="Username must be >= 3 and password >= 4 characters.")
@@ -567,16 +571,16 @@ def register_user(credentials: AuthCredentials):
             try:
                 conn, cursor = relational_db._get_connection()
                 cursor.execute(
-                    "UPDATE users SET email = %s WHERE username = %s" if relational_db.is_mysql else
-                    "UPDATE users SET email = ? WHERE username = ?",
-                    (email, username)
+                    "UPDATE users SET email = %s, first_name = %s, last_name = %s WHERE username = %s" if relational_db.is_mysql else
+                    "UPDATE users SET email = ?, first_name = ?, last_name = ? WHERE username = ?",
+                    (email, first_name, last_name, username)
                 )
                 conn.commit()
                 conn.close()
             except Exception:
                 pass
         else:
-            success = relational_db.register_user(username, hashed_pw, email)
+            success = relational_db.register_user(username, hashed_pw, email, first_name, last_name)
             if not success:
                 raise HTTPException(status_code=500, detail="Database write error.")
             
@@ -588,7 +592,11 @@ def register_user(credentials: AuthCredentials):
         else:
             msg = f"Account saved! (SMTP delivery error - check backend logs)."
             
-        return {"status": "success", "message": msg, "email": email, "username": username, "email_sent": sent}
+        user_record = relational_db.get_user_by_username(username)
+        role = user_record.get('role', 'user') if user_record else 'user'
+        token = create_access_token(data={"sub": username, "role": role})
+            
+        return {"status": "success", "message": msg, "email": email, "username": username, "email_sent": sent, "access_token": token, "token_type": "bearer"}
     except HTTPException as he:
         raise he
     except Exception as e:
@@ -607,7 +615,9 @@ def login_user(credentials: AuthCredentials):
             raise HTTPException(status_code=401, detail="Invalid username or password credentials.")
             
         # Generate token
-        token = create_access_token(data={"sub": username})
+        user_record = relational_db.get_user_by_username(username)
+        role = user_record.get('role', 'user') if user_record else 'user'
+        token = create_access_token(data={"sub": username, "role": role})
         return {
             "access_token": token,
             "token_type": "bearer",
@@ -664,6 +674,41 @@ def verify_otp(payload: OTPVerify):
 @app.get("/api/v1/auth/me")
 def get_user_profile(current_user: dict = Depends(get_current_user)):
     return {"username": current_user.get("sub")}
+
+from fastapi import Request
+
+@app.post("/api/v1/auth/check-username")
+async def check_username(request: Request):
+    body = await request.json()
+    desired = body.get("username", "").strip()
+    if not desired or len(desired) < 3:
+        return {"available": False, "suggestions": [], "error": "Username must be at least 3 characters."}
+    
+    exists = relational_db.check_username_exists(desired)
+    suggestions = []
+    if exists:
+        import random
+        base = desired.lower().replace(" ", "_")
+        candidates = [
+            f"{base}_{random.randint(100,999)}",
+            f"{base}_ai",
+            f"{base}_{random.randint(1,99)}",
+            f"{base}_pro",
+            f"patent_{base}",
+        ]
+        suggestions = [c for c in candidates if not relational_db.check_username_exists(c)][:3]
+    
+    return {"available": not exists, "suggestions": suggestions}
+
+@app.get("/api/v1/admin/all-users")
+async def admin_get_all_users(user: dict = Depends(get_current_user)):
+    # Check if user is admin
+    user_data = relational_db.get_user_by_username(user.get("sub", ""))
+    if not user_data or user_data.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required.")
+    
+    users = relational_db.get_all_users()
+    return {"users": users, "total": len(users)}
 
 @app.get("/api/v1/auth/admin/users")
 def get_all_users(current_user: dict = Depends(get_current_user)):

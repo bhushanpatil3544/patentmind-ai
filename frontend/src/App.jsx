@@ -101,10 +101,15 @@ function App() {
   const [token, setToken] = useState(() => getValidStorageItem('token'));
   const [username, setUsername] = useState(() => getValidStorageItem('username'));
   const [authMode, setAuthMode] = useState('login'); // login / register
-  const [authForm, setAuthForm] = useState({ username: '', password: '', email: '' });
+  const [authForm, setAuthForm] = useState({ username: '', password: '', email: '', first_name: '', last_name: '' });
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [authRole, setAuthRole] = useState(() => getValidStorageItem('authRole') || 'client'); // client / admin
+  const [userRole, setUserRole] = useState(() => getValidStorageItem('userRole') || 'user');
+  const [usernameAvailable, setUsernameAvailable] = useState(null);
+  const [usernameSuggestions, setUsernameSuggestions] = useState([]);
+  const [usernameCheckLoading, setUsernameCheckLoading] = useState(false);
+  const [gmailVerified, setGmailVerified] = useState(false);
 
   const isAdminUser = () => {
     const u = (username || '').toLowerCase().trim();
@@ -303,7 +308,7 @@ function App() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'theme-normal');
 
   // Navigation tab state
-  const [activeTab, setActiveTab] = useState('search');
+  const [activeTab, setActiveTab] = useState('chat');
   const [selectedPatentNumber, setSelectedPatentNumber] = useState('US10922485B2');
   const [comparePatentB, setComparePatentB] = useState('US11450291B1');
 
@@ -747,7 +752,9 @@ function App() {
     setDatasetResult(null);
     setChatMessages([]);
     setAdminUsers([]);
-    setActiveTab('search');
+    setActiveTab('chat');
+    localStorage.removeItem('userRole');
+    setUserRole('user');
     setShowOnboarding(true);
     setOnboardingSlide(0);
     setShowLogoutModal(false);
@@ -770,7 +777,9 @@ function App() {
         body: JSON.stringify({
           username: cleanUsername,
           password: authForm.password,
-          email: authForm.email ? authForm.email.trim() : undefined
+          email: authForm.email ? authForm.email.trim() : undefined,
+          first_name: authForm.first_name ? authForm.first_name.trim() : undefined,
+          last_name: authForm.last_name ? authForm.last_name.trim() : undefined
         })
       });
 
@@ -781,11 +790,20 @@ function App() {
           localStorage.setItem('token', data.access_token);
           localStorage.setItem('username', data.username);
           localStorage.setItem('onboarding_done', 'true');
+          // Decode role from JWT token
+          try {
+            const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+            const role = payload.role || 'user';
+            localStorage.setItem('userRole', role);
+            setUserRole(role);
+          } catch(e) { localStorage.setItem('userRole', 'user'); setUserRole('user'); }
           setToken(data.access_token);
           setUsername(data.username);
           setShowWelcome(false);
           setShowOnboarding(false);
-          setAuthForm({ username: '', password: '', email: '' });
+          setAuthForm({ username: '', password: '', email: '', first_name: '', last_name: '' });
+          setGmailVerified(false);
+          setUsernameAvailable(null);
         } else {
           setAuthMode('login');
           setAuthError(data.message || 'Registration complete! Username & password sent to your email.');
@@ -798,6 +816,30 @@ function App() {
       setAuthError(`Connection notice: ${err.message || 'Unable to reach backend server'}. Please refresh or tap login again.`);
     } finally {
       setAuthLoading(false);
+    }
+  };
+
+  // Check username availability for registration
+  const handleCheckUsername = async (desiredUsername) => {
+    if (!desiredUsername || desiredUsername.trim().length < 3) {
+      setUsernameAvailable(null);
+      setUsernameSuggestions([]);
+      return;
+    }
+    setUsernameCheckLoading(true);
+    try {
+      const res = await fetch(apiUrl('/api/v1/auth/check-username'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: desiredUsername.trim() })
+      });
+      const data = await res.json();
+      setUsernameAvailable(data.available);
+      setUsernameSuggestions(data.suggestions || []);
+    } catch {
+      setUsernameAvailable(null);
+    } finally {
+      setUsernameCheckLoading(false);
     }
   };
 
@@ -1563,7 +1605,7 @@ function App() {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => { setShowWelcome(false); setActiveTab('search'); }}
+              onClick={() => { setShowWelcome(false); setActiveTab('chat'); }}
               className="btn-theme px-5 py-2.5 rounded-xl font-semibold text-xs flex items-center gap-2"
             >
               <span>Launch Platform</span>
@@ -1584,7 +1626,7 @@ function App() {
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Transform complex patent research into actionable engineering decisions. Powered by high-speed PaddleOCR text extraction, ChromaDB vector search, and custom Retrieval-Augmented Generation (RAG).
+            Upload your patent or research paper and get instant AI-powered insights, comparisons, and answers about any patent or technical document.
           </p>
 
           {/* AI Search & Action Bar */}
@@ -1604,7 +1646,7 @@ function App() {
                 className="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none py-2 font-sans"
               />
               <button
-                onClick={() => { setShowWelcome(false); setActiveTab('search'); }}
+                onClick={() => { setShowWelcome(false); setActiveTab('chat'); }}
                 className="btn-theme px-6 rounded-xl font-medium text-xs flex-shrink-0 flex items-center gap-2"
               >
                 <span>Search Patents</span>
@@ -1713,541 +1755,275 @@ function App() {
 
   if (!token) {
     return (
-      <div className={`app-wrapper kelly-auth-page bg-[#050816] ${theme} flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans`}>
-        
-        {/* Wrangler Enterprise SaaS Atmospheric Ambient Blurs (Zero Gridlines) */}
+      <div className="app-wrapper bg-[#050816] flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans">
+        {/* Background Ambient */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-          <div className="absolute top-[-10%] left-[15%] w-[650px] h-[650px] rounded-full bg-[#5B7CFA]/15 blur-[160px] animate-pulse duration-[9000ms]" />
-          <div className="absolute bottom-[-10%] right-[15%] w-[600px] h-[600px] rounded-full bg-[#00C2FF]/15 blur-[150px] animate-pulse duration-[7000ms]" />
-          <div className="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#7B61FF]/12 blur-[140px]" />
-        </div>
-
-        {/* Top-Right Theme Selector */}
-        <div className="absolute top-6 right-6 flex items-center gap-3 bg-black/40 backdrop-blur-md px-4 py-2 border border-white/5 rounded-full z-20">
-          <Palette className="w-3.5 h-3.5 text-zinc-500" />
-          <select 
-            value={theme} 
-            onChange={(e) => setTheme(e.target.value)}
-            className="bg-transparent text-[10px] font-mono border-none focus:outline-none text-main uppercase cursor-pointer"
-          >
-            {themesList.map((t) => (
-              <option key={t.id} value={t.id} className="bg-zinc-950 text-zinc-400">
-                {t.name}
-              </option>
-            ))}
-          </select>
+          <div className="absolute top-[-10%] left-[15%] w-[650px] h-[650px] rounded-full bg-[#5B7CFA]/15 blur-[160px] animate-pulse" />
+          <div className="absolute bottom-[-10%] right-[15%] w-[600px] h-[600px] rounded-full bg-[#00C2FF]/15 blur-[150px] animate-pulse" />
         </div>
 
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className={`kelly-auth-card w-full max-w-sm bg-[#111111]/85 backdrop-blur-xl p-8 space-y-7 rounded-2xl shadow-2xl border ${
-            authRole === 'admin' 
-              ? 'border-red-950/60 shadow-[0_0_50px_rgba(239,68,68,0.06)]' 
-              : 'border-white/5 shadow-[0_0_50px_rgba(124,58,237,0.05)]'
-          } relative z-10`}
+          className="w-full max-w-md bg-[#111111]/85 backdrop-blur-xl p-8 space-y-6 rounded-2xl shadow-2xl border border-white/5 relative z-10"
         >
+          {/* Logo & Title */}
           <div className="text-center space-y-2">
-            {theme === 'theme-brusterna' ? (
-              <>
-                <h1 className="font-outfit font-bold text-3xl tracking-widest text-[#3C2218] flex items-center justify-center gap-0.5">
-                  BR
-                  <span className="relative inline-block">
-                    Ü
-                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex gap-0.5 opacity-80 animate-pulse">
-                      <svg className="w-3.5 h-3.5 text-[#3C2218]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                        <path d="M9 10c1-2-1-4 1-6" />
-                        <path d="M14 10c1-2-1-4 1-6" />
-                      </svg>
-                    </span>
-                  </span>
-                  STERNA
-                </h1>
-                <p className="text-[10px] font-mono tracking-widest text-[#6E5B53] font-medium uppercase">
-                  Brew Bold. Live Sharp.
-                </p>
-              </>
-            ) : (
-              <>
-                <h1 className={`font-outfit font-light text-2xl tracking-wider leading-none transition-colors duration-300 ${
-                  authRole === 'admin' ? 'text-red-500 font-mono font-semibold' : 'text-main'
-                }`}>
-                  {authRole === 'admin' ? 'SECURE ADMIN KERNEL' : 'PATENTMIND CLIENT'}
-                </h1>
-                <p className={`text-[9px] font-mono tracking-widest uppercase transition-colors duration-300 ${
-                  authRole === 'admin' ? 'text-red-650' : 'text-muted'
-                }`}>
-                  {authRole === 'admin' ? 'RESTRICTED OPERATOR INTERFACE' : 'KNOWLEDGE ARCHITECTURE GATEWAY'}
-                </p>
-              </>
-            )}
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#5B7CFA] to-[#00C2FF] p-[1px] mx-auto shadow-lg">
+              <div className="w-full h-full bg-[#111111] rounded-[15px] flex items-center justify-center text-[#00C2FF] font-bold text-lg font-heading">P</div>
+            </div>
+            <h1 className="font-heading font-bold text-xl text-white tracking-tight">PatentMind AI</h1>
+            <p className="text-[11px] text-slate-400 font-sans">
+              {authMode === 'login' ? 'Sign in to your account' : 'Create your account'}
+            </p>
           </div>
 
-          {theme === 'theme-brusterna' && (
-            <div className="w-full h-24 flex items-center justify-center opacity-85 border-t border-b border-[#D5C8C0]/40 py-2">
-              <svg className="w-full h-full text-[#3C2218]" viewBox="0 0 200 80" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                {/* Table line */}
-                <line x1="10" y1="65" x2="190" y2="65" strokeWidth="2" />
-                
-                {/* Person 1 (Left - holding cup) */}
-                <path d="M30 65 L30 50 C30 45 35 42 40 42 C45 42 45 48 45 50" />
-                <circle cx="37" cy="35" r="5" />
-                <path d="M35 45 C35 50 25 52 25 55" /> 
-                <rect x="22" y="55" width="6" height="7" rx="1" fill="#3C2218" /> 
-                
-                {/* Person 2 (Middle - using laptop) */}
-                <path d="M90 65 L90 48 C90 42 95 40 100 40 C105 40 110 42 110 48 M110 48 L110 65" />
-                <circle cx="100" cy="33" r="5.5" />
-                <path d="M95 45 L85 52 L95 56" /> 
-                <path d="M105 45 L115 52 L105 56" /> 
-                <path d="M85 57 L115 57 L110 50 Z" /> 
-                
-                {/* Person 3 (Right - writing on notepad) */}
-                <path d="M150 65 L150 48 C150 43 155 42 160 42 C165 42 170 43 170 48 M170 48 L170 65" />
-                <circle cx="160" cy="35" r="5" />
-                <path d="M153 45 L143 55 L150 58" /> 
-                <rect x="138" y="56" width="10" height="7" rx="0.5" /> 
-                
-                {/* Small coffee cups on the table */}
-                <path d="M60 65 L60 61 L64 61 L64 65 Z" fill="currentColor" />
-                <path d="M130 65 L130 61 L134 61 L134 65 Z" fill="currentColor" />
-              </svg>
+          {/* Auth Error */}
+          {authError && (
+            <div className="p-3 bg-red-950/30 border border-red-800/40 rounded-xl text-xs text-red-300 text-center">
+              {authError}
             </div>
           )}
 
-          {/* Client vs Admin Segment Control */}
-          <div className={`grid grid-cols-2 gap-1.5 p-1 bg-black/30 border rounded-full text-[9px] font-mono tracking-wider transition-colors ${
-            authRole === 'admin' ? 'border-red-950/50' : 'border-theme'
-          }`}>
-            <button
-              type="button"
-              onClick={() => {
-                setAuthRole('client');
-                setTheme('theme-aurora'); // Standard smooth theme
-                setAuthForm(prev => ({ ...prev, username: prev.username === 'admin' ? 'client' : prev.username }));
-                setAuthError('');
-              }}
-              className={`py-1.5 rounded-full transition-all duration-150 uppercase ${
-                authRole === 'client'
-                  ? 'bg-zinc-900 border border-theme text-main font-semibold'
-                  : 'text-zinc-600 hover:text-zinc-400'
-              }`}
-            >
-              CLIENT ACCESS
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setAuthRole('admin');
-                setTheme('theme-cyber'); // Green/Red command prompt hacker theme
-                setAuthForm(prev => ({ ...prev, username: prev.username === 'client' ? 'admin' : prev.username }));
-                setAuthError('');
-              }}
-              className={`py-1.5 rounded-full transition-all duration-150 uppercase ${
-                authRole === 'admin'
-                  ? 'bg-red-950/40 border border-red-900/60 text-red-400 font-semibold'
-                  : 'text-zinc-650 hover:text-zinc-450'
-              }`}
-            >
-              ADMIN PORTAL
-            </button>
-          </div>
-
-          {/* Dynamic Banner Notification */}
-          {authRole === 'admin' ? (
-            <div className="p-3 border border-red-950/70 bg-red-950/10 text-[9px] font-mono text-red-400 tracking-wider flex items-start gap-2.5 leading-relaxed uppercase">
-              <ShieldAlert className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-              <div>
-                <strong>Restricted Gateway</strong>
-                <p className="mt-1 text-[8px] text-red-600 font-light">Unauthorized access attempts are prohibited and logged under system audit registries.</p>
-              </div>
-            </div>
-          ) : (
-            <div className="p-3 border border-theme/60 bg-black/15 text-[9px] font-mono text-zinc-400 tracking-wider flex items-start gap-2.5 leading-relaxed uppercase">
-              <Sparkles className="w-4 h-4 text-zinc-450 flex-shrink-0 mt-0.5" />
-              <div>
-                <strong>Client Workspace</strong>
-                <p className="mt-1 text-[8px] text-zinc-550 font-light">Access your dedicated patent search engine, RAG dialogue chatbot, and crawler analytics.</p>
-              </div>
-            </div>
-          )}
-
-          {/* Login Method Tab Controller */}
-          {authMode === 'login' && (
-            <div className={`grid grid-cols-3 gap-1 p-1 bg-black/20 border rounded-full text-[9px] font-mono tracking-wider transition-colors ${
-              authRole === 'admin' ? 'border-red-950/40' : 'border-theme'
-            }`}>
-              <button
-                type="button"
-                onClick={() => {
-                  setLoginMethod('password');
-                  setAuthError('');
-                }}
-                className={`py-1 rounded-full transition-all duration-150 uppercase ${
-                  loginMethod === 'password'
-                    ? 'bg-zinc-800 text-main font-semibold'
-                    : 'text-zinc-550 hover:text-zinc-400'
-                }`}
-              >
-                SECURE KEY
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setLoginMethod('forgot_password');
-                  setAuthError('');
-                }}
-                className={`py-1 rounded-full transition-all duration-150 uppercase ${
-                  loginMethod === 'forgot_password'
-                    ? 'bg-zinc-800 text-main font-semibold'
-                    : 'text-zinc-550 hover:text-zinc-400'
-                }`}
-              >
-                FORGOT PW
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setLoginMethod('forgot_username');
-                  setAuthError('');
-                  setRecoveredUsernameResult('');
-                }}
-                className={`py-1 rounded-full transition-all duration-150 uppercase ${
-                  loginMethod === 'forgot_username'
-                    ? 'bg-zinc-800 text-main font-semibold'
-                    : 'text-zinc-550 hover:text-zinc-400'
-                }`}
-              >
-                FORGOT USER
-              </button>
-            </div>
-          )}
-
-          {/* REGISTER MODE (GMAIL OTP VERIFICATION) */}
-          {authMode === 'register' ? (
-            <div className="space-y-5">
-              {!gmailOtpSent ? (
-                <div className="space-y-4">
-                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5">
-                    <User className="w-4 h-4 text-zinc-500 flex-shrink-0" />
+          <form onSubmit={handleAuthSubmit} className="space-y-4">
+            {/* REGISTER MODE: Extra fields */}
+            {authMode === 'register' && (
+              <>
+                {/* First Name & Last Name */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">First Name</label>
                     <input
                       type="text"
-                      value={authForm.username}
-                      onChange={(e) => setAuthForm({ ...authForm, username: e.target.value })}
-                      onKeyDown={handleTypingKeydown}
-                      placeholder="DESIRED USERNAME"
+                      value={authForm.first_name}
+                      onChange={(e) => setAuthForm({...authForm, first_name: e.target.value})}
+                      placeholder="Bhushan"
                       required
-                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 text-main uppercase"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#5B7CFA]/50 transition-colors"
                     />
                   </div>
-
-                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5">
-                    <Mail className="w-4 h-4 text-zinc-500 flex-shrink-0" />
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Last Name</label>
                     <input
-                      type="email"
-                      value={authForm.email || ''}
-                      onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
-                      onKeyDown={handleTypingKeydown}
-                      placeholder="YOUR GMAIL ADDRESS"
+                      type="text"
+                      value={authForm.last_name}
+                      onChange={(e) => setAuthForm({...authForm, last_name: e.target.value})}
+                      placeholder="Shelke"
                       required
-                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 text-main uppercase"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#5B7CFA]/50 transition-colors"
                     />
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={handleRequestGmailOTP}
-                    disabled={authLoading || !authForm.username.trim() || !authForm.email.trim()}
-                    className="w-full py-3 rounded-full text-xs font-mono tracking-widest uppercase btn-theme disabled:opacity-40 transition-all duration-200"
-                  >
-                    {authLoading ? 'SENDING GMAIL OTP...' : 'SEND VERIFICATION OTP TO GMAIL'}
-                  </button>
                 </div>
-              ) : (
-                <form onSubmit={handleVerifyGmailOTPAndRegister} className="space-y-4">
-                  <div className="p-3 bg-emerald-950/20 border border-emerald-900/50 rounded text-[9.5px] font-mono text-emerald-400 space-y-1">
-                    <strong className="block uppercase tracking-wider">OTP Dispatched to {authForm.email}</strong>
-                    <p className="text-[8.5px] text-zinc-400 font-light">Enter the 6-digit verification code below and set your account password.</p>
-                  </div>
 
-                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5">
-                    <KeyRound className="w-4 h-4 text-zinc-500 flex-shrink-0" />
-                    <input
-                      type="text"
-                      value={gmailOtpCode}
-                      onChange={(e) => setGmailOtpCode(e.target.value)}
-                      onKeyDown={handleTypingKeydown}
-                      placeholder="6-DIGIT GMAIL OTP CODE"
-                      required
-                      maxLength={6}
-                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 text-main uppercase tracking-widest text-center"
-                    />
-                  </div>
-
-                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5">
-                    <KeyRound className="w-4 h-4 text-zinc-500 flex-shrink-0" />
-                    <input
-                      type="password"
-                      value={authForm.password || ''}
-                      onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-                      onKeyDown={handleTypingKeydown}
-                      placeholder="SET YOUR PASSWORD"
-                      required
-                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 text-main"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={authLoading || !gmailOtpCode.trim() || !authForm.password.trim()}
-                    className="w-full py-3 rounded-full text-xs font-mono tracking-widest uppercase btn-theme disabled:opacity-40 transition-all duration-200"
-                  >
-                    {authLoading ? 'VERIFYING...' : 'VERIFY OTP & CREATE ACCOUNT'}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setGmailOtpSent(false)}
-                    className="w-full text-[9px] font-mono text-zinc-500 hover:text-zinc-300 uppercase tracking-wider text-center block pt-1"
-                  >
-                    Change Email or Resend OTP
-                  </button>
-                </form>
-              )}
-            </div>
-          ) : loginMethod === 'forgot_password' ? (
-            <div className="space-y-5">
-              {!forgotOtpSent ? (
-                <form onSubmit={handleRequestForgotOTP} className="space-y-4">
-                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5">
-                    <Mail className="w-4 h-4 text-zinc-500 flex-shrink-0" />
+                {/* Gmail with OTP Verification */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Gmail Address</label>
+                  <div className="flex gap-2">
                     <input
                       type="email"
-                      value={forgotEmail}
-                      onChange={(e) => setForgotEmail(e.target.value)}
-                      onKeyDown={handleTypingKeydown}
-                      placeholder="REGISTERED GMAIL ADDRESS"
+                      value={authForm.email}
+                      onChange={(e) => { setAuthForm({...authForm, email: e.target.value}); setGmailVerified(false); }}
+                      placeholder="you@gmail.com"
                       required
-                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 text-main uppercase"
+                      className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#5B7CFA]/50 transition-colors"
                     />
+                    <button
+                      type="button"
+                      onClick={handleRequestGmailOTP}
+                      disabled={!authForm.email || gmailVerified || authLoading}
+                      className={`px-4 py-3 rounded-xl text-[10px] font-semibold transition-all flex-shrink-0 ${
+                        gmailVerified
+                          ? 'bg-emerald-600/20 border border-emerald-500/30 text-emerald-400'
+                          : 'bg-[#5B7CFA]/20 border border-[#5B7CFA]/30 text-[#5B7CFA] hover:bg-[#5B7CFA]/30 disabled:opacity-40'
+                      }`}
+                    >
+                      {gmailVerified ? 'Verified' : gmailOtpSent ? 'Resend' : 'Send OTP'}
+                    </button>
                   </div>
+                </div>
 
-                  <button
-                    type="submit"
-                    disabled={authLoading || !forgotEmail.trim()}
-                    className="w-full py-3 rounded-full text-xs font-mono tracking-widest uppercase btn-theme disabled:opacity-40 transition-all duration-200"
-                  >
-                    {authLoading ? 'DISPATCHING...' : 'SEND RESET OTP TO GMAIL'}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleResetForgotPassword} className="space-y-4">
-                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5">
-                    <KeyRound className="w-4 h-4 text-zinc-500 flex-shrink-0" />
-                    <input
-                      type="text"
-                      value={forgotOtpCode}
-                      onChange={(e) => setForgotOtpCode(e.target.value)}
-                      onKeyDown={handleTypingKeydown}
-                      placeholder="6-DIGIT RESET OTP CODE"
-                      required
-                      maxLength={6}
-                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 text-main uppercase tracking-widest text-center"
-                    />
+                {/* OTP Input (shown after sending) */}
+                {gmailOtpSent && !gmailVerified && (
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Enter 6-Digit OTP</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={gmailOtpCode}
+                        onChange={(e) => setGmailOtpCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                        placeholder="000000"
+                        maxLength={6}
+                        className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#5B7CFA]/50 transition-colors text-center tracking-[0.5em] font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setAuthLoading(true);
+                          setAuthError('');
+                          try {
+                            const res = await fetch(apiUrl('/api/v1/auth/gmail-otp/verify'), {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ email: authForm.email, otp: gmailOtpCode })
+                            });
+                            const data = await res.json();
+                            if (res.ok && data.verified) {
+                              setGmailVerified(true);
+                              setAuthError('');
+                            } else {
+                              setAuthError(data.detail || 'Invalid OTP. Please try again.');
+                            }
+                          } catch { setAuthError('Failed to verify OTP.'); }
+                          finally { setAuthLoading(false); }
+                        }}
+                        disabled={gmailOtpCode.length !== 6 || authLoading}
+                        className="px-4 py-3 bg-[#5B7CFA] text-white rounded-xl text-[10px] font-semibold hover:bg-[#4A6CE8] disabled:opacity-40 transition-all flex-shrink-0"
+                      >
+                        Verify
+                      </button>
+                    </div>
+                    {gmailOtpDebug && (
+                      <p className="text-[10px] text-amber-400 font-mono text-center mt-1">Debug OTP: {gmailOtpDebug}</p>
+                    )}
                   </div>
+                )}
 
-                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5">
-                    <KeyRound className="w-4 h-4 text-zinc-500 flex-shrink-0" />
-                    <input
-                      type="password"
-                      value={forgotNewPassword}
-                      onChange={(e) => setForgotNewPassword(e.target.value)}
-                      onKeyDown={handleTypingKeydown}
-                      placeholder="ENTER NEW PASSWORD"
-                      required
-                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 text-main"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={authLoading || !forgotOtpCode.trim() || !forgotNewPassword.trim()}
-                    className="w-full py-3 rounded-full text-xs font-mono tracking-widest uppercase btn-theme disabled:opacity-40 transition-all duration-200"
-                  >
-                    {authLoading ? 'RESETTING...' : 'RESET PASSWORD NOW'}
-                  </button>
-                </form>
-              )}
-            </div>
-          ) : loginMethod === 'forgot_username' ? (
-            <div className="space-y-5">
-              {!forgotUserOtpSent ? (
-                <form onSubmit={handleRequestForgotUserOTP} className="space-y-4">
-                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5">
-                    <Mail className="w-4 h-4 text-zinc-500 flex-shrink-0" />
-                    <input
-                      type="email"
-                      value={forgotUserEmail}
-                      onChange={(e) => setForgotUserEmail(e.target.value)}
-                      onKeyDown={handleTypingKeydown}
-                      placeholder="REGISTERED GMAIL ADDRESS"
-                      required
-                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 text-main uppercase"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={authLoading || !forgotUserEmail.trim()}
-                    className="w-full py-3 rounded-full text-xs font-mono tracking-widest uppercase btn-theme disabled:opacity-40 transition-all duration-200"
-                  >
-                    {authLoading ? 'SENDING OTP...' : 'SEND RECOVERY OTP TO GMAIL'}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleVerifyForgotUserOTP} className="space-y-4">
-                  {recoveredUsernameResult && (
-                    <div className="p-3 bg-emerald-950/30 border border-emerald-900/60 rounded text-[10px] font-mono text-emerald-400 text-center space-y-1">
-                      <span className="block text-[8.5px] uppercase tracking-wider text-zinc-400">Account Username Recovered</span>
-                      <strong className="text-sm tracking-widest block text-white">{recoveredUsernameResult}</strong>
+                {/* Username with availability check */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Choose Username</label>
+                  <input
+                    type="text"
+                    value={authForm.username}
+                    onChange={(e) => {
+                      const val = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+                      setAuthForm({...authForm, username: val});
+                      if (val.length >= 3) handleCheckUsername(val);
+                      else { setUsernameAvailable(null); setUsernameSuggestions([]); }
+                    }}
+                    placeholder="your_username"
+                    required
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#5B7CFA]/50 transition-colors font-mono"
+                  />
+                  {usernameCheckLoading && (
+                    <p className="text-[10px] text-slate-400 font-mono">Checking availability...</p>
+                  )}
+                  {usernameAvailable === true && authForm.username.length >= 3 && (
+                    <p className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> Username is available
+                    </p>
+                  )}
+                  {usernameAvailable === false && (
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-red-400 font-mono">Username is taken. Try one of these:</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {usernameSuggestions.map(s => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => { setAuthForm({...authForm, username: s}); handleCheckUsername(s); }}
+                            className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] text-[#00C2FF] hover:bg-[#5B7CFA]/20 transition-all font-mono"
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
+                </div>
 
-                  <div className="border-b border-theme focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5">
-                    <KeyRound className="w-4 h-4 text-zinc-500 flex-shrink-0" />
-                    <input
-                      type="text"
-                      value={forgotUserOtpCode}
-                      onChange={(e) => setForgotUserOtpCode(e.target.value)}
-                      onKeyDown={handleTypingKeydown}
-                      placeholder="6-DIGIT GMAIL OTP CODE"
-                      required
-                      maxLength={6}
-                      className="w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 text-main uppercase tracking-widest text-center"
-                    />
-                  </div>
+                {/* Password */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Password</label>
+                  <input
+                    type="password"
+                    value={authForm.password}
+                    onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
+                    placeholder="Min 6 characters"
+                    required
+                    minLength={6}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#5B7CFA]/50 transition-colors"
+                  />
+                </div>
+              </>
+            )}
 
-                  <button
-                    type="submit"
-                    disabled={authLoading || !forgotUserOtpCode.trim()}
-                    className="w-full py-3 rounded-full text-xs font-mono tracking-widest uppercase btn-theme disabled:opacity-40 transition-all duration-200"
-                  >
-                    {authLoading ? 'VERIFYING...' : 'RECOVER USERNAME NOW'}
-                  </button>
-                </form>
-              )}
-            </div>
-          ) : (
-            <form onSubmit={handleAuthSubmit} className="space-y-5">
+            {/* LOGIN MODE: Simple username + password */}
+            {authMode === 'login' && (
+              <>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Username</label>
+                  <input
+                    type="text"
+                    value={authForm.username}
+                    onChange={(e) => setAuthForm({...authForm, username: e.target.value})}
+                    placeholder="Enter your username"
+                    required
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#5B7CFA]/50 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Password</label>
+                  <input
+                    type="password"
+                    value={authForm.password}
+                    onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
+                    placeholder="Enter your password"
+                    required
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#5B7CFA]/50 transition-colors"
+                  />
+                </div>
+              </>
+            )}
 
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={authLoading || (authMode === 'register' && (!gmailVerified || usernameAvailable === false))}
+              className="w-full py-3.5 bg-gradient-to-r from-[#5B7CFA] to-[#00C2FF] text-white font-semibold text-sm rounded-xl hover:opacity-90 disabled:opacity-40 transition-all shadow-lg"
+            >
+              {authLoading ? 'Processing...' : authMode === 'login' ? 'Sign In' : 'Create Account'}
+            </button>
+          </form>
 
-              <div className={`border-b focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5 ${
-                authRole === 'admin' ? 'border-red-950/80 focus-within:border-red-550' : 'border-theme'
-              }`}>
-                <User className={`w-4 h-4 flex-shrink-0 ${authRole === 'admin' ? 'text-red-650' : 'text-zinc-500'}`} />
-                <input
-                  type="text"
-                  value={authForm.username}
-                  onChange={(e) => setAuthForm({ ...authForm, username: e.target.value })}
-                  onKeyDown={handleTypingKeydown}
-                  placeholder="USERNAME"
-                  required
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck="false"
-                  className={`w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 ${
-                    authRole === 'admin' ? 'text-red-400' : 'text-main'
-                  }`}
-                />
-              </div>
-
-              <div className={`border-b focus-within:border-zinc-500 transition-colors py-1 flex items-center gap-2.5 ${
-                authRole === 'admin' ? 'border-red-950/80 focus-within:border-red-555' : 'border-theme'
-              }`}>
-                <KeyRound className={`w-4 h-4 flex-shrink-0 ${authRole === 'admin' ? 'text-red-655' : 'text-zinc-500'}`} />
-                <input
-                  type="password"
-                  value={authForm.password}
-                  onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-                  onKeyDown={handleTypingKeydown}
-                  placeholder="PASSWORD"
-                  required
-                  className={`w-full bg-transparent text-xs font-mono tracking-wider focus:outline-none placeholder:text-zinc-655 ${
-                    authRole === 'admin' ? 'text-red-400' : 'text-main'
-                  }`}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={authLoading}
-                className={`w-full py-3 rounded-full text-xs font-mono tracking-widest uppercase disabled:opacity-40 transition-all duration-200 ${
-                  authRole === 'admin'
-                    ? 'bg-red-950/20 border border-red-900 text-red-400 hover:bg-red-900/30 hover:text-red-300'
-                    : 'btn-theme'
-                }`}
-              >
-                {authLoading ? 'AUTHORIZING...' : 'ESTABLISH SESSION'}
-              </button>
-            </form>
-          )}
-
-          <div className="text-center pt-2 space-y-3">
-            {/* Quick Demo Admin Auto-Login Button */}
+          {/* Toggle Login/Register */}
+          <div className="text-center space-y-2">
             <button
               type="button"
-              onClick={() => {
-                setAuthForm({ username: 'BHUSHAN', password: '3544', email: 'bhushan3544@gmail.com' });
-                setTimeout(() => {
-                  const fakeEvent = { preventDefault: () => {} };
-                  handleAuthSubmit(fakeEvent);
-                }, 50);
-              }}
-              className="kelly-auth-demo w-full py-2.5 bg-gradient-to-r from-[#0D9488]/30 to-[#22D3EE]/20 hover:from-[#0D9488]/50 hover:to-[#22D3EE]/40 border border-[#22D3EE]/40 rounded-full text-[11px] font-semibold font-sans text-[#22D3EE] transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
-            >
-              <Zap className="w-3.5 h-3.5" />
-              <span>QUICK ENTER AS BHUSHAN (ADMIN )</span>
-            </button>
-
-            <button
               onClick={() => {
                 setAuthMode(authMode === 'login' ? 'register' : 'login');
                 setAuthError('');
+                setAuthForm({ username: '', password: '', email: '', first_name: '', last_name: '' });
+                setGmailVerified(false);
+                setGmailOtpSent(false);
+                setGmailOtpCode('');
+                setUsernameAvailable(null);
+                setUsernameSuggestions([]);
               }}
-              className={`text-[10px] font-mono uppercase tracking-wider transition-colors ${
-                authRole === 'admin' ? 'text-red-650 hover:text-red-400' : 'text-zinc-450 hover:text-white'
-              }`}
+              className="text-xs text-[#5B7CFA] hover:text-[#00C2FF] font-medium transition-colors"
             >
-              {authMode === 'login' ? 'Need an account? Register' : 'Already registered? Login'}
+              {authMode === 'login' ? "Don't have an account? Create one" : 'Already have an account? Sign in'}
             </button>
+
+            {authMode === 'login' && (
+              <button
+                type="button"
+                onClick={() => setLoginMethod('forgot_password')}
+                className="block mx-auto text-[10px] text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                Forgot Password?
+              </button>
+            )}
           </div>
 
-          {/* Interactive Animations Settings Toggles */}
-          <div className="flex items-center justify-center gap-4 pt-4 border-t border-theme/20 text-[9px] font-mono text-zinc-500">
-            <label className="flex items-center gap-1.5 cursor-pointer hover:text-zinc-300 transition-colors">
-              <input
-                type="checkbox"
-                checked={enableBubbles}
-                onChange={(e) => setEnableBubbles(e.target.checked)}
-                className="w-3 h-3 rounded bg-zinc-950 border-theme text-theme focus:ring-0 focus:ring-offset-0 cursor-pointer accent-[#8B5CF6]"
-              />
-              <span>MOUSE BUBBLES</span>
-            </label>
-            <label className="flex items-center gap-1.5 cursor-pointer hover:text-zinc-300 transition-colors">
-              <input
-                type="checkbox"
-                checked={enableSparks}
-                onChange={(e) => setEnableSparks(e.target.checked)}
-                className="w-3 h-3 rounded bg-zinc-950 border-theme text-theme focus:ring-0 focus:ring-offset-0 cursor-pointer accent-[#8B5CF6]"
-              />
-              <span>TYPING SPARKS</span>
-            </label>
-          </div>
+          <p className="text-[10px] text-slate-600 text-center font-sans">
+            © 2026 PatentMind AI. All rights reserved.
+          </p>
         </motion.div>
       </div>
     );
   }
+
 
   // CORE APPLICATION DASHBOARD (LOGGED IN)
   return (
@@ -2279,22 +2055,28 @@ function App() {
 
           {/* Center Horizontal Navigation Menu */}
           <nav className="flex items-center gap-1 md:gap-1.5 overflow-x-auto py-1 px-1 no-scrollbar">
-            {[
-              { id: 'search', label: 'Search', icon: Search },
-              { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-              { id: 'knowledge-graph', label: 'Graph', icon: Network },
-              { id: 'compare', label: 'Compare', icon: Layers },
-              { id: 'upload', label: 'Upload', icon: UploadCloud },
-              { id: 'chat', label: 'Chatbot', icon: MessageSquare },
-              { id: 'saved-patents', label: 'Saved', icon: Tag },
-              { id: 'projects', label: 'Projects', icon: FolderOpen },
-              { id: 'team', label: 'Team', icon: UserCheck },
-              { id: 'notifications', label: 'Alerts', icon: ShieldAlert },
-              { id: 'api-keys', label: 'API Keys', icon: KeyRound },
-              { id: 'billing', label: 'Billing', icon: Palette },
-              { id: 'settings', label: 'Settings', icon: Settings },
-              { id: 'help', label: 'Help', icon: HelpCircle }
-            ].map((tab) => {
+            {(() => {
+              const userTabs = [
+                { id: 'chat', label: 'AI Chat', icon: MessageSquare },
+                { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
+                { id: 'saved-patents', label: 'My Documents', icon: FolderOpen },
+              ];
+              const adminTabs = [
+                { id: 'chat', label: 'AI Chat', icon: MessageSquare },
+                { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
+                { id: 'saved-patents', label: 'My Documents', icon: FolderOpen },
+                { id: 'search', label: 'Patent Search', icon: Search },
+                { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+                { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
+                { id: 'compare', label: 'Compare Patents', icon: Layers },
+                { id: 'projects', label: 'Projects', icon: FolderOpen },
+                { id: 'analytics', label: 'Analytics', icon: Activity },
+                { id: 'settings', label: 'Settings', icon: Settings },
+                { id: 'admin', label: 'Admin Panel', icon: ShieldAlert },
+                { id: 'help', label: 'Help', icon: HelpCircle },
+              ];
+              return (userRole === 'admin' ? adminTabs : userTabs);
+            })().map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
@@ -2410,22 +2192,28 @@ function App() {
 
           {/* Center Nav List */}
           <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
-            {[
-              { id: 'search', label: 'Search', icon: Search },
-              { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-              { id: 'knowledge-graph', label: 'Graph', icon: Network },
-              { id: 'compare', label: 'Compare', icon: Layers },
-              { id: 'upload', label: 'Upload', icon: UploadCloud },
-              { id: 'chat', label: 'Chatbot', icon: MessageSquare },
-              { id: 'saved-patents', label: 'Saved', icon: Tag },
-              { id: 'projects', label: 'Projects', icon: FolderOpen },
-              { id: 'team', label: 'Team', icon: UserCheck },
-              { id: 'notifications', label: 'Alerts', icon: ShieldAlert },
-              { id: 'api-keys', label: 'API Keys', icon: KeyRound },
-              { id: 'billing', label: 'Billing', icon: Palette },
-              { id: 'settings', label: 'Settings', icon: Settings },
-              { id: 'help', label: 'Help', icon: HelpCircle }
-            ].map((tab) => {
+            {(() => {
+              const userTabs = [
+                { id: 'chat', label: 'AI Chat', icon: MessageSquare },
+                { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
+                { id: 'saved-patents', label: 'My Documents', icon: FolderOpen },
+              ];
+              const adminTabs = [
+                { id: 'chat', label: 'AI Chat', icon: MessageSquare },
+                { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
+                { id: 'saved-patents', label: 'My Documents', icon: FolderOpen },
+                { id: 'search', label: 'Patent Search', icon: Search },
+                { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+                { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
+                { id: 'compare', label: 'Compare Patents', icon: Layers },
+                { id: 'projects', label: 'Projects', icon: FolderOpen },
+                { id: 'analytics', label: 'Analytics', icon: Activity },
+                { id: 'settings', label: 'Settings', icon: Settings },
+                { id: 'admin', label: 'Admin Panel', icon: ShieldAlert },
+                { id: 'help', label: 'Help', icon: HelpCircle },
+              ];
+              return (userRole === 'admin' ? adminTabs : userTabs);
+            })().map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
@@ -2448,17 +2236,7 @@ function App() {
 
           {/* Bottom Profile Details Row */}
           <div className="p-4 border-t border-white/10 space-y-3 bg-[#03050F]/60">
-            {/* Sidebar toggle back to Horizontal Dock */}
-            <button
-              onClick={() => {
-                setIsSidebarNavMode(false);
-                localStorage.setItem('sidebar_nav_mode', 'false');
-              }}
-              className="w-full flex items-center justify-center gap-2 py-2 border border-white/10 hover:border-[#00C2FF]/40 rounded-lg text-[10px] font-mono text-slate-350 hover:text-white hover:bg-white/5 transition-all"
-            >
-              <Sliders className="w-3.5 h-3.5" />
-              {!isSidebarCollapsed && <span>TOP FLOATING NAV</span>}
-            </button>
+
 
             {/* Profile User Status */}
             <div onClick={() => setActiveTab('profile')} className="flex items-center gap-3 truncate cursor-pointer hover:opacity-90 transition-opacity" title="View Profile">
@@ -2581,7 +2359,7 @@ function App() {
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-sans leading-relaxed">
-                Transform complex patent research into actionable engineering decisions. Powered by high-speed PaddleOCR text extraction, ChromaDB vector search, and custom Retrieval-Augmented Generation (RAG).
+                Upload your patent or research paper and get instant AI-powered insights, comparisons, and answers about any patent or technical document.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
