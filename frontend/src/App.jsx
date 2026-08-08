@@ -309,6 +309,10 @@ function App() {
 
   // Navigation tab state
   const [activeTab, setActiveTab] = useState('chat');
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [promoSuccessMsg, setPromoSuccessMsg] = useState('');
+  const [isProUnlocked, setIsProUnlocked] = useState(() => localStorage.getItem('pro_unlocked') === 'true');
   const [selectedPatentNumber, setSelectedPatentNumber] = useState('US10922485B2');
   const [comparePatentB, setComparePatentB] = useState('US11450291B1');
 
@@ -2042,10 +2046,10 @@ function App() {
         <div className="flex flex-col items-center gap-6">
           <div 
             onClick={() => setActiveTab('chat')}
-            className="w-10 h-10 rounded-xl bg-[#00F2FE] flex items-center justify-center text-[#050609] font-bold text-lg shadow-[0_0_20px_rgba(0,242,254,0.4)] cursor-pointer hover:scale-105 transition-transform"
+            className="w-10 h-10 rounded-xl overflow-hidden bg-[#12141C] border border-[#00F2FE]/40 flex items-center justify-center shadow-[0_0_20px_rgba(0,242,254,0.3)] cursor-pointer hover:scale-105 transition-transform p-1"
             title="PatentMind AI Workspace"
           >
-            <ArrowUp className="w-5 h-5 rotate-45 stroke-[2.5]" />
+            <img src="/logo.jpg" alt="PatentMind Logo" className="w-full h-full object-cover rounded-lg" />
           </div>
 
           {/* Navigation Icon List */}
@@ -3140,51 +3144,119 @@ function App() {
             <div className="flex-1 space-y-6 flex flex-col justify-center my-auto">
               
               {chatMessages.length === 0 ? (
-                <div className="relative flex flex-col items-center justify-center text-center p-4 space-y-8 max-w-3xl mx-auto my-auto pt-8">
-                  {/* Liquid Backdrop Orb & Metallic Sphere */}
+                <div className="relative flex flex-col items-center justify-center text-center p-4 space-y-7 max-w-3xl mx-auto my-auto pt-6">
+                  {/* Liquid Backdrop Orb */}
                   <div className="liquid-orb-bg"></div>
+
+                  {/* Centered Official PatentMind Logo Emblem Badge */}
+                  <div className="w-16 h-16 rounded-2xl bg-[#12141C] border border-white/10 p-2 shadow-2xl flex items-center justify-center relative z-10">
+                    <img src="/logo.jpg" alt="PatentMind Logo" className="w-full h-full object-cover rounded-xl" />
+                  </div>
                   
-                  <div className="space-y-2 relative z-10 text-left w-full max-w-2xl">
-                    <h1 className="text-4xl md:text-5xl font-heading font-medium tracking-tight text-white leading-tight">
-                      Hey! {username || 'Researcher'}
+                  {/* Greeting Text matching Aether AI template */}
+                  <div className="space-y-1 relative z-10 text-center">
+                    <h1 className="text-3xl md:text-4xl font-heading font-normal tracking-tight text-slate-200">
+                      Good to See You!
                     </h1>
-                    <h2 className="text-4xl md:text-5xl font-heading font-medium tracking-tight text-slate-300 leading-tight">
-                      What can I help with?
+                    <h2 className="text-3xl md:text-4xl font-heading font-medium tracking-tight text-white">
+                      How Can I be an Assistance?
                     </h2>
+                    <p className="text-xs text-slate-400 pt-1 font-sans">
+                      I'm available 24/7 for you, ask me anything.
+                    </p>
                   </div>
 
-                  {/* Quick Category Suggestion Cards matching Template */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl relative z-10">
-                    <div 
-                      onClick={() => setChatInput("Perform semantic prior-art patent search for neural network hardware acceleration")}
-                      className="wrangler-card p-5 text-left space-y-3 cursor-pointer hover:scale-[1.02] transition-transform"
-                    >
-                      <span className="badge-chip-teal">Patent Search</span>
-                      <p className="text-xs text-slate-300 font-sans leading-relaxed">
-                        Search 50M+ patents with AI semantic vector matching
-                      </p>
+                  {/* Floating Prompt Box Container matching Aether AI template */}
+                  <div className="w-full max-w-xl bg-[#12141D] border border-white/10 rounded-2xl p-4 shadow-2xl relative z-10 text-left space-y-3">
+                    {/* Top Status Banner */}
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 font-sans pb-2 border-b border-white/5">
+                      <button onClick={() => setShowUpgradeModal(true)} className="flex items-center gap-1.5 hover:text-white transition-colors">
+                        <Zap className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Unlock more features with the Pro plan.</span>
+                      </button>
+                      <div className="flex items-center gap-1.5 text-emerald-400 font-mono text-[10px]">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>Active extensions</span>
+                      </div>
                     </div>
 
-                    <div 
-                      onClick={() => pdfInputRef.current?.click()}
-                      className="wrangler-card p-5 text-left space-y-3 cursor-pointer hover:scale-[1.02] transition-transform"
-                    >
-                      <span className="badge-chip-coral">Compare Docs</span>
-                      <p className="text-xs text-slate-300 font-sans leading-relaxed">
-                        Upload & compare PDF specification claims
-                      </p>
-                    </div>
+                    {/* Input Field with + button and waveform icon */}
+                    <form onSubmit={handleChatSubmit} className="flex items-center gap-3 bg-black/30 border border-white/5 rounded-xl px-3 py-2">
+                      <button
+                        type="button"
+                        onClick={() => pdfInputRef.current?.click()}
+                        className="text-slate-400 hover:text-white text-lg font-light px-1"
+                        title="Attach PDF Document"
+                      >
+                        +
+                      </button>
+                      <input
+                        type="text"
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        placeholder="Ask anything..."
+                        className="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none py-1"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleVoiceInput(setChatInput, 'chat')}
+                        className="text-slate-400 hover:text-[#00F2FE] p-1"
+                        title="Voice Input"
+                      >
+                        <Volume2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={!chatInput.trim() || chatLoading}
+                        className="w-8 h-8 rounded-lg bg-[#00F2FE] text-[#050609] flex items-center justify-center font-bold hover:scale-105 transition-transform disabled:opacity-40"
+                      >
+                        <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+                      </button>
+                    </form>
 
-                    <div 
-                      onClick={() => setChatInput("Analyze freedom-to-operate strategy and patent infringement risk")}
-                      className="wrangler-card p-5 text-left space-y-3 cursor-pointer hover:scale-[1.02] transition-transform"
-                    >
-                      <span className="badge-chip-lime">Idea Strategy</span>
-                      <p className="text-xs text-slate-300 font-sans leading-relaxed">
-                        Analyze white-space opportunities & FTO strategy
-                      </p>
+                    {/* Bottom Quick Suggestion Pills */}
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setChatInput("Search for recent AI prior-art patents in USPTO database")}
+                        className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-full text-[11px] text-slate-300 flex items-center gap-1.5 transition-all"
+                      >
+                        <User className="w-3 h-3 text-[#00F2FE]" />
+                        <span>Any advice for me?</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => pdfInputRef.current?.click()}
+                        className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-full text-[11px] text-slate-300 flex items-center gap-1.5 transition-all"
+                      >
+                        <FileText className="w-3 h-3 text-[#38BDF8]" />
+                        <span>Upload & compare PDF</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setChatInput("Explain freedom to operate patent strategy")}
+                        className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-full text-[11px] text-slate-300 flex items-center gap-1.5 transition-all"
+                      >
+                        <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Patent strategy lessons</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('search')}
+                        className="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-full text-[11px] text-slate-400"
+                      >
+                        ...
+                      </button>
                     </div>
                   </div>
+
+                  {/* Template Footer */}
+                  <p className="text-[11px] text-slate-500 font-sans relative z-10 pt-4">
+                    Unlock new era with PatentMind AI. <button onClick={() => setShowUpgradeModal(true)} className="underline text-slate-400 hover:text-white">share us</button>
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-6 flex-1 overflow-y-auto glass-panel-sleek rounded-2xl p-6 md:p-8 shadow-2xl">
@@ -4727,7 +4799,95 @@ class ErrorBoundary extends React.Component {
               RECOVER & RELOAD PLATFORM
             </button>
           </div>
+        
+      {/* UPGRADE PRO MODAL WITH PROMO CODE 'BHUSHAN' */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#12141D] border border-white/10 wrangler-card p-6 md:p-8 max-w-md w-full space-y-6 fade-in rounded-3xl shadow-2xl relative">
+            <button
+              onClick={() => setShowUpgradeModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white font-mono text-sm"
+            >
+              ✕
+            </button>
+
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 rounded-2xl bg-[#00F2FE]/10 border border-[#00F2FE]/30 flex items-center justify-center text-[#00F2FE] mx-auto">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-heading font-bold text-white">Upgrade to PatentMind Pro</h3>
+              <p className="text-xs text-slate-400 font-sans">
+                Unlock unlimited AI patent vector search, multi-PDF comparison, and priority RAG reasoning.
+              </p>
+            </div>
+
+            {/* Promo Code Input Section */}
+            <div className="space-y-3 p-4 bg-white/5 border border-white/5 rounded-2xl">
+              <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Have a Promo Code?</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={promoCodeInput}
+                  onChange={(e) => setPromoCodeInput(e.target.value)}
+                  placeholder="Enter code (e.g. bhushan)"
+                  className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-[#00F2FE]/50 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (promoCodeInput.trim().toLowerCase() === 'bhushan') {
+                      setIsProUnlocked(true);
+                      localStorage.setItem('pro_unlocked', 'true');
+                      localStorage.setItem('userRole', 'admin');
+                      setUserRole('admin');
+                      setPromoSuccessMsg('🎉 PROMO CODE "BHUSHAN" APPLIED! LIFETIME PRO & ADMIN UNLOCKED!');
+                    } else {
+                      setPromoSuccessMsg('❌ Invalid promo code. Try "bhushan".');
+                    }
+                  }}
+                  className="px-4 py-2 bg-[#00F2FE] text-[#050609] font-bold rounded-xl text-xs hover:bg-[#38BDF8] transition-all"
+                >
+                  Apply
+                </button>
+              </div>
+              {promoSuccessMsg && (
+                <p className={`text-[11px] font-mono text-center pt-1 ${promoSuccessMsg.includes('APPLIED') ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {promoSuccessMsg}
+                </p>
+              )}
+            </div>
+
+            {/* Features List */}
+            <div className="space-y-2.5 text-xs text-slate-300 font-sans">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-[#00F2FE]" />
+                <span>Unlimited Semantic Patent Searches</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-[#00F2FE]" />
+                <span>Multi-PDF Document Claim Comparison</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-[#00F2FE]" />
+                <span>Full Knowledge Graph & Citation Explorer</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setIsProUnlocked(true);
+                localStorage.setItem('pro_unlocked', 'true');
+                setShowUpgradeModal(false);
+              }}
+              className="w-full py-3 bg-[#00F2FE] text-[#050609] font-bold text-xs rounded-xl hover:bg-[#38BDF8] transition-all shadow-lg"
+            >
+              {isProUnlocked ? 'Close' : 'Activate Pro Membership'}
+            </button>
+          </div>
         </div>
+      )}
+
+</div>
       );
     }
     return this.props.children;
