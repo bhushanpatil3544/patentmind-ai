@@ -471,6 +471,54 @@ export default function App() {
             </div>
           )}
 
+          {/* TAB: SETTINGS & MODEL CONFIG */}
+          {activeTab === 'settings' && (
+            <div className="space-y-6 max-w-3xl mx-auto w-full py-6">
+              <h2 className="text-2xl font-bold text-white">Platform Settings & AI Configuration</h2>
+              
+              <div className="bg-[#12141D] border border-white/10 rounded-2xl p-6 space-y-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-mono text-slate-400 uppercase tracking-wider block">Preferred LLM Inference Engine</label>
+                  <select
+                    defaultValue="ollama"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#00F2FE]/50"
+                  >
+                    <option value="ollama">Ollama Llama 3 (Local Primary Engine)</option>
+                    <option value="groq">Groq Llama 3 (Cloud Fast Inference)</option>
+                    <option value="openai">OpenAI GPT-4o (Cloud Deep Reasoning)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-mono text-slate-400 uppercase tracking-wider block">Voice & Output Language</label>
+                  <select
+                    defaultValue="English"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#00F2FE]/50"
+                  >
+                    <option value="English">English (US)</option>
+                    <option value="Hindi">Hindi (India)</option>
+                    <option value="Marathi">Marathi (India)</option>
+                    <option value="Spanish">Spanish (Spain)</option>
+                    <option value="French">French (France)</option>
+                  </select>
+                </div>
+
+                <div className="pt-4 border-t border-white/10 flex justify-between items-center">
+                  <div>
+                    <span className="text-xs font-semibold text-white block">Account Pro Membership</span>
+                    <span className="text-[10px] text-slate-400">{isProUnlocked ? 'Active Unlimited Pro Membership' : 'Free Trial Tier'}</span>
+                  </div>
+                  <button
+                    onClick={() => setShowUpgradeModal(true)}
+                    className="px-4 py-2 bg-[#00F2FE] text-[#050609] font-bold text-xs rounded-xl hover:bg-[#38BDF8] transition-all"
+                  >
+                    {isProUnlocked ? 'Manage Membership' : 'Upgrade to Pro'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* TAB 4: ADMIN CONTROL PANEL */}
           {activeTab === 'admin' && (
             <div className="space-y-6 max-w-5xl mx-auto w-full py-8">
