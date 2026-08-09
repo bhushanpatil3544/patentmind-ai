@@ -2059,12 +2059,10 @@ function App() {
               const userTabs = [
                 { id: 'chat', label: 'AI Chat', icon: MessageSquare },
                 { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
-                { id: 'saved-patents', label: 'My Documents', icon: FolderOpen },
               ];
               const adminTabs = [
                 { id: 'chat', label: 'AI Chat', icon: MessageSquare },
                 { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
-                { id: 'saved-patents', label: 'My Documents', icon: FolderOpen },
                 { id: 'search', label: 'Patent Search', icon: Search },
                 { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
                 { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
@@ -2196,12 +2194,10 @@ function App() {
               const userTabs = [
                 { id: 'chat', label: 'AI Chat', icon: MessageSquare },
                 { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
-                { id: 'saved-patents', label: 'My Documents', icon: FolderOpen },
               ];
               const adminTabs = [
                 { id: 'chat', label: 'AI Chat', icon: MessageSquare },
                 { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
-                { id: 'saved-patents', label: 'My Documents', icon: FolderOpen },
                 { id: 'search', label: 'Patent Search', icon: Search },
                 { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
                 { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
