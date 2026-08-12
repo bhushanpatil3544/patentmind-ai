@@ -2,7 +2,8 @@
   "framework": "vite",
   "functions": {
     "api/index.py": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": "api/*.json"
     }
   },
   "buildCommand": "cd frontend && npm install && npm run build",
