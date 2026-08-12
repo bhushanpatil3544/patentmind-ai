@@ -1171,6 +1171,16 @@ function App() {
     }
   };
 
+  const cleanAiResponse = (text) => {
+    if (!text) return '';
+    let cleaned = text
+      .replace(/Bhushan\s*Shelke/gi, '')
+      .replace(/Bhushan/gi, '')
+      .replace(/Shelke/gi, '');
+    cleaned = cleaned.replace(/\n+\s*(Regards|Best regards|Sincerely|Warm regards|Thanks|Thank you|Yours truly|—|-|\*|#)\s*,?\s*$/gi, '');
+    return cleaned.trim();
+  };
+
   const handleChatSend = async (e) => {
     e.preventDefault();
     if (!chatInput.trim() || chatLoading) return;
@@ -1204,7 +1214,7 @@ function App() {
       if (response.ok) {
         setChatMessages(prev => [...prev, {
           role: 'assistant',
-          content: data.answer,
+          content: cleanAiResponse(data.answer),
           citations: data.retrieved_chunks || [],
           latency: data.latency_sec,
           active_llm: data.active_llm,
@@ -1251,7 +1261,7 @@ function App() {
       if (response.ok) {
         setChatMessages(prev => [...prev, {
           role: 'assistant',
-          content: `📊 **PDF Specification Analysis Complete** for **${file.name}**:\n\n${data.ai_analysis}`,
+          content: `📊 **PDF Specification Analysis Complete** for **${file.name}**:\n\n${cleanAiResponse(data.ai_analysis)}`,
           citations: data.matched_patents ? data.matched_patents.map(p => ({
             metadata: { patent_number: p.patent_number, title: p.title, section: p.sections ? p.sections.join(', ') : 'Patent Match' },
             score: p.avg_score,
