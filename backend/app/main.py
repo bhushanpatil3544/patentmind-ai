@@ -10,6 +10,7 @@ import requests
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query, Depends, status, Response
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -1762,3 +1763,30 @@ def list_patents(current_user: dict = Depends(get_current_user)):
     List all registered patents (Secured).
     """
     return relational_db.list_patents_meta()
+
+
+@app.get("/api/v1/patents/{patent_id}/pdf")
+def download_actual_patent_pdf(patent_id: str):
+    """
+    Returns the actual raw original PDF patent document from storage or redirects to official Google Patents.
+    """
+    clean_id = patent_id.strip()
+    if not clean_id.endswith(".pdf"):
+        pdf_filename = f"{clean_id}.pdf"
+    else:
+        pdf_filename = clean_id
+        clean_id = clean_id[:-4]
+
+    s3_dir = Config.S3_MOCK_DIR
+    local_pdf_path = os.path.join(s3_dir, pdf_filename)
+
+    if os.path.exists(local_pdf_path):
+        return FileResponse(
+            path=local_pdf_path,
+            filename=pdf_filename,
+            media_type="application/pdf"
+        )
+    
+    # Fallback to Google Patents official URL
+    google_patent_url = f"https://patents.google.com/patent/{clean_id}/en"
+    return RedirectResponse(url=google_patent_url)
