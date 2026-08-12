@@ -1768,8 +1768,8 @@ def list_patents(current_user: dict = Depends(get_current_user)):
 @app.get("/api/v1/patents/{patent_id}/pdf")
 def download_actual_patent_pdf(patent_id: str):
     """
-    Returns the actual raw original PDF patent document from storage,
-    or generates a comprehensive AI-powered patent brief report.
+    Returns the actual raw original PDF patent document from storage (local),
+    or redirects directly to your Google Drive patent repository.
     """
     clean_id = patent_id.strip()
     if not clean_id.endswith(".pdf"):
@@ -1789,138 +1789,6 @@ def download_actual_patent_pdf(patent_id: str):
             media_type="application/pdf"
         )
 
-    # 2. Collect patent data from vector store
-    chunks_found = []
-    title = "Patent Specification"
-    try:
-        if rag_chain and rag_chain.db:
-            query_vec = rag_chain.embedder.embed_query(clean_id)
-            all_results = rag_chain.db.search(query_vec, limit=50)
-            for chunk in all_results:
-                meta = chunk.get("metadata", {})
-                if meta.get("patent_number", "") == clean_id:
-                    chunks_found.append(chunk)
-            if not chunks_found:
-                for chunk in all_results:
-                    meta = chunk.get("metadata", {})
-                    pnum = meta.get("patent_number", "")
-                    if clean_id in pnum or pnum in clean_id:
-                        chunks_found.append(chunk)
-    except Exception as e:
-        logger.warning(f"Vector store search for patent {clean_id} failed: {e}")
-
-    if chunks_found:
-        first_meta = chunks_found[0].get("metadata", {})
-        title = first_meta.get("title", "Patent Specification")
-
-    # 3. Build raw context from chunks
-    raw_context = ""
-    sections_data = []
-    for idx, chunk in enumerate(chunks_found[:10], 1):
-        meta = chunk.get("metadata", {})
-        section = meta.get("section", "General")
-        claim_num = meta.get("claim_number", "")
-        text = chunk.get("text", "")
-        sections_data.append({"section": section, "claim_num": claim_num, "text": text})
-        raw_context += f"[Section: {section}] {text}\n"
-
-    # 4. Use Groq LLM to generate brief patent summary
-    ai_brief = ""
-    if raw_context.strip() and rag_chain and rag_chain.groq_key:
-        brief_prompt = f"""You are a patent analyst. Generate a comprehensive brief report for the following patent.
-Use this exact format with clear sections:
-
-1. EXECUTIVE SUMMARY (2-3 sentences overview of the patent)
-2. KEY INNOVATION (What is the core novel contribution?)
-3. TECHNICAL DOMAIN (Which technology area does this patent belong to?)
-4. PROBLEM SOLVED (What problem does this invention address?)
-5. CLAIMS ANALYSIS (Summarize the key independent and dependent claims)
-6. POTENTIAL APPLICATIONS (List 3-5 real-world commercial applications)
-7. COMPETITIVE LANDSCAPE (How does this compare to existing solutions?)
-
-Patent Number: {clean_id}
-Patent Title: {title}
-
-Patent Specification Data:
-{raw_context[:4000]}
-
-Generate a detailed, professional brief report:"""
-
-        groq_url = "https://api.groq.com/openai/v1/chat/completions"
-        groq_headers = {"Authorization": f"Bearer {rag_chain.groq_key}", "Content-Type": "application/json"}
-        for g_model in rag_chain.groq_models:
-            try:
-                payload = {
-                    "model": g_model,
-                    "messages": [
-                        {"role": "system", "content": "You are a senior patent analyst generating professional patent brief reports."},
-                        {"role": "user", "content": brief_prompt}
-                    ],
-                    "temperature": 0.3,
-                    "max_tokens": 2048
-                }
-                resp = requests.post(groq_url, headers=groq_headers, json=payload, timeout=15.0)
-                if resp.status_code == 200:
-                    ai_brief = resp.json()["choices"][0]["message"]["content"].strip()
-                    break
-                else:
-                    logger.warning(f"Groq brief model {g_model} status {resp.status_code}")
-            except Exception as g_err:
-                logger.warning(f"Groq brief model {g_model} error: {g_err}")
-
-    # 5. Build final downloadable report
-    report_lines = []
-    report_lines.append("=" * 70)
-    report_lines.append("        PATENTMIND AI - PATENT BRIEF REPORT")
-    report_lines.append("=" * 70)
-    report_lines.append("")
-    report_lines.append(f"  PATENT NUMBER  : {clean_id}")
-    report_lines.append(f"  TITLE          : {title}")
-    report_lines.append(f"  REPORT DATE    : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    report_lines.append(f"  DATA SOURCE    : PatentMind AI Vector Store")
-    report_lines.append(f"  ANALYSIS BY    : Groq Cloud LLM (AI-Powered)")
-    report_lines.append("")
-    report_lines.append("=" * 70)
-
-    if ai_brief:
-        report_lines.append("")
-        report_lines.append("~" * 70)
-        report_lines.append("  AI-GENERATED PATENT BRIEF")
-        report_lines.append("~" * 70)
-        report_lines.append("")
-        report_lines.append(ai_brief)
-        report_lines.append("")
-
-    if sections_data:
-        report_lines.append("-" * 70)
-        report_lines.append("  RAW PATENT SPECIFICATION EXCERPTS")
-        report_lines.append("-" * 70)
-        report_lines.append("")
-        for idx, sec in enumerate(sections_data, 1):
-            report_lines.append(f"  [{idx}] Section: {sec['section']}")
-            if sec['claim_num']:
-                report_lines.append(f"      Claim #: {sec['claim_num']}")
-            report_lines.append("")
-            report_lines.append(f"      {sec['text']}")
-            report_lines.append("")
-            report_lines.append("      " + "- " * 30)
-            report_lines.append("")
-
-    report_lines.append("=" * 70)
-    report_lines.append("  CONFIDENTIALITY NOTICE")
-    report_lines.append("  This report is generated by PatentMind AI Enterprise Platform.")
-    report_lines.append("  For official patent documents, visit USPTO or WIPO databases.")
-    report_lines.append("")
-    report_lines.append("  Regards, Bhushan Shelke")
-    report_lines.append("  PatentMind AI | AI-Powered Patent Intelligence")
-    report_lines.append("=" * 70)
-
-    report_content = "\n".join(report_lines)
-    return Response(
-        content=report_content,
-        media_type="text/plain; charset=utf-8",
-        headers={
-            "Content-Disposition": f'attachment; filename="Patent_{clean_id}_Brief_Report.txt"'
-        }
-    )
-
+    # 2. Redirect directly to Google Drive Repository containing all 724+ original patent PDFs
+    drive_folder_url = "https://drive.google.com/drive/folders/1m992HmbkJkY3X7LCeIGpo9b_7xpHrH8U"
+    return RedirectResponse(url=drive_folder_url)
