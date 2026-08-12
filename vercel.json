@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 30
+    }
+  },
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "rewrites": [
@@ -7,7 +12,7 @@
       "destination": "/api/index.py"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api|assets|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]
