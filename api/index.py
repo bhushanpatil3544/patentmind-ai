@@ -130,3 +130,37 @@ def analytics_overview():
             {"field": "LLM Patent Information Extraction", "count": 185, "percentage": 25.5, "status": "HIGH ACTIVITY"}
         ]
     }
+
+@app.get("/")
+@app.get("/login")
+@app.get("/chat")
+def serve_frontend_ui():
+    possible_paths = [
+        os.path.join(os.path.dirname(__file__), "..", "frontend", "dist", "index.html"),
+        os.path.join(os.path.dirname(__file__), "dist", "index.html"),
+        os.path.join(os.getcwd(), "frontend", "dist", "index.html")
+    ]
+    for p in possible_paths:
+        if os.path.exists(p):
+            with open(p, "r", encoding="utf-8") as f:
+                return Response(content=f.read(), media_type="text/html")
+    
+    # Inline Fail-safe HTML fallback
+    fallback_html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatentMind AI — Enterprise Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#050816] text-white flex items-center justify-center min-h-screen">
+    <div class="max-w-md p-8 bg-[#111111] rounded-2xl border border-white/10 text-center space-y-4 shadow-2xl">
+        <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-lg mx-auto">P</div>
+        <h1 class="text-xl font-bold">PatentMind AI Platform</h1>
+        <p class="text-xs text-slate-400">Enterprise AI for patent analysis & claim verification.</p>
+        <a href="https://patentmind-ai-p6qx.vercel.app" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold">Refresh Platform</a>
+    </div>
+</body>
+</html>"""
+    return Response(content=fallback_html, media_type="text/html")
