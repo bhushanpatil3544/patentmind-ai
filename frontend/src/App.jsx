@@ -1775,8 +1775,9 @@ function App() {
 
   if (!token) {
     return (
-            {/* MOBILE TOP HEADER BAR WITH DRAWER TOGGLE (for smartphones & small screens) */}
-      <div className="md:hidden bg-[#050816] border-b border-white/10 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+      <div className="min-h-screen flex flex-col bg-[#050816]">
+        {/* MOBILE TOP HEADER BAR WITH DRAWER TOGGLE (for smartphones & small screens) */}
+        <div className="md:hidden bg-[#050816] border-b border-white/10 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#5B7CFA] to-[#00C2FF] flex items-center justify-center text-white font-bold text-xs">P</div>
           <span className="font-heading font-bold text-sm text-white">PatentMind AI</span>
@@ -2058,6 +2059,7 @@ function App() {
             © 2026 PatentMind AI. All rights reserved.
           </p>
         </div>
+      </div>
       </div>
     );
   }
