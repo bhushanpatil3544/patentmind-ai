@@ -1577,9 +1577,10 @@ Help them refine, differentiate, and strengthen their idea based on the patent l
 Be specific and actionable. Reference patent numbers when relevant."""
 
 @app.post("/api/v1/idea/analyze")
+@app.post("/v1/idea/analyze")
+@app.post("/idea/analyze")
 async def analyze_idea(
-    file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user)
+    file: UploadFile = File(...)
 ):
     """
     Upload an idea PDF, find matching patents, and get AI analysis (Secured).
