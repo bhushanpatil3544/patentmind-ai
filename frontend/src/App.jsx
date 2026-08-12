@@ -126,7 +126,8 @@ function App() {
 
   const isAdminUser = () => {
     const u = (username || '').toLowerCase().trim();
-    return true; // Admin Control tab enabled for system administration
+    const r = (userRole || authRole || '').toLowerCase().trim();
+    return u === 'bhushan' || u === 'admin' || r === 'admin';
   };
 
   // Gmail OTP Registration states
@@ -1768,7 +1769,25 @@ function App() {
 
   if (!token) {
     return (
-      <div className="app-wrapper bg-[#050816] flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans">
+            {/* MOBILE TOP HEADER BAR WITH DRAWER TOGGLE (for smartphones & small screens) */}
+      <div className="md:hidden bg-[#050816] border-b border-white/10 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#5B7CFA] to-[#00C2FF] flex items-center justify-center text-white font-bold text-xs">P</div>
+          <span className="font-heading font-bold text-sm text-white">PatentMind AI</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            className="p-2 rounded-lg bg-white/5 border border-white/10 text-zinc-300 hover:text-white"
+            title="Toggle Menu"
+          >
+            <MoreHorizontal className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+<div className="app-wrapper bg-[#050816] flex items-center justify-center p-6 min-h-screen relative overflow-hidden font-sans">
         {/* Background Ambient */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
           <div className="absolute top-[-10%] left-[15%] w-[650px] h-[650px] rounded-full bg-[#5B7CFA]/15 blur-[160px] animate-pulse" />
@@ -2069,14 +2088,21 @@ function App() {
           {/* Center Horizontal Navigation Menu */}
           <nav className="flex items-center gap-1 md:gap-1.5 overflow-x-auto py-1 px-1 no-scrollbar">
             {(() => {
+              const isUserAdmin = isAdminUser();
               const userTabs = [
                 { id: 'chat', label: 'AI Chat', icon: MessageSquare },
+                { id: 'search', label: 'Patent Search', icon: Search },
                 { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
+                { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
+                { id: 'compare', label: 'Compare Patents', icon: Layers },
+                { id: 'projects', label: 'Projects', icon: FolderOpen },
+                { id: 'settings', label: 'Settings', icon: Settings },
+                { id: 'help', label: 'Help', icon: HelpCircle },
               ];
               const adminTabs = [
                 { id: 'chat', label: 'AI Chat', icon: MessageSquare },
-                { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
                 { id: 'search', label: 'Patent Search', icon: Search },
+                { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
                 { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
                 { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
                 { id: 'compare', label: 'Compare Patents', icon: Layers },
@@ -2086,7 +2112,7 @@ function App() {
                 { id: 'admin', label: 'Admin Panel', icon: ShieldAlert },
                 { id: 'help', label: 'Help', icon: HelpCircle },
               ];
-              return (userRole === 'admin' ? adminTabs : userTabs);
+              return (isUserAdmin ? adminTabs : userTabs);
             })().map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -2204,14 +2230,21 @@ function App() {
           {/* Center Nav List */}
           <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
             {(() => {
+              const isUserAdmin = isAdminUser();
               const userTabs = [
                 { id: 'chat', label: 'AI Chat', icon: MessageSquare },
+                { id: 'search', label: 'Patent Search', icon: Search },
                 { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
+                { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
+                { id: 'compare', label: 'Compare Patents', icon: Layers },
+                { id: 'projects', label: 'Projects', icon: FolderOpen },
+                { id: 'settings', label: 'Settings', icon: Settings },
+                { id: 'help', label: 'Help', icon: HelpCircle },
               ];
               const adminTabs = [
                 { id: 'chat', label: 'AI Chat', icon: MessageSquare },
-                { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
                 { id: 'search', label: 'Patent Search', icon: Search },
+                { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
                 { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
                 { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
                 { id: 'compare', label: 'Compare Patents', icon: Layers },
@@ -2221,7 +2254,7 @@ function App() {
                 { id: 'admin', label: 'Admin Panel', icon: ShieldAlert },
                 { id: 'help', label: 'Help', icon: HelpCircle },
               ];
-              return (userRole === 'admin' ? adminTabs : userTabs);
+              return (isUserAdmin ? adminTabs : userTabs);
             })().map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
