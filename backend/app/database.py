@@ -333,34 +333,34 @@ class DatabaseManager:
                 logger.info("Seeding default patent records for RAG search fallback...")
                 default_patents = [
                     (
-                        "LD-260715330V1",
-                        "Xiaomi-Robotics-1: Scaling Vision-Language-Action Models with over 100K Hours of Real-World Trajectories",
-                        "We present Xiaomi-Robotics-1, a foundational vision-language-action (VLA) model capable of (1) following diverse language instructions to perform a wide range of mobile manipulation tasks in unseen environments out-of-the-box, and (2) efficiently adapting to novel downstream tasks.",
+                        "BS-29132143-02",
+                        "System and Method for Quantum Computing Optimization",
+                        "A computer-implemented system and technical method for quantum computing optimization. Features high-dimensional vector representations, automated qubit circuit alignment, and real-time error mitigation.",
                         "2026-07-26",
-                        '["Xiaomi Robotics Team", "Jun Guo", "Piaopiao Jin", "Jason Li"]',
-                        '["G06F 17/30"]',
+                        '["Dr. Marcus Vance", "Dr. Elena Rostova"]',
+                        '["G06N 10/00"]',
                         "USPTO",
-                        "s3://patentmind-vault/pdfs/LD-260715330V1.pdf"
+                        "s3://patentmind-vault/pdfs/BS-29132143-02.pdf"
                     ),
                     (
-                        "LD-260710151V1",
-                        "MC-RAG System: A Structure-Driven RAG System for Multi-Constraint Queries",
-                        "MC-RAG System: A Structure-Driven RAG System for Multi-Constraint Queries. We propose a structure-driven Retrieval-Augmented Generation system that efficiently formats and optimizes multi-constraint database queries using structural parsing.",
-                        "2026-07-26",
-                        '["Xiao Zhang", "Yang Wan", "Yi Li", "Miao Xie", "Chunli Lv"]',
-                        '["G06F 17/30"]',
+                        "LD-07060550V1",
+                        "Convolutional Spatial Feature Alignment for Autonomous Vision Systems",
+                        "Convolutional spatial feature alignment for autonomous vehicle vision systems integrating multi-camera optical feeds with LiDAR point clouds for real-time object detection and trajectory planning.",
+                        "2026-06-15",
+                        '["Dr. Aris Thorne", "Dr. Ananya Patel"]',
+                        '["G06V 20/56"]',
                         "USPTO",
-                        "s3://patentmind-vault/pdfs/LD-260710151V1.pdf"
+                        "s3://patentmind-vault/pdfs/LD-07060550V1.pdf"
                     ),
                     (
-                        "LD-260707612V1",
-                        "Towards Agentic AI Governance: A Preliminary Assessment",
-                        "Artificial intelligence is rapidly evolving from generative systems to agentic AI capable of autonomously planning and executing complex, multi-step actions. This patent outlines preliminary compliance and governance metrics for autonomous agents.",
-                        "2026-06-02",
-                        '["Mr Mubarak Raji", "Masooda Bashir"]',
-                        '["G06F 17/30"]',
+                        "LD-08081458V2",
+                        "AI-Assisted Genomics Sequence Alignment and Variant Identification",
+                        "Deep learning pipeline for high-throughput genomic read alignment, DNA sequence analysis, and variant identification with sub-second retrieval latency.",
+                        "2026-05-20",
+                        '["Prof. Rajesh Kumar", "Dr. Elena Rostova"]',
+                        '["G16B 20/00"]',
                         "USPTO",
-                        "s3://patentmind-vault/pdfs/LD-260707612V1.pdf"
+                        "s3://patentmind-vault/pdfs/LD-08081458V2.pdf"
                     )
                 ]
                 for p in default_patents:

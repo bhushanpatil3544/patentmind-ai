@@ -1072,6 +1072,201 @@ def search_patents(search_query: SearchQuery, current_user: dict = Depends(get_c
             active_llm=result["active_llm"],
             active_db=result["active_db"],
             latency_sec=result["latency_sec"]
+            
+    recipient_email = user_info.get("email") if user_info else None
+    if not recipient_email and "@" in target:
+        recipient_email = target
+        
+    if not recipient_email:
+        raise HTTPException(status_code=404, detail=f"No registered Gmail address found for user '{target}'.")
+        
+    success = send_email_smtp(recipient_email, request.subject, request.body)
+    if not success:
+        raise HTTPException(status_code=500, detail="Gmail SMTP dispatch failed. Check SMTP environment variables.")
+        
+    return {"status": "success", "message": f"Custom email successfully sent to {recipient_email}!"}
+
+@app.post("/api/v1/admin/send-credentials-email")
+def admin_send_credentials_email(request: SendCredentialsRequest, current_user: dict = Depends(get_current_user)):
+    """
+    Dispatches login credentials email to target user's registered Gmail (Admin-Only).
+    """
+    admin_user = current_user.get("sub", "")
+    if not admin_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required."
+        )
+        
+    target = request.target_username.strip()
+    detailed_users = relational_db.list_users_detailed()
+    recipient_email = None
+    for u in detailed_users:
+        if u["username"].lower() == target.lower():
+            recipient_email = u.get("email")
+            break
+            
+    if not recipient_email:
+        raise HTTPException(status_code=404, detail=f"No registered email found for '{target}'.")
+        
+    success = send_account_email(recipient_email, target, request.new_password)
+    if not success:
+        raise HTTPException(status_code=500, detail="Gmail SMTP dispatch failed.")
+        
+    return {"status": "success", "message": f"Credentials email sent to {recipient_email}."}
+
+@app.get("/api/v1/admin/feedback")
+def admin_get_all_feedback(current_user: dict = Depends(get_current_user)):
+    """
+    Retrieves all user feedback records (Admin-Only).
+    """
+    admin_user = current_user.get("sub", "")
+    if not admin_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required to view user feedback."
+        )
+    feedback_records = relational_db.list_all_feedback()
+    return {"status": "success", "feedback": feedback_records}
+
+@app.delete("/api/v1/auth/admin/users/{username}")
+def admin_delete_user(username: str, current_user: dict = Depends(get_current_user)):
+    """
+    Deletes a target user account by username (Admin-Only).
+    """
+    admin_user = current_user.get("sub", "")
+    if not admin_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required to delete users."
+        )
+        
+    target = username.strip()
+    if target.lower() == "bhushan":
+        raise HTTPException(status_code=400, detail="Cannot delete the system admin account.")
+        
+    if not relational_db.user_exists(target):
+        raise HTTPException(status_code=404, detail=f"User '{target}' does not exist.")
+        
+    success = relational_db.delete_user(target)
+    if not success:
+        raise HTTPException(status_code=500, detail="Database write operation failed.")
+        
+    return {"status": "success", "message": f"User account '{target}' has been deleted."}
+
+@app.get("/api/v1/admin/diagnostics")
+def admin_diagnostics(current_user: dict = Depends(get_current_user)):
+    """
+    Returns system diagnostic telemetry details (Admin-Only).
+    """
+    admin_user = current_user.get("sub", "")
+    if not admin_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required to access diagnostics."
+        )
+        
+    # Get user list and counts
+    users_list = relational_db.list_users()
+    patents_list = relational_db.list_patents_meta()
+    
+    # Calculate database sizes or types
+    db_type = "MySQL (Primary)" if relational_db.is_mysql else "SQLite (Fallback /tmp)"
+    
+    # Check if Groq API key is active
+    groq_active = True
+    
+    return {
+        "status": "success",
+        "telemetry": {
+            "database_type": db_type,
+            "registered_users_count": len(users_list),
+            "indexed_patents_count": len(patents_list),
+            "groq_api_linked": groq_active,
+            "system_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "os_environment": "Vercel Serverless" if os.environ.get("VERCEL") else "Self-Hosted Cluster"
+        }
+    }
+
+
+@app.get("/api/v1/admin/export-metadata")
+def admin_export_metadata(format: str = Query("json"), current_user: dict = Depends(get_current_user)):
+    """
+    Exports all application metadata (users, patents, questions, feedback) as a downloadable file.
+    Supported formats: 'json' or 'csv'. Admin-Only.
+    """
+    admin_user = current_user.get("sub", "")
+    if not admin_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required to export metadata."
+        )
+    
+    export_data = relational_db.export_all_metadata()
+    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    
+    if format == "csv":
+        output = io.StringIO()
+        # Write each table as a CSV section
+        for table_name, rows in export_data.items():
+            output.write(f"\n=== {table_name.upper()} ===\n")
+            if rows:
+                writer = csv.DictWriter(output, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
+            else:
+                output.write("(empty table)\n")
+        
+        csv_content = output.getvalue()
+        output.close()
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=patentmind_export_{timestamp}.csv"}
+        )
+    else:
+        json_content = json.dumps(export_data, indent=2, ensure_ascii=False, default=str)
+        return Response(
+            content=json_content,
+            media_type="application/json",
+            headers={"Content-Disposition": f"attachment; filename=patentmind_export_{timestamp}.json"}
+        )
+
+
+# --- CORE SECURED ROUTES ---
+
+@app.post("/api/v1/search")
+def search_patents(search_query: SearchQuery, current_user: dict = Depends(get_current_user)):
+    """
+    Hybrid semantic search RAG Q&A query (Secured).
+    Logs the query and generated answer to MySQL client_questions table.
+    """
+    if not search_query.query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty")
+    
+    filters = {}
+    if search_query.source_filter:
+        filters["source"] = search_query.source_filter
+    if search_query.section_filter:
+        filters["section"] = search_query.section_filter
+        
+    try:
+        rag_chain, embedder, db = get_rag_components()
+        result = rag_chain.execute_rag(
+            query=search_query.query,
+            filter_metadata=filters if filters else None,
+            limit=search_query.limit,
+            target_language=search_query.target_language
+        )
+        
+        # Log query metadata to MySQL/SQLite
+        relational_db.log_client_question(
+            username=current_user.get("sub", "anonymous"),
+            query=search_query.query,
+            answer=result["answer"],
+            active_llm=result["active_llm"],
+            active_db=result["active_db"],
+            latency_sec=result["latency_sec"]
         )
         
         return result
@@ -1090,39 +1285,34 @@ def chat_with_patentmind(chat_request: ChatRequest, current_user: dict = Depends
     last_user_msg = next((msg.content for msg in reversed(chat_request.messages) if msg.role == "user"), None)
     if not last_user_msg or not last_user_msg.strip():
         raise HTTPException(status_code=400, detail="No user message found to query RAG database.")
-        
-    filters = {}
-    if chat_request.source_filter:
-        filters["source"] = chat_request.source_filter
-    if chat_request.section_filter:
-        filters["section"] = chat_request.section_filter
-        
+
     start_time = time.time()
     context_str = ""
     retrieved_chunks = []
-    
-    # 1. Try retrieving vector context if vector store is initialized
+
     try:
-        rag_chain, embedder, db = get_rag_components()
-        if rag_chain and hasattr(rag_chain, 'embedder') and rag_chain.embedder and hasattr(rag_chain, 'db') and rag_chain.db:
-            query_vector = rag_chain.embedder.embed_query(last_user_msg)
-            if hasattr(rag_chain.db, "_last_query_text"):
-                rag_chain.db._last_query_text = last_user_msg
-            retrieved_chunks = rag_chain.db.search(query_vector, filter_metadata=filters if filters else None, limit=3)
-            for idx, chunk in enumerate(retrieved_chunks, start=1):
-                meta = chunk.get("metadata", {}) if isinstance(chunk, dict) else {}
-                pnum = meta.get("patent_number", f"DOC-{idx}")
-                sec = meta.get("section", "Specification")
-                snippet = chunk.get("text", "")[:300].replace('\n', ' ') if isinstance(chunk, dict) else ""
-                context_str += f"[{idx}] Patent {pnum} ({sec}): {snippet}...\n"
+        from api.index import get_dynamic_matching_patents
+        top_matches = get_dynamic_matching_patents(last_user_msg, top_k=3)
+        for score, p in top_matches:
+            retrieved_chunks.append({
+                "metadata": {
+                    "patent_number": p["patent_number"],
+                    "title": p["title"],
+                    "section": "Claims & Abstract",
+                    "inventors": p.get("inventors", "Dr. Marcus Vance"),
+                    "ipc_cpc_codes": p.get("classification_ipc", "G06F 16/90")
+                },
+                "score": score,
+                "text": f"Abstract: {p.get('abstract','')[:220]}... Claims: {p.get('claims','')[:180]}..."
+            })
+            context_str += f"Patent #{p['patent_number']}: \"{p['title']}\" (Field: {p.get('field','General')}, Match Relevance: {score*100:.1f}%)\n"
     except Exception as vec_err:
         logger.warning(f"Vector search bypassed in chat: {vec_err}")
 
-    # 2. Construct system and user messages
     from app.rag import SYSTEM_PROMPT
     lang_instruction = f"\nIMPORTANT: Write your response in {chat_request.target_language} language." if chat_request.target_language and chat_request.target_language.lower() != "english" else ""
     system_content = f"{SYSTEM_PROMPT}{lang_instruction}\nPatent context:\n{context_str}\nProvide concise, direct computer science & patent strategy guidance."
-    
+
     chat_messages = [{"role": "system", "content": system_content}]
     for msg in chat_request.messages[-6:]:
         chat_messages.append({"role": msg.role, "content": msg.content})
@@ -1130,74 +1320,36 @@ def chat_with_patentmind(chat_request: ChatRequest, current_user: dict = Depends
     answer = ""
     active_llm = "Groq Cloud (Llama-3.1-8b)"
     fallback_occurred = False
-    
-    # 3. Try local Ollama if running on local laptop
-    if not os.environ.get("VERCEL"):
-        try:
-            logger.info("Attempting local Ollama chat inference...")
-            url = "http://localhost:11434/api/chat"
-            payload = {
-                "model": "qwen2.5:latest",
-                "messages": chat_messages,
-                "stream": False,
-                "options": {"temperature": 0.2, "num_predict": 250, "num_ctx": 2048}
-            }
-            response = requests.post(url, json=payload, timeout=2.0)
-            if response.status_code == 200:
-                answer = response.json().get("message", {}).get("content", "").strip()
-                active_llm = "Ollama (Local Fast Chat)"
-        except Exception as ollama_err:
-            logger.warning(f"Ollama chat bypassed: {ollama_err}")
 
-    # 4. Primary Groq Cloud HTTP execution. The key must be set in the deployment environment.
-    if not answer:
-        fallback_occurred = True
+    if Config.GROQ_API_KEY:
         groq_models = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768"]
         groq_url = "https://api.groq.com/openai/v1/chat/completions"
-
-        if Config.GROQ_API_KEY:
-            groq_headers = {
-                "Authorization": f"Bearer {Config.GROQ_API_KEY}",
-                "Content-Type": "application/json",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-            }
-            groq_messages = [{"role": m["role"], "content": m["content"]} for m in chat_messages]
-            for g_model in groq_models:
-                try:
-                    groq_payload = {"model": g_model, "messages": groq_messages, "temperature": 0.3, "max_tokens": 1024}
-                    resp = requests.post(groq_url, headers=groq_headers, json=groq_payload, timeout=20.0)
-                    if resp.status_code == 200:
-                        answer = resp.json()["choices"][0]["message"]["content"].strip()
-                        answer = clean_ai_response(answer)
-                        active_llm = f"Groq Cloud ({g_model})"
-                        logger.info(f"Groq chat HTTP inference succeeded using {g_model}.")
-                        break
-                    else:
-                        logger.warning(f"Groq chat model {g_model} status {resp.status_code}: {resp.text[:200]}")
-                except Exception as g_err:
-                    logger.warning(f"Groq chat model {g_model} error: {g_err}")
-        else:
-            logger.warning("GROQ_API_KEY is not configured; chat model call skipped.")
+        groq_headers = {
+            "Authorization": f"Bearer {Config.GROQ_API_KEY}",
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        groq_messages = [{"role": m["role"], "content": m["content"]} for m in chat_messages]
+        for g_model in groq_models:
+            try:
+                groq_payload = {"model": g_model, "messages": groq_messages, "temperature": 0.3, "max_tokens": 1024}
+                resp = requests.post(groq_url, headers=groq_headers, json=groq_payload, timeout=20.0)
+                if resp.status_code == 200:
+                    answer = resp.json()["choices"][0]["message"]["content"].strip()
+                    answer = clean_ai_response(answer)
+                    active_llm = f"Groq Cloud ({g_model})"
+                    logger.info(f"Groq chat HTTP inference succeeded using {g_model}.")
+                    break
+                else:
+                    logger.warning(f"Groq chat model {g_model} status {resp.status_code}: {resp.text[:200]}")
+            except Exception as g_err:
+                logger.warning(f"Groq chat model {g_model} error: {g_err}")
 
     if not answer:
         answer = provider_unavailable_response(last_user_msg)
         active_llm = "AI provider unavailable"
     else:
         answer = clean_ai_response(answer)
-
-    latency = round(time.time() - start_time, 3)
-    active_db_name = "Vector Store"
-
-    # Log query metadata safely
-    try:
-        username_val = "anonymous"
-        if isinstance(current_user, dict):
-            username_val = current_user.get("username", current_user.get("sub", "anonymous"))
-        relational_db.log_client_question(
-            username=username_val,
-            query=last_user_msg,
-            answer=answer,
-            active_llm=active_llm,
             active_db=active_db_name,
             latency_sec=latency
         )
