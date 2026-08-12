@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
-import json, time, requests, os, logging, random
+import json, time, requests, os, logging, re
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PatentMindAPI")
@@ -17,8 +17,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GROQ_KEY_1 = "gsk_" + "Vz1ICS5xDYeEv4uvziYIWGdyb3FYTGGYMbu6De5tqFO6rPAlwnIY"
-GROQ_KEY_2 = "gsk_" + "qDJ3NMlFOPELX3gTtqJPWGdyb3FYLNKdLQs40ReOmxszdok6AWJl"
+# Configure this in Vercel's Environment Variables. Never commit provider keys.
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 
 class AuthCredentials(BaseModel):
     username: str
@@ -37,50 +37,18 @@ class ChatRequest(BaseModel):
     section_filter: Optional[str] = None
     target_language: Optional[str] = "english"
 
-def generate_topic_ai_response(prompt: str) -> str:
-    prompt_clean = prompt.strip().lower()
-    
-    # Topic 1: Project Ideas & Suggestions
-    if any(w in prompt_clean for w in ["project", "idea", "suggest", "build", "create", "make"]):
-        return (
-            f"Here is a comprehensive breakdown of top-tier AI-based project recommendations tailored for **'{prompt.strip()}'**:\n\n"
-            f"### 1. Autonomous Agentic AI Patent Verification Engine\n"
-            f"- **Core Concept**: Multi-agent workflow that ingests patent PDF specifications and performs automated claim validity analysis.\n"
-            f"- **Tech Stack**: Python, FastAPI, LangChain/LlamaIndex, Groq Llama-3.1, Vector Store.\n"
-            f"- **Patent Potential**: High commercial value in corporate IP portfolio management.\n\n"
-            f"### 2. Real-Time Prior Art Semantic Search Platform\n"
-            f"- **Core Concept**: Dense vector embedding search engine matching user tech disclosures against 700+ USPTO/WIPO records.\n"
-            f"- **Tech Stack**: SentenceTransformers, ChromaDB/Qdrant, React.js, TailwindCSS.\n"
-            f"- **Patent Potential**: White-space landscape discovery and gap identification.\n\n"
-            f"### 3. Neural Claim Scope Comparison & Infringement Analyzer\n"
-            f"- **Core Concept**: Deep learning pipeline that compares independent patent claims line-by-line against product codebases.\n"
-            f"- **Tech Stack**: PyTorch, HuggingFace Transformers, FastBERT, ReportLab PDF Engine.\n\n"
-            f"### 4. Smart Legal Dossier & Specification Document Generator\n"
-            f"- **Core Concept**: Generative AI system that generates structured patent claims, abstract summaries, and IPC/CPC classification codes.\n\n"
-            f"Regards,\n"
-            f"Bhushan Shelke"
-        )
-        
-    # Topic 2: Patent Search & Prior Art
-    if any(w in prompt_clean for w in ["search", "patent", "prior art", "find", "claim", "uspto"]):
-        return (
-            f"### Patent Strategy & Technical Analysis: '{prompt.strip()}'\n\n"
-            f"Based on our dual vector store and patent database analytics, here is the technical assessment:\n\n"
-            f"1. **Patent Scope Identification**: Query mapped against IPC/CPC classifications (G06F 17/30 & G06N 20/00).\n"
-            f"2. **Prior Art Density**: Moderate competition with high differentiation potential in autonomous claim verification.\n"
-            f"3. **Recommended Action**: File independent claims focusing on novel multi-agent consensus mechanisms.\n\n"
-            f"Regards,\n"
-            f"Bhushan Shelke"
-        )
-
-    # General Intelligence Synthesis
+def provider_unavailable_response(prompt: str) -> str:
+    """Return an honest, query-specific status instead of a misleading canned answer."""
+    clean_prompt = re.sub(r"\s+", " ", prompt).strip()
+    keywords = [word for word in re.findall(r"[A-Za-z0-9][A-Za-z0-9-]{2,}", clean_prompt.lower())
+                if word not in {"the", "and", "for", "with", "what", "about", "that", "this", "from"}]
+    focus = ", ".join(dict.fromkeys(keywords[:5])) or "the supplied question"
     return (
-        f"### Technical Analysis & Recommendations for '{prompt.strip()}'\n\n"
-        f"1. **Architecture Overview**: Implements modular neural pipelines for high-throughput processing.\n"
-        f"2. **Technical Feasibility**: Optimized for low-latency inference with 99.4% precision.\n"
-        f"3. **Implementation Strategy**: Deploy using asynchronous microservices with automated failover.\n\n"
-        f"Regards,\n"
-        f"Bhushan Shelke"
+        f"### I received your question\n\n"
+        f"> {clean_prompt}\n\n"
+        f"PatentMind cannot generate a reliable answer right now because its AI provider is not configured or is unavailable. "
+        f"I have not substituted a generic response. The detected research focus is: **{focus}**.\n\n"
+        f"To restore AI answers, add a valid `GROQ_API_KEY` to the Vercel project's Environment Variables and redeploy."
     )
 
 @app.get("/api/v1/health")
@@ -141,25 +109,19 @@ def chat(chat_req: ChatRequest):
     if target_lang and target_lang.lower() != "english":
         system_prompt += f"\nWrite your entire response in {target_lang} language."
 
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": last_user_msg}
-    ]
+    # Keep a small, valid slice of chat history so follow-up questions retain context.
+    messages = [{"role": "system", "content": system_prompt}]
+    for message in (chat_req.messages or [])[-10:]:
+        if message.role in {"user", "assistant"} and message.content and message.content.strip():
+            messages.append({"role": message.role, "content": message.content.strip()})
+    if len(messages) == 1:
+        messages.append({"role": "user", "content": last_user_msg})
 
     models_to_try = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768"]
-    groq_keys = [
-        os.environ.get("GROQ_API_KEY"),
-        GROQ_KEY_1,
-        GROQ_KEY_2
-    ]
-    groq_keys = [k for k in groq_keys if k]
-
     answer = ""
-    active_model = "Groq Cloud (Llama-3.1-8b)"
+    active_model = "Groq Cloud"
 
-    for g_key in groq_keys:
-        if answer:
-            break
+    if GROQ_API_KEY:
         for g_model in models_to_try:
             try:
                 resp = requests.post(
@@ -171,12 +133,11 @@ def chat(chat_req: ChatRequest):
                         "max_tokens": 1024
                     },
                     headers={
-                        "Authorization": f"Bearer {g_key}",
+                        "Authorization": f"Bearer {GROQ_API_KEY}",
                         "Content-Type": "application/json",
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
                     },
-                    timeout=8,
-                    verify=False
+                    timeout=20
                 )
                 if resp.status_code == 200:
                     g_json = resp.json()
@@ -184,12 +145,15 @@ def chat(chat_req: ChatRequest):
                     if answer:
                         active_model = f"Groq Cloud ({g_model})"
                         break
+                logger.warning("Groq %s returned HTTP %s", g_model, resp.status_code)
             except Exception as e:
                 logger.warning(f"Groq API error: {e}")
+    else:
+        logger.warning("GROQ_API_KEY is not configured; returning provider status to the client.")
 
     if not answer:
-        answer = generate_topic_ai_response(last_user_msg)
-        active_model = "PatentMind AI Neural Engine"
+        answer = provider_unavailable_response(last_user_msg)
+        active_model = "AI provider unavailable"
 
     return {
         "answer": answer,
