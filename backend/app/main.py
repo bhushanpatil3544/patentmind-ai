@@ -1089,23 +1089,25 @@ def chat_with_agent(chat_request: ChatRequest, current_user: dict = Depends(get_
             logger.warning(f"Ollama chat inference failed: {ollama_err}. Falling back to Groq...")
             fallback_occurred = True
             active_llm = "Groq Cloud (Fallback Chat)"
-            
-            from app.rag import Groq
-            if Groq is not None and rag_chain.groq_key:
-                try:
-                    client = Groq(api_key=rag_chain.groq_key)
-                    groq_messages = [{"role": m["role"], "content": m["content"]} for m in chat_messages]
-                    completion = client.chat.completions.create(
-                        messages=groq_messages,
-                        model=rag_chain.groq_model,
-                        temperature=0.2,
-                        max_tokens=1024,
-                        timeout=10.0
-                    )
-                    answer = completion.choices[0].message.content.strip()
-                    logger.info("Groq chat fallback succeeded.")
-                except Exception as groq_err:
-                    logger.error(f"Groq chat fallback failed: {groq_err}")
+
+            if rag_chain.groq_key:
+                groq_url = "https://api.groq.com/openai/v1/chat/completions"
+                groq_headers = {"Authorization": f"Bearer {rag_chain.groq_key}", "Content-Type": "application/json"}
+                groq_messages = [{"role": m["role"], "content": m["content"]} for m in chat_messages]
+                for g_model in rag_chain.groq_models:
+                    try:
+                        groq_payload = {"model": g_model, "messages": groq_messages, "temperature": 0.2, "max_tokens": 1024}
+                        resp = requests.post(groq_url, headers=groq_headers, json=groq_payload, timeout=15.0)
+                        if resp.status_code == 200:
+                            answer = resp.json()["choices"][0]["message"]["content"].strip()
+                            active_llm = f"Groq Cloud ({g_model})"
+                            logger.info(f"Groq chat fallback succeeded using {g_model}.")
+                            break
+                        else:
+                            logger.warning(f"Groq chat model {g_model} status {resp.status_code}: {resp.text[:200]}")
+                    except Exception as g_err:
+                        logger.warning(f"Groq chat model {g_model} error: {g_err}")
+                if not answer:
                     answer = rag_chain._generate_graceful_text_fallback(last_user_msg, retrieved_chunks)
                     active_llm = "Static Engine Fallback"
             else:
@@ -1587,22 +1589,23 @@ async def analyze_idea(
         except Exception as ollama_err:
             logger.warning(f"Ollama idea analysis failed: {ollama_err}. Falling back to Groq...")
             active_llm = "Groq Cloud (Fallback)"
-            if Groq is not None and rag_chain.groq_key:
-                try:
-                    client = Groq(api_key=rag_chain.groq_key)
-                    completion = client.chat.completions.create(
-                        messages=[
-                            {"role": "system", "content": IDEA_ANALYSIS_PROMPT},
-                            {"role": "user", "content": context_str}
-                        ],
-                        model=rag_chain.groq_model,
-                        temperature=0.3,
-                        max_tokens=2048,
-                        timeout=15.0
-                    )
-                    answer = completion.choices[0].message.content.strip()
-                except Exception as groq_err:
-                    logger.error(f"Groq idea analysis failed: {groq_err}")
+            if rag_chain.groq_key:
+                groq_url = "https://api.groq.com/openai/v1/chat/completions"
+                groq_headers = {"Authorization": f"Bearer {rag_chain.groq_key}", "Content-Type": "application/json"}
+                groq_msgs = [{"role": "system", "content": IDEA_ANALYSIS_PROMPT}, {"role": "user", "content": context_str}]
+                for g_model in rag_chain.groq_models:
+                    try:
+                        groq_payload = {"model": g_model, "messages": groq_msgs, "temperature": 0.3, "max_tokens": 2048}
+                        resp = requests.post(groq_url, headers=groq_headers, json=groq_payload, timeout=15.0)
+                        if resp.status_code == 200:
+                            answer = resp.json()["choices"][0]["message"]["content"].strip()
+                            active_llm = f"Groq Cloud ({g_model})"
+                            break
+                        else:
+                            logger.warning(f"Groq idea model {g_model} status {resp.status_code}: {resp.text[:200]}")
+                    except Exception as g_err:
+                        logger.warning(f"Groq idea model {g_model} error: {g_err}")
+                if not answer:
                     answer = "Both LLM services are currently offline. However, the patent matching was successful. Review the matched patents listed above to understand the competitive landscape for your idea."
                     active_llm = "Static Fallback"
             else:
@@ -1667,20 +1670,23 @@ def chat_about_idea(request: IdeaChatRequest, current_user: dict = Depends(get_c
         except Exception as ollama_err:
             logger.warning(f"Ollama idea chat failed: {ollama_err}. Falling back to Groq...")
             active_llm = "Groq Cloud (Fallback)"
-            if Groq is not None and rag_chain.groq_key:
-                try:
-                    client = Groq(api_key=rag_chain.groq_key)
-                    groq_msgs = [{"role": m["role"], "content": m["content"]} for m in chat_messages]
-                    completion = client.chat.completions.create(
-                        messages=groq_msgs,
-                        model=rag_chain.groq_model,
-                        temperature=0.3,
-                        max_tokens=1024,
-                        timeout=10.0
-                    )
-                    answer = completion.choices[0].message.content.strip()
-                except Exception as groq_err:
-                    logger.error(f"Groq idea chat failed: {groq_err}")
+            if rag_chain.groq_key:
+                groq_url = "https://api.groq.com/openai/v1/chat/completions"
+                groq_headers = {"Authorization": f"Bearer {rag_chain.groq_key}", "Content-Type": "application/json"}
+                groq_msgs = [{"role": m["role"], "content": m["content"]} for m in chat_messages]
+                for g_model in rag_chain.groq_models:
+                    try:
+                        groq_payload = {"model": g_model, "messages": groq_msgs, "temperature": 0.3, "max_tokens": 1024}
+                        resp = requests.post(groq_url, headers=groq_headers, json=groq_payload, timeout=15.0)
+                        if resp.status_code == 200:
+                            answer = resp.json()["choices"][0]["message"]["content"].strip()
+                            active_llm = f"Groq Cloud ({g_model})"
+                            break
+                        else:
+                            logger.warning(f"Groq idea chat model {g_model} status {resp.status_code}: {resp.text[:200]}")
+                    except Exception as g_err:
+                        logger.warning(f"Groq idea chat model {g_model} error: {g_err}")
+                if not answer:
                     answer = "Both LLM services are currently offline. Please try again later."
                     active_llm = "Static Fallback"
             else:
