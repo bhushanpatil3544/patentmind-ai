@@ -26,14 +26,17 @@ from pydantic import BaseModel
 
 # App modules
 from app.config import Config
-try:
-    from app.ingestion import IngestionEngine, PatentModel
-    from app.processing import ProcessingEngine
-    from app.indexing import PatentChunker, PatentEmbedder
-    from app.vector_store import DualVectorStore
-    from app.rag import IntelligentRAGChain, Groq
-except Exception as err:
+if os.environ.get("VERCEL"):
     IngestionEngine = PatentModel = ProcessingEngine = PatentChunker = PatentEmbedder = DualVectorStore = IntelligentRAGChain = Groq = None
+else:
+    try:
+        from app.ingestion import IngestionEngine, PatentModel
+        from app.processing import ProcessingEngine
+        from app.indexing import PatentChunker, PatentEmbedder
+        from app.vector_store import DualVectorStore
+        from app.rag import IntelligentRAGChain, Groq
+    except Exception as err:
+        IngestionEngine = PatentModel = ProcessingEngine = PatentChunker = PatentEmbedder = DualVectorStore = IntelligentRAGChain = Groq = None
 
 from app.auth import get_current_user, hash_password, verify_password, create_access_token
 from app.database import DatabaseManager

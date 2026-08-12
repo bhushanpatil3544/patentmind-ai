@@ -149,8 +149,17 @@ class DatabaseManager:
         return PooledConnectionWrapper(raw_conn, self), raw_conn.cursor()
 
     def _create_tables(self):
+        # On Vercel, use ultra-fast lightweight schema setup
         conn, cursor = self._get_connection()
         try:
+            if os.environ.get("VERCEL"):
+                cursor.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, password TEXT NOT NULL, email TEXT NULL, first_name TEXT NULL, last_name TEXT NULL, role TEXT DEFAULT 'user', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+                cursor.execute("CREATE TABLE IF NOT EXISTS patents (id INTEGER PRIMARY KEY AUTOINCREMENT, patent_number TEXT UNIQUE NOT NULL, title TEXT NOT NULL, abstract TEXT NOT NULL, document_date TEXT NOT NULL, inventors TEXT NOT NULL, ipc_cpc_codes TEXT NOT NULL, source TEXT NOT NULL, s3_url TEXT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+                cursor.execute("CREATE TABLE IF NOT EXISTS client_questions (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL, query TEXT NOT NULL, answer TEXT NOT NULL, active_llm TEXT NOT NULL, active_db TEXT NOT NULL, latency_sec REAL NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+                cursor.execute("CREATE TABLE IF NOT EXISTS user_feedback (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL, rating INTEGER NOT NULL, comments TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+                conn.commit()
+                conn.close()
+                return
             if self.is_mysql:
                 # 1. Users Table
                 cursor.execute("""
