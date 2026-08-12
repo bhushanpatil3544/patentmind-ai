@@ -1,8 +1,12 @@
+try:
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+    REPORTLAB_AVAILABLE = True
+except Exception:
+    REPORTLAB_AVAILABLE = False
 
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 
 import os
 import io
@@ -1940,6 +1944,12 @@ def download_actual_patent_pdf(patent_id: str):
         )
     except Exception as pdf_err:
         logger.error(f"ReportLab PDF generation failed: {pdf_err}")
-        # Fallback redirect if PDF generation fails
-        drive_folder_url = f"https://drive.google.com/drive/folders/1m992HmbkJkY3X7LCeIGpo9b_7xpHrH8U?q={clean_id}"
-        return RedirectResponse(url=drive_folder_url)
+        txt_content = f"PATENTMIND AI DOSSIER REPORT\nPATENT: {clean_id}\nTITLE: {title}\n\n"
+        for sec in sections_list:
+            txt_content += f"--- {sec.get('section', 'Section')} ---\n{sec.get('text', '')}\n\n"
+        txt_content += "Regards, Bhushan Shelke\nPatentMind AI Platform"
+        return Response(
+            content=txt_content,
+            media_type="text/plain; charset=utf-8",
+            headers={"Content-Disposition": f'attachment; filename="Patent_{clean_id}_Report.txt"'}
+        )
