@@ -1,4 +1,5 @@
 {
+  "framework": "vite",
   "functions": {
     "api/index.py": {
       "maxDuration": 30
@@ -6,6 +7,17 @@
   },
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate, max-age=0"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
