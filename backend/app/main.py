@@ -1790,5 +1790,5 @@ def download_actual_patent_pdf(patent_id: str):
         )
 
     # 2. Redirect directly to Google Drive Repository containing all 724+ original patent PDFs
-    drive_folder_url = "https://drive.google.com/drive/folders/1m992HmbkJkY3X7LCeIGpo9b_7xpHrH8U"
+    drive_folder_url = f"https://drive.google.com/drive/folders/1m992HmbkJkY3X7LCeIGpo9b_7xpHrH8U?q={clean_id}"
     return RedirectResponse(url=drive_folder_url)
