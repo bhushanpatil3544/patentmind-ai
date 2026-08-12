@@ -16,6 +16,7 @@ import logging
 import json
 import random
 import string
+import re
 import requests
 from datetime import datetime
 from typing import List, Dict, Any, Optional
@@ -44,6 +45,20 @@ from app.database import DatabaseManager
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("MainAPI")
+
+
+def provider_unavailable_response(prompt: str) -> str:
+    """Avoid returning the same fabricated answer when no model is available."""
+    clean_prompt = re.sub(r"\s+", " ", prompt).strip()
+    keywords = [word for word in re.findall(r"[A-Za-z0-9][A-Za-z0-9-]{2,}", clean_prompt.lower())
+                if word not in {"the", "and", "for", "with", "what", "about", "that", "this", "from"}]
+    focus = ", ".join(dict.fromkeys(keywords[:5])) or "the supplied question"
+    return (
+        f"### I received your question\n\n> {clean_prompt}\n\n"
+        f"PatentMind cannot answer it reliably because the AI provider is not configured or is unavailable. "
+        f"I have not replaced it with a generic reply. Detected focus: **{focus}**.\n\n"
+        "An administrator must set `GROQ_API_KEY` in the deployment environment and redeploy to enable AI-generated answers."
+    )
 
 app = FastAPI(
     title="PatentMind AI Platform",
@@ -1116,23 +1131,15 @@ def chat_with_patentmind(chat_request: ChatRequest, current_user: dict = Depends
         except Exception as ollama_err:
             logger.warning(f"Ollama chat bypassed: {ollama_err}")
 
-    # 4. Primary Groq Cloud HTTP Execution
+    # 4. Primary Groq Cloud HTTP execution. The key must be set in the deployment environment.
     if not answer:
         fallback_occurred = True
-        groq_keys = [
-            Config.GROQ_API_KEY,
-            "gsk_" + "Vz1ICS5xDYeEv4uvziYIWGdyb3FYTGGYMbu6De5tqFO6rPAlwnIY",
-            "gsk_" + "qDJ3NMlFOPELX3gTtqJPWGdyb3FYLNKdLQs40ReOmxszdok6AWJl"
-        ]
-        groq_keys = [k for k in groq_keys if k]
         groq_models = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768"]
         groq_url = "https://api.groq.com/openai/v1/chat/completions"
 
-        for g_k in groq_keys:
-            if answer:
-                break
+        if Config.GROQ_API_KEY:
             groq_headers = {
-                "Authorization": f"Bearer {g_k}",
+                "Authorization": f"Bearer {Config.GROQ_API_KEY}",
                 "Content-Type": "application/json",
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             }
@@ -1140,7 +1147,7 @@ def chat_with_patentmind(chat_request: ChatRequest, current_user: dict = Depends
             for g_model in groq_models:
                 try:
                     groq_payload = {"model": g_model, "messages": groq_messages, "temperature": 0.3, "max_tokens": 1024}
-                    resp = requests.post(groq_url, headers=groq_headers, json=groq_payload, timeout=12.0, verify=False)
+                    resp = requests.post(groq_url, headers=groq_headers, json=groq_payload, timeout=20.0)
                     if resp.status_code == 200:
                         answer = resp.json()["choices"][0]["message"]["content"].strip()
                         active_llm = f"Groq Cloud ({g_model})"
@@ -1150,10 +1157,12 @@ def chat_with_patentmind(chat_request: ChatRequest, current_user: dict = Depends
                         logger.warning(f"Groq chat model {g_model} status {resp.status_code}: {resp.text[:200]}")
                 except Exception as g_err:
                     logger.warning(f"Groq chat model {g_model} error: {g_err}")
+        else:
+            logger.warning("GROQ_API_KEY is not configured; chat model call skipped.")
 
     if not answer:
-        answer = "Hello! I am your PatentMind AI Assistant. How can I help you analyze patents, review claims, or inspect legal prior art today?\n\nRegards, Bhushan Shelke"
-        active_llm = "PatentMind AI Assistant"
+        answer = provider_unavailable_response(last_user_msg)
+        active_llm = "AI provider unavailable"
 
     latency = round(time.time() - start_time, 3)
     active_db_name = "Vector Store"
