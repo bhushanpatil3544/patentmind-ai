@@ -4,3 +4,4 @@ pydantic
 requests
 pyjwt
 python-multipart
+PyPDF2
