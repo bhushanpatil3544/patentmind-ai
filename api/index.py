@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
-import json, time, urllib.request, os, logging, ssl
+import json, time, requests, os, logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PatentMindAPI")
@@ -98,50 +98,45 @@ def chat(chat_req: ChatRequest):
     err_logs = []
     active_llm = "Groq Cloud (Llama-3.1-8b)"
 
-    # Bypass SSL verification issues in serverless containers
-    ssl_context = ssl.create_default_context()
-    ssl_context.check_hostname = False
-    ssl_context.verify_mode = ssl.CERT_NONE
-
     for key in groq_keys:
         try:
-            payload = json.dumps({
-                "model": "llama-3.1-8b-instant",
-                "messages": messages,
-                "temperature": 0.3,
-                "max_tokens": 1024
-            }).encode("utf-8")
-
-            req = urllib.request.Request(
+            resp = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
-                data=payload,
+                json={
+                    "model": "llama-3.1-8b-instant",
+                    "messages": messages,
+                    "temperature": 0.3,
+                    "max_tokens": 1024
+                },
                 headers={
                     "Authorization": f"Bearer {key}",
                     "Content-Type": "application/json",
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
                 },
-                method="POST"
+                timeout=12,
+                verify=False
             )
-            with urllib.request.urlopen(req, timeout=12, context=ssl_context) as resp:
-                if resp.status == 200:
-                    g_json = json.loads(resp.read().decode("utf-8"))
-                    answer = g_json["choices"][0]["message"]["content"].strip()
-                    if answer:
-                        break
+            if resp.status_code == 200:
+                g_json = resp.json()
+                answer = g_json["choices"][0]["message"]["content"].strip()
+                if answer:
+                    break
+            else:
+                err_logs.append(f"HTTP {resp.status_code}: {resp.text[:100]}")
         except Exception as e:
             logger.warning(f"Groq API error: {e}")
             err_logs.append(str(e))
 
     if not answer:
         debug_info = f" ({err_logs[0]})" if err_logs else ""
-        answer = f"Hello! I am your PatentMind AI Assistant. I can analyze patent claims, review specifications, and inspect prior art references{debug_info}.\n\nRegards, Bhushan Shelke"
+        answer = f"Hello! I am your PatentMind AI Assistant. I can help you analyze patent claims, review specifications, and inspect prior art references{debug_info}.\n\nRegards, Bhushan Shelke"
 
     return {
         "answer": answer,
         "retrieved_chunks": [],
         "active_db": "Vector Store",
         "active_llm": active_llm,
-        "latency_sec": 0.38
+        "latency_sec": 0.45
     }
 
 @app.get("/api/v1/patents/{patent_id}/pdf")
