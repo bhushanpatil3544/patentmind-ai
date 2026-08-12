@@ -1759,12 +1759,11 @@ function App() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               { id: 'dashboard', title: 'Stripe-Style Dashboard', icon: BarChart3, desc: 'Filing trends, inventor rankings, company insights, and live activity feeds.' },
               { id: 'knowledge-graph', title: 'Interactive Graph', icon: Network, desc: 'SVG network nodes linking patents, assignees, inventors, and CPC classes.' },
-              { id: 'chat', title: 'Perplexity AI Assistant', icon: MessageSquare, desc: 'Cited sources 3-column card deck with match scores and line-level excerpts.' },
-              { id: 'analytics', title: 'Patent Analytics', icon: Layers, desc: 'Global country heatmaps, technology velocity charts, and competitor rankings.' }
+              { id: 'chat', title: 'Perplexity AI Assistant', icon: MessageSquare, desc: 'Cited sources 3-column card deck with match scores and line-level excerpts.' }
             ].map(mod => {
               const Icon = mod.icon;
               return (
