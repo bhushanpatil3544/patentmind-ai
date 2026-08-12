@@ -2140,7 +2140,6 @@ function App() {
                 { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
                 { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
                 { id: 'compare', label: 'Compare Patents', icon: Layers },
-                { id: 'projects', label: 'Projects', icon: FolderOpen },
                 { id: 'settings', label: 'Settings', icon: Settings },
                 { id: 'help', label: 'Help', icon: HelpCircle },
               ];
@@ -2151,8 +2150,6 @@ function App() {
                 { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
                 { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
                 { id: 'compare', label: 'Compare Patents', icon: Layers },
-                { id: 'projects', label: 'Projects', icon: FolderOpen },
-                { id: 'analytics', label: 'Analytics', icon: Activity },
                 { id: 'settings', label: 'Settings', icon: Settings },
                 { id: 'admin', label: 'Admin Panel', icon: ShieldAlert },
                 { id: 'help', label: 'Help', icon: HelpCircle },
@@ -2282,7 +2279,6 @@ function App() {
                 { id: 'upload', label: 'Upload & Compare', icon: UploadCloud },
                 { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
                 { id: 'compare', label: 'Compare Patents', icon: Layers },
-                { id: 'projects', label: 'Projects', icon: FolderOpen },
                 { id: 'settings', label: 'Settings', icon: Settings },
                 { id: 'help', label: 'Help', icon: HelpCircle },
               ];
@@ -2293,8 +2289,6 @@ function App() {
                 { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
                 { id: 'knowledge-graph', label: 'Knowledge Graph', icon: Network },
                 { id: 'compare', label: 'Compare Patents', icon: Layers },
-                { id: 'projects', label: 'Projects', icon: FolderOpen },
-                { id: 'analytics', label: 'Analytics', icon: Activity },
                 { id: 'settings', label: 'Settings', icon: Settings },
                 { id: 'admin', label: 'Admin Panel', icon: ShieldAlert },
                 { id: 'help', label: 'Help', icon: HelpCircle },
