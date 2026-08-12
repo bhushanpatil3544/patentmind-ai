@@ -70,7 +70,7 @@ def clean_ai_response(text: str) -> str:
 @app.get("/v1/health")
 @app.get("/health")
 def health():
-    return {"status": "healthy", "service": "PatentMind AI Engine", "version": "1.0.4_clean"}
+    return {"status": "healthy", "service": "PatentMind AI Engine", "version": "1.0.5_dossier"}
 
 @app.post("/api/v1/auth/login")
 @app.post("/v1/auth/login")
