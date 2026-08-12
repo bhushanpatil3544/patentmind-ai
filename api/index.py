@@ -7,8 +7,8 @@ import json, time, requests, os, logging, re, io
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PatentMindAPI")
 
-# Cache Bust: 2026-08-13T00:58:30Z - Fresh Build Trigger
-app = FastAPI(title="PatentMind AI Platform", version="1.0.1")
+# Cache Bust: 2026-08-13T03:01:20Z - Force Vercel Clean Build v20.2.0
+app = FastAPI(title="PatentMind AI Platform", version="1.0.2")
 
 app.add_middleware(
     CORSMiddleware,
