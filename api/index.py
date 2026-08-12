@@ -122,7 +122,7 @@ def chat(chat_req: ChatRequest):
                 if answer:
                     break
             else:
-                err_logs.append(f"HTTP {resp.status_code}: {resp.text[:100]}")
+                err_logs.append(f"HTTP_{resp.status_code}_{resp.text[:60].replace(' ', '_')}")
         except Exception as e:
             logger.warning(f"Groq API error: {e}")
             err_logs.append(str(e))
