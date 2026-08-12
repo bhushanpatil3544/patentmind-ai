@@ -164,3 +164,9 @@ def serve_frontend_ui():
 </body>
 </html>"""
     return Response(content=fallback_html, media_type="text/html")
+
+@app.get("/{path:path}")
+def catchall_frontend_ui(path: str):
+    if path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="API endpoint not found")
+    return serve_frontend_ui()
