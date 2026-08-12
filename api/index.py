@@ -250,3 +250,6 @@ def analytics_overview():
             {"field": "Autonomous IP Claim Verification", "count": 169, "percentage": 23.4, "status": "EMERGING DOMAIN"}
         ]
     }
+
+# Export app and handler for Vercel Serverless Function entrypoints
+handler = app
