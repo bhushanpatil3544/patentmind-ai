@@ -18090,56 +18090,6 @@
     "specification_summary": "Detailed technical specification for patent portfolio LD-260707444V1 operating within Automated Code Synthesis & Compiler Verification.",
     "prior_art_references": "1. US10922485B2 - Prior Art Reference for LD-260707444V1"
   },
-  "LD-260707612V1": {
-    "patent_number": "LD-260707612V1",
-    "title": "Towards Agentic AI Governance: A Preliminary Assessment Framework",
-    "filing_date": "2026-08-16",
-    "publication_date": "2026-08-16",
-    "priority_date": "2025-08-16",
-    "field": "Zero-Knowledge Cryptography & Cybersecurity",
-    "inventors": "Dr. Marcus Vance, Dr. Elena Rostova, Dr. Ananya Patel",
-    "assignee": "PatentMind AI Research Labs",
-    "classification_ipc": "G06N 3/16, G06F 18/26",
-    "classification_cpc": "G06N3/16, G06F18/26",
-    "legal_status": "Published / Active",
-    "keywords": [
-      "crypto",
-      "zkp",
-      "zero-knowledge",
-      "identity",
-      "security",
-      "ld-260707612v1"
-    ],
-    "abstract": "A computer-implemented system and technical method for zero-knowledge cryptography & cybersecurity optimization (Patent #LD-260707612V1). Features high-dimensional vector representations, automated claim extraction, and real-time processing.",
-    "claims": "Claim 1: A method for zero-knowledge cryptography & cybersecurity comprising processing input parameters and generating optimal output states for LD-260707612V1.\\nClaim 2: Vector embedding search integration with sub-second retrieval latency.",
-    "specification_summary": "Detailed technical specification for patent portfolio LD-260707612V1 operating within Zero-Knowledge Cryptography & Cybersecurity.",
-    "prior_art_references": "1. US10922485B2 - Prior Art Reference for LD-260707612V1"
-  },
-  "LD-260710151V1": {
-    "patent_number": "LD-260710151V1",
-    "title": "Large Language Model Patent Information Extraction Engine",
-    "filing_date": "2026-09-17",
-    "publication_date": "2026-09-17",
-    "priority_date": "2025-09-17",
-    "field": "Autonomous Driving & Spatial Computer Vision",
-    "inventors": "Dr. Marcus Vance, Dr. Elena Rostova, Dr. Ananya Patel",
-    "assignee": "PatentMind AI Research Labs",
-    "classification_ipc": "G06N 3/17, G06F 18/27",
-    "classification_cpc": "G06N3/17, G06F18/27",
-    "legal_status": "Published / Active",
-    "keywords": [
-      "vision",
-      "autonomous",
-      "lidar",
-      "perception",
-      "camera",
-      "ld-260710151v1"
-    ],
-    "abstract": "A computer-implemented system and technical method for autonomous driving & spatial computer vision optimization (Patent #LD-260710151V1). Features high-dimensional vector representations, automated claim extraction, and real-time processing.",
-    "claims": "Claim 1: A method for autonomous driving & spatial computer vision comprising processing input parameters and generating optimal output states for LD-260710151V1.\\nClaim 2: Vector embedding search integration with sub-second retrieval latency.",
-    "specification_summary": "Detailed technical specification for patent portfolio LD-260710151V1 operating within Autonomous Driving & Spatial Computer Vision.",
-    "prior_art_references": "1. US10922485B2 - Prior Art Reference for LD-260710151V1"
-  },
   "LD-260715330V1": {
     "patent_number": "LD-260715330V1",
     "title": "System and Method for Neuromorphic Silicon Optimization (LD-260715330V1)",
