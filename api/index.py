@@ -95,6 +95,7 @@ def chat(chat_req: ChatRequest):
     groq_keys = [k for k in groq_keys if k]
 
     answer = ""
+    err_logs = []
     active_llm = "Groq Cloud (Llama-3.1-8b)"
 
     for key in groq_keys:
@@ -124,6 +125,7 @@ def chat(chat_req: ChatRequest):
                         break
         except Exception as e:
             logger.warning(f"Groq API key error: {e}")
+            err_logs.append(str(e))
 
     if not answer:
         answer = "I apologize for the brief connection notice. Please resend your prompt to continue our patent analysis.\n\nRegards, Bhushan Shelke"
