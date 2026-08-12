@@ -1022,15 +1022,13 @@ def search_patents(search_query: SearchQuery, current_user: dict = Depends(get_c
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/chat")
-def chat_with_agent(chat_request: ChatRequest, current_user: dict = Depends(get_current_user)):
+def chat_with_patentmind(chat_request: ChatRequest, current_user: dict = Depends(get_current_user)):
     """
-    Conversational RAG Chatbot endpoint (Secured).
-    Maintains context across previous messages and injects relevant patent context.
+    Interactive Chatbot RAG Endpoint with direct Groq LLM inference.
     """
     if not chat_request.messages:
         raise HTTPException(status_code=400, detail="Conversation message list cannot be empty.")
         
-    # Extract last user message as the query
     last_user_msg = next((msg.content for msg in reversed(chat_request.messages) if msg.role == "user"), None)
     if not last_user_msg or not last_user_msg.strip():
         raise HTTPException(status_code=400, detail="No user message found to query RAG database.")
@@ -1041,119 +1039,114 @@ def chat_with_agent(chat_request: ChatRequest, current_user: dict = Depends(get_
     if chat_request.section_filter:
         filters["section"] = chat_request.section_filter
         
+    start_time = time.time()
+    context_str = ""
+    retrieved_chunks = []
+    
+    # 1. Try retrieving vector context if vector store is initialized
     try:
-        start_time = time.time()
-        context_str = ""
-        retrieved_chunks = []
-        
-        # Safely attempt vector context retrieval if components are loaded
+        rag_chain, embedder, db = get_rag_components()
+        if rag_chain and hasattr(rag_chain, 'embedder') and rag_chain.embedder and hasattr(rag_chain, 'db') and rag_chain.db:
+            query_vector = rag_chain.embedder.embed_query(last_user_msg)
+            if hasattr(rag_chain.db, "_last_query_text"):
+                rag_chain.db._last_query_text = last_user_msg
+            retrieved_chunks = rag_chain.db.search(query_vector, filter_metadata=filters if filters else None, limit=3)
+            for idx, chunk in enumerate(retrieved_chunks, start=1):
+                meta = chunk.get("metadata", {}) if isinstance(chunk, dict) else {}
+                pnum = meta.get("patent_number", f"DOC-{idx}")
+                sec = meta.get("section", "Specification")
+                snippet = chunk.get("text", "")[:300].replace('\n', ' ') if isinstance(chunk, dict) else ""
+                context_str += f"[{idx}] Patent {pnum} ({sec}): {snippet}...\n"
+    except Exception as vec_err:
+        logger.warning(f"Vector search bypassed in chat: {vec_err}")
+
+    # 2. Construct system and user messages
+    from app.rag import SYSTEM_PROMPT
+    lang_instruction = f"\nIMPORTANT: Write your response in {chat_request.target_language} language." if chat_request.target_language and chat_request.target_language.lower() != "english" else ""
+    system_content = f"{SYSTEM_PROMPT}{lang_instruction}\nPatent context:\n{context_str}\nProvide concise, direct computer science & patent strategy guidance."
+    
+    chat_messages = [{"role": "system", "content": system_content}]
+    for msg in chat_request.messages[-6:]:
+        chat_messages.append({"role": msg.role, "content": msg.content})
+
+    answer = ""
+    active_llm = "Groq Cloud (Llama-3.1-8b)"
+    fallback_occurred = False
+    
+    # 3. Try local Ollama if running on local laptop
+    if not os.environ.get("VERCEL"):
         try:
-            rag_chain, embedder, db = get_rag_components()
-            if rag_chain and hasattr(rag_chain, 'embedder') and rag_chain.embedder and hasattr(rag_chain, 'db') and rag_chain.db:
-                query_vector = rag_chain.embedder.embed_query(last_user_msg)
-                if hasattr(rag_chain.db, "_last_query_text"):
-                    rag_chain.db._last_query_text = last_user_msg
-                retrieved_chunks = rag_chain.db.search(query_vector, filter_metadata=filters if filters else None, limit=3)
-                for idx, chunk in enumerate(retrieved_chunks, start=1):
-                    meta = chunk.get("metadata", {}) if isinstance(chunk, dict) else {}
-                    pnum = meta.get("patent_number", f"DOC-{idx}")
-                    sec = meta.get("section", "Specification")
-                    snippet = chunk.get("text", "")[:300].replace('\n', ' ') if isinstance(chunk, dict) else ""
-                    context_str += f"[{idx}] Patent {pnum} ({sec}): {snippet}...\n"
-        except Exception as vec_err:
-            logger.warning(f"Vector search bypassed in chat: {vec_err}")
+            logger.info("Attempting local Ollama chat inference...")
+            url = "http://localhost:11434/api/chat"
+            payload = {
+                "model": "qwen2.5:latest",
+                "messages": chat_messages,
+                "stream": False,
+                "options": {"temperature": 0.2, "num_predict": 250, "num_ctx": 2048}
+            }
+            response = requests.post(url, json=payload, timeout=2.0)
+            if response.status_code == 200:
+                answer = response.json().get("message", {}).get("content", "").strip()
+                active_llm = "Ollama (Local Fast Chat)"
+        except Exception as ollama_err:
+            logger.warning(f"Ollama chat bypassed: {ollama_err}")
 
-        # Construct messages history block
-        from app.rag import SYSTEM_PROMPT
-        lang_instruction = f"\nIMPORTANT: Write your response in {chat_request.target_language} language." if chat_request.target_language and chat_request.target_language.lower() != "english" else ""
-        system_content = f"{SYSTEM_PROMPT}{lang_instruction}\nPatent context:\n{context_str}\nProvide concise, direct computer science & patent strategy guidance."
+    # 4. Primary Groq Cloud HTTP Execution
+    if not answer:
+        fallback_occurred = True
+        groq_key = Config.GROQ_API_KEY
+        groq_models = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768"]
         
-        chat_messages = [{"role": "system", "content": system_content}]
-        for msg in chat_request.messages[-6:]:
-            chat_messages.append({"role": msg.role, "content": msg.content})
+        if groq_key:
+            groq_url = "https://api.groq.com/openai/v1/chat/completions"
+            groq_headers = {"Authorization": f"Bearer {groq_key}", "Content-Type": "application/json"}
+            groq_messages = [{"role": m["role"], "content": m["content"]} for m in chat_messages]
+            for g_model in groq_models:
+                try:
+                    groq_payload = {"model": g_model, "messages": groq_messages, "temperature": 0.2, "max_tokens": 1024}
+                    resp = requests.post(groq_url, headers=groq_headers, json=groq_payload, timeout=15.0)
+                    if resp.status_code == 200:
+                        answer = resp.json()["choices"][0]["message"]["content"].strip()
+                        active_llm = f"Groq Cloud ({g_model})"
+                        logger.info(f"Groq chat HTTP inference succeeded using {g_model}.")
+                        break
+                    else:
+                        logger.warning(f"Groq chat model {g_model} status {resp.status_code}: {resp.text[:200]}")
+                except Exception as g_err:
+                    logger.warning(f"Groq chat model {g_model} error: {g_err}")
 
-        answer = ""
-        active_llm = "Groq Cloud (Llama-3.1-8b)"
-        fallback_occurred = False
-        
-        # 1. Try local Ollama if not on Vercel
-        if not os.environ.get("VERCEL"):
-            try:
-                logger.info("Attempting local Ollama fast chat inference...")
-                ollama_host = getattr(rag_chain, 'ollama_host', 'http://localhost:11434') if 'rag_chain' in locals() and rag_chain else 'http://localhost:11434'
-                ollama_model = getattr(rag_chain, 'ollama_model', 'qwen2.5:latest') if 'rag_chain' in locals() and rag_chain else 'qwen2.5:latest'
-                url = f"{ollama_host}/api/chat"
-                payload = {
-                    "model": ollama_model,
-                    "messages": chat_messages,
-                    "stream": False,
-                    "options": {"temperature": 0.2, "num_predict": 250, "num_ctx": 2048}
-                }
-                response = requests.post(url, json=payload, timeout=2.0)
-                if response.status_code == 200:
-                    answer = response.json().get("message", {}).get("content", "").strip()
-                    active_llm = "Ollama (Local Fast Chat)"
-            except Exception as ollama_err:
-                logger.warning(f"Ollama chat bypassed: {ollama_err}")
+    if not answer:
+        answer = "Hello! I am your PatentMind AI Assistant. How can I help you analyze patents, review claims, or inspect legal prior art today?"
+        active_llm = "PatentMind AI Assistant"
 
-        # 2. Primary Groq Cloud HTTP Execution
-        if not answer:
-            fallback_occurred = True
-            groq_key = Config.GROQ_API_KEY
-            groq_models = getattr(rag_chain, 'groq_models', ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768"]) if 'rag_chain' in locals() and rag_chain else ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768"]
-            
-            if groq_key:
-                groq_url = "https://api.groq.com/openai/v1/chat/completions"
-                groq_headers = {"Authorization": f"Bearer {groq_key}", "Content-Type": "application/json"}
-                groq_messages = [{"role": m["role"], "content": m["content"]} for m in chat_messages]
-                for g_model in groq_models:
-                    try:
-                        groq_payload = {"model": g_model, "messages": groq_messages, "temperature": 0.2, "max_tokens": 1024}
-                        resp = requests.post(groq_url, headers=groq_headers, json=groq_payload, timeout=15.0)
-                        if resp.status_code == 200:
-                            answer = resp.json()["choices"][0]["message"]["content"].strip()
-                            active_llm = f"Groq Cloud ({g_model})"
-                            logger.info(f"Groq chat HTTP inference succeeded using {g_model}.")
-                            break
-                        else:
-                            logger.warning(f"Groq chat model {g_model} status {resp.status_code}: {resp.text[:200]}")
-                    except Exception as g_err:
-                        logger.warning(f"Groq chat model {g_model} error: {g_err}")
+    latency = round(time.time() - start_time, 3)
+    active_db_name = "Vector Store"
 
-        if not answer:
-            answer = "Hello! I am your PatentMind AI Assistant. How can I help you analyze patents, review claims, or inspect legal prior art today?"
-            active_llm = "PatentMind AI Assistant" 
-                if not answer:
-                    answer = rag_chain._generate_graceful_text_fallback(last_user_msg, retrieved_chunks)
-                    active_llm = "Static Engine Fallback"
-            else:
-                logger.warning("Groq API key not set. Skipping fallback.")
-                answer = rag_chain._generate_graceful_text_fallback(last_user_msg, retrieved_chunks)
-                active_llm = "Static Engine Fallback"
-
-        latency = round(time.time() - start_time, 3)
-
-        # Log query metadata to MySQL/SQLite
+    # Log query metadata safely
+    try:
+        username_val = "anonymous"
+        if isinstance(current_user, dict):
+            username_val = current_user.get("username", current_user.get("sub", "anonymous"))
         relational_db.log_client_question(
-            username=current_user.get("sub", "anonymous"),
+            username=username_val,
             query=last_user_msg,
             answer=answer,
             active_llm=active_llm,
-            active_db=rag_chain.db.get_stats()["active_database"],
+            active_db=active_db_name,
             latency_sec=latency
         )
-        
-        return {
-            "answer": answer,
-            "retrieved_chunks": retrieved_chunks,
-            "active_db": rag_chain.db.get_stats()["active_database"],
-            "active_llm": active_llm,
-            "latency_sec": latency,
-            "fallback_occurred": fallback_occurred
-        }
-    except Exception as e:
-        logger.error(f"Chatbot endpoint error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as db_log_err:
+        logger.warning(f"Could not log question to database: {db_log_err}")
+    
+    return {
+        "answer": answer,
+        "retrieved_chunks": retrieved_chunks,
+        "active_db": active_db_name,
+        "active_llm": active_llm,
+        "latency_sec": latency,
+        "fallback_occurred": fallback_occurred
+    }
+
 
 @app.post("/api/v1/ingest")
 def trigger_ingestion(request: IngestRequest, current_user: dict = Depends(get_current_user)):
