@@ -111,7 +111,7 @@ function App() {
   };
 
   // Session & Auth state
-  const [token, setToken] = useState(() => getValidStorageItem('token') || 'active_session_token');
+  const [token, setToken] = useState(() => getValidStorageItem('token'));
   const [username, setUsername] = useState(() => getValidStorageItem('username'));
   const [authMode, setAuthMode] = useState('login'); // login / register
   const [authForm, setAuthForm] = useState({ username: '', password: '', email: '', first_name: '', last_name: '' });
@@ -155,7 +155,7 @@ function App() {
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingSlide, setOnboardingSlide] = useState(0);
-  const [showWelcome, setShowWelcome] = useState(() => !getValidStorageItem('token'));
+  const [showWelcome, setShowWelcome] = useState(true);
   const [welcomeLayout, setWelcomeLayout] = useState('claymation'); // claymation / brutalist / cyber / aurora
 
   // Voice Assistance & Multi-Language & Platform Settings states
@@ -769,7 +769,8 @@ function App() {
     setActiveTab('chat');
     localStorage.removeItem('userRole');
     setUserRole('user');
-    setShowOnboarding(true);
+    setShowWelcome(true);
+    setShowOnboarding(false);
     setOnboardingSlide(0);
     setShowLogoutModal(false);
   };
@@ -1662,10 +1663,10 @@ function App() {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => { setShowWelcome(false); setActiveTab('chat'); }}
+              onClick={() => { setShowWelcome(false); }}
               className="btn-theme px-5 py-2.5 rounded-xl font-semibold text-xs flex items-center gap-2"
             >
-              <span>Launch Platform</span>
+              <span>Sign In</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -1695,15 +1696,14 @@ function App() {
                 placeholder="Search by natural language, patent number, inventor, or technical keywords..."
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    setQuery(e.target.value);
                     setShowWelcome(false);
-                    setActiveTab('search');
+                    setAuthMode('login');
                   }
                 }}
                 className="w-full bg-transparent text-xs text-white placeholder:text-slate-500 focus:outline-none py-2 font-sans"
               />
               <button
-                onClick={() => { setShowWelcome(false); setActiveTab('chat'); }}
+                onClick={() => { setShowWelcome(false); }}
                 className="btn-theme px-6 rounded-xl font-medium text-xs flex-shrink-0 flex items-center gap-2"
               >
                 <span>Search Patents</span>
@@ -1713,14 +1713,14 @@ function App() {
 
             <div className="flex items-center justify-center gap-4 text-xs font-medium">
               <button
-                onClick={() => { setShowWelcome(false); setActiveTab('upload'); }}
+                onClick={() => { setShowWelcome(false); }}
                 className="btn-secondary-outline px-6 flex items-center gap-2"
               >
                 <UploadCloud className="w-4 h-4 text-[#38BDF8]" />
                 <span>Upload Patent PDF</span>
               </button>
               <button
-                onClick={() => { setShowWelcome(false); setActiveTab('chat'); }}
+                onClick={() => { setShowWelcome(false); }}
                 className="btn-secondary-outline px-6 flex items-center gap-2"
               >
                 <MessageSquare className="w-4 h-4 text-[#8B5CF6]" />
@@ -1769,7 +1769,7 @@ function App() {
               return (
                 <div
                   key={mod.id}
-                  onClick={() => { setShowWelcome(false); setActiveTab(mod.id); }}
+                  onClick={() => { setShowWelcome(false); }}
                   className="wrangler-card p-6 space-y-3 cursor-pointer hover:border-blue-500/40 group"
                 >
                   <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-[#38BDF8] flex items-center justify-center">
@@ -1796,10 +1796,10 @@ function App() {
             </div>
 
             <div className="flex items-center gap-6 font-mono">
-              <button onClick={() => { setShowWelcome(false); setActiveTab('privacy'); }} className="hover:text-white">Privacy Policy</button>
-              <button onClick={() => { setShowWelcome(false); setActiveTab('terms'); }} className="hover:text-white">Terms of Service</button>
-              <button onClick={() => { setShowWelcome(false); setActiveTab('contact'); }} className="hover:text-white">Contact Sales</button>
-              <button onClick={() => { setShowWelcome(false); setActiveTab('help'); }} className="hover:text-white">Help Center</button>
+              <button onClick={() => { setShowWelcome(false); }} className="hover:text-white">Privacy Policy</button>
+              <button onClick={() => { setShowWelcome(false); }} className="hover:text-white">Terms of Service</button>
+              <button onClick={() => { setShowWelcome(false); }} className="hover:text-white">Contact Sales</button>
+              <button onClick={() => { setShowWelcome(false); }} className="hover:text-white">Help Center</button>
             </div>
 
             <span className="font-mono text-[11px] text-slate-500">© 2026 PatentMind AI Inc. All rights reserved.</span>
