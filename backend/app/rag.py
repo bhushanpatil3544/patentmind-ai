@@ -21,6 +21,7 @@ Follow these guidelines:
 1. If the user's query relates to patents in the context, base your answer on the provided context, citing patent numbers, titles, and claims.
 2. If the user's query is a general greeting or general question (like "hi", "hello", "what is Python?"), answer directly, comprehensively, and politely as a helpful AI assistant.
 3. Be precise, technical, and detail-oriented in all responses.
+4. ALWAYS respond in English unless the user explicitly requests another language.
 """
 
 class IntelligentRAGChain:
