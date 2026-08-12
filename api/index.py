@@ -1,149 +1,132 @@
-# Official Vercel Python Native HTTP Request Handler
-from http.server import BaseHTTPRequestHandler
-import json
-import os
-import time
-import urllib.request
-import urllib.parse
-from datetime import datetime
+from fastapi import FastAPI, HTTPException, Response
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import List, Optional
+import json, time, urllib.request, os
+
+app = FastAPI(title="PatentMind AI Platform", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 GROQ_KEY = os.environ.get("GROQ_API_KEY") or ("gsk_" + "Vz1ICS5xDYeEv4uvziYIWGdyb3FYTGGYMbu6De5tqFO6rPAlwnIY")
 
-class handler(BaseHTTPRequestHandler):
+class AuthCredentials(BaseModel):
+    username: str
+    password: str
+    email: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
 
-    def _send_json(self, data, status=200):
-        body = json.dumps(data).encode("utf-8")
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
-        self.send_header("Access-Control-Allow-Headers", "*")
-        self.end_headers()
-        self.wfile.write(body)
+class ChatMessage(BaseModel):
+    role: str
+    content: str
 
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
-        self.send_header("Access-Control-Allow-Headers", "*")
-        self.end_headers()
+class ChatRequest(BaseModel):
+    messages: List[ChatMessage]
+    source_filter: Optional[str] = None
+    section_filter: Optional[str] = None
+    target_language: Optional[str] = "english"
 
-    def do_GET(self):
-        path = self.path.split("?")[0]
+@app.get("/api/v1/health")
+def health():
+    return {"status": "healthy", "service": "PatentMind AI"}
 
-        if "/pdf" in path:
-            patent_id = path.split("/patents/")[1].split("/pdf")[0].replace(".pdf", "")
-            dossier_text = f"PATENTMIND AI SPECIFICATION DOSSIER REPORT\nPATENT NUMBER: {patent_id}\nGENERATED ON : {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}\n\nSTATUS: PUBLISHED SPECIFICATION\n\nRegards, Bhushan Shelke"
-            self.send_response(200)
-            self.send_header("Content-Type", "text/plain; charset=utf-8")
-            self.send_header("Content-Disposition", f'attachment; filename="Patent_{patent_id}_Report.txt"')
-            self.send_header("Access-Control-Allow-Origin", "*")
-            self.end_headers()
-            self.wfile.write(dossier_text.encode("utf-8"))
-            return
+@app.post("/api/v1/auth/login")
+@app.post("/api/v1/login")
+def login(credentials: AuthCredentials):
+    u = credentials.username.strip().lower()
+    p = credentials.password.strip()
+    role = "admin" if (u in ["bhushan", "admin"] or p in ["3544", "bhushan"]) else "client"
+    return {
+        "access_token": f"patentmind_token_{int(time.time())}_{u}",
+        "token_type": "bearer",
+        "username": credentials.username,
+        "role": role,
+        "status": "success"
+    }
 
-        if "/patents" in path:
-            return self._send_json([
-                {"patent_number": "LD-260707612V1", "title": "Towards Agentic AI Governance: A Preliminary Assessment", "document_date": "2026-06-02", "source": "USPTO"},
-                {"patent_number": "LD-260710151V1", "title": "Large Language Model Patent Information Extraction Engine", "document_date": "2026-07-26", "source": "USPTO"}
-            ])
+@app.post("/api/v1/auth/register")
+def register(credentials: AuthCredentials):
+    u = credentials.username.strip()
+    return {
+        "status": "success",
+        "message": f"Account '{u}' registered successfully!",
+        "username": u,
+        "access_token": f"patentmind_token_{int(time.time())}_{u}",
+        "token_type": "bearer"
+    }
 
-        if "/analytics" in path:
-            return self._send_json({
-                "total_patents": 724,
-                "indexed_chunks": 4350,
-                "active_vector_store": "Vector Store",
-                "top_created_fields": [
-                    {"field": "AI Governance & Agentic Systems", "count": 210, "percentage": 29.0, "status": "RAPID GROWTH"},
-                    {"field": "LLM Patent Information Extraction", "count": 185, "percentage": 25.5, "status": "HIGH ACTIVITY"},
-                    {"field": "Neural Hardware Acceleration", "count": 160, "percentage": 22.1, "status": "STEADY FILING"}
-                ]
-            })
+@app.post("/api/v1/chat")
+def chat(chat_req: ChatRequest):
+    if not chat_req.messages:
+        return {"answer": "Hello! How can I assist you with patent strategy today?\n\nRegards, Bhushan Shelke", "retrieved_chunks": []}
 
-        return self._send_json({"status": "healthy", "service": "PatentMind AI", "timestamp": datetime.utcnow().isoformat()})
+    last_user_msg = next((msg.content for msg in reversed(chat_req.messages) if msg.role == "user"), "Hello")
+    answer = ""
+    
+    # Try Groq Cloud via standard urllib
+    try:
+        payload = json.dumps({
+            "model": "llama-3.1-8b-instant",
+            "messages": [
+                {"role": "system", "content": "You are PatentMind AI, a senior patent analyst. Always sign with: Regards, Bhushan Shelke"},
+                {"role": "user", "content": last_user_msg}
+            ],
+            "temperature": 0.2,
+            "max_tokens": 1024
+        }).encode("utf-8")
 
-    def do_POST(self):
-        content_length = int(self.headers.get("Content-Length", 0))
-        post_data = self.rfile.read(content_length) if content_length > 0 else b"{}"
+        req = urllib.request.Request(
+            "https://api.groq.com/openai/v1/chat/completions",
+            data=payload,
+            headers={"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"},
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            if resp.status == 200:
+                g_json = json.loads(resp.read().decode("utf-8"))
+                answer = g_json["choices"][0]["message"]["content"].strip()
+    except Exception:
+        pass
 
-        try:
-            req_data = json.loads(post_data.decode("utf-8"))
-        except Exception:
-            req_data = {}
+    if not answer:
+        answer = "Hello! I am your PatentMind AI Assistant. I can help you analyze patent claims, review specifications, and inspect prior art references.\n\nRegards, Bhushan Shelke"
 
-        path = self.path.split("?")[0]
+    return {
+        "answer": answer,
+        "retrieved_chunks": [],
+        "active_db": "Vector Store",
+        "active_llm": "Groq Cloud (Llama-3.1-8b)",
+        "latency_sec": 0.35
+    }
 
-        # Login / Registration Endpoints
-        if "/login" in path or "/register" in path:
-            username = str(req_data.get("username", "user")).strip()
-            password = str(req_data.get("password", ""))
-            clean_u = username.lower()
+@app.get("/api/v1/patents/{patent_id}/pdf")
+def download_pdf(patent_id: str):
+    clean_id = patent_id.strip().replace(".pdf", "")
+    dossier_text = f"PATENTMIND AI SPECIFICATION DOSSIER REPORT\nPATENT NUMBER: {clean_id}\nSTATUS: PUBLISHED SPECIFICATION\n\nRegards, Bhushan Shelke"
+    return Response(content=dossier_text, media_type="text/plain; charset=utf-8", headers={"Content-Disposition": f'attachment; filename="Patent_{clean_id}_Report.txt"'})
 
-            role = "admin" if (clean_u in ["bhushan", "admin"] or password in ["3544", "bhushan"]) else "client"
-            token = f"patentmind_token_{int(time.time())}_{clean_u}"
+@app.get("/api/v1/patents")
+def list_patents():
+    return [
+        {"patent_number": "LD-260707612V1", "title": "Towards Agentic AI Governance: A Preliminary Assessment", "document_date": "2026-06-02", "source": "USPTO"},
+        {"patent_number": "LD-260710151V1", "title": "Large Language Model Patent Information Extraction Engine", "document_date": "2026-07-26", "source": "USPTO"}
+    ]
 
-            return self._send_json({
-                "access_token": token,
-                "token_type": "bearer",
-                "username": username,
-                "role": role,
-                "status": "success"
-            })
-
-        # Chatbot Endpoint
-        if "/chat" in path:
-            messages = req_data.get("messages", [])
-            last_msg = "Hello"
-            for m in reversed(messages):
-                if m.get("role") == "user":
-                    last_msg = m.get("content", "Hello")
-                    break
-
-            target_lang = req_data.get("target_language", "english")
-            answer = ""
-            active_llm = "Groq Cloud (Llama-3.1-8b)"
-
-            # Call Groq API via standard urllib
-            try:
-                groq_payload = json.dumps({
-                    "model": "llama-3.1-8b-instant",
-                    "messages": [
-                        {"role": "system", "content": f"You are PatentMind AI, a senior patent analyst. Answer directly. Language: {target_lang}. Always sign with: Regards, Bhushan Shelke"},
-                        {"role": "user", "content": last_msg}
-                    ],
-                    "temperature": 0.2,
-                    "max_tokens": 1024
-                }).encode("utf-8")
-
-                g_req = urllib.request.Request(
-                    "https://api.groq.com/openai/v1/chat/completions",
-                    data=groq_payload,
-                    headers={
-                        "Authorization": f"Bearer {GROQ_KEY}",
-                        "Content-Type": "application/json"
-                    },
-                    method="POST"
-                )
-                with urllib.request.urlopen(g_req, timeout=10) as g_resp:
-                    if g_resp.status == 200:
-                        g_json = json.loads(g_resp.read().decode("utf-8"))
-                        answer = g_json["choices"][0]["message"]["content"].strip()
-            except Exception as e:
-                pass
-
-            if not answer:
-                answer = (
-                    "Hello! I am your PatentMind AI Assistant. I can help you analyze patent claims, "
-                    "inspect prior art references, compare technical specifications, and conduct white-space landscape analysis.\n\n"
-                    "Regards, Bhushan Shelke"
-                )
-
-            return self._send_json({
-                "answer": answer,
-                "retrieved_chunks": [],
-                "active_db": "Vector Store",
-                "active_llm": active_llm,
-                "latency_sec": 0.35
-            })
-
-        return self._send_json({"status": "success", "message": "Endpoint received"})
+@app.get("/api/v1/analytics/overview")
+def analytics_overview():
+    return {
+        "total_patents": 724,
+        "indexed_chunks": 4350,
+        "active_vector_store": "Vector Store",
+        "top_created_fields": [
+            {"field": "AI Governance & Agentic Systems", "count": 210, "percentage": 29.0, "status": "RAPID GROWTH"},
+            {"field": "LLM Patent Information Extraction", "count": 185, "percentage": 25.5, "status": "HIGH ACTIVITY"}
+        ]
+    }
