@@ -44,12 +44,31 @@ def provider_unavailable_response(prompt: str) -> str:
                 if word not in {"the", "and", "for", "with", "what", "about", "that", "this", "from"}]
     focus = ", ".join(dict.fromkeys(keywords[:5])) or "the supplied question"
     return (
-        f"### I received your question\n\n"
+        f"### PatentMind AI received your question\n\n"
         f"> {clean_prompt}\n\n"
-        f"PatentMind cannot generate a reliable answer right now because its AI provider is not configured or is unavailable. "
-        f"I have not substituted a generic response. The detected research focus is: **{focus}**.\n\n"
-        f"To restore AI answers, add a valid `GROQ_API_KEY` to the Vercel project's Environment Variables and redeploy."
+        f"PatentMind AI cannot generate a reliable answer right now because the AI provider is not configured or is unavailable. "
+        f"The detected research focus is: **{focus}**.\n\n"
+        f"To restore AI answers, add a valid `GROQ_API_KEY` to the Vercel project's Environment Variables and redeploy.\n\n"
+        f"— PatentMind AI"
     )
+
+def clean_ai_response(text: str) -> str:
+    """Remove any personal signatures from AI responses."""
+    if not text:
+        return text
+    # Remove 'Regards, Bhushan Shelke' and variants
+    patterns = [
+        r'\n*Regards,?\s*Bhushan\s*Shelke\s*$',
+        r'\n*Regards,?\s*Bhushan\s*$',
+        r'\n*Best\s+regards,?\s*Bhushan\s*Shelke\s*$',
+        r'\n*Sincerely,?\s*Bhushan\s*Shelke\s*$',
+        r'\n*—\s*Bhushan\s*Shelke\s*$',
+        r'\n*-\s*Bhushan\s*Shelke\s*$',
+        r'Bhushan\s*Shelke',
+    ]
+    for pattern in patterns:
+        text = re.sub(pattern, '', text, flags=re.IGNORECASE | re.MULTILINE)
+    return text.rstrip()
 
 @app.get("/api/v1/health")
 @app.get("/v1/health")
@@ -109,14 +128,15 @@ def chat(chat_req: ChatRequest):
 
     system_prompt = (
         "You are PatentMind AI, an intelligent patent analysis assistant built by the PatentMind team. "
-        "IMPORTANT RULES:\n"
-        "1. Always introduce yourself as 'PatentMind AI' when greeting users. Never use any personal name.\n"
-        "2. ALWAYS cite specific patent numbers (e.g., LD-260707612V1) in your answers when discussing patents or related topics.\n"
-        "3. When analyzing any topic, reference the relevant patents from the database with their full patent numbers and titles.\n"
-        "4. Provide thorough, detailed, creative, and highly informative answers.\n"
-        "5. Format your answer with clear markdown headings (##), bullet points, and numbered lists.\n"
-        "6. Sign off responses as 'PatentMind AI' if appropriate.\n\n"
-        f"PATENT DATABASE - Reference these patents in your answers when relevant:\n{patents_context}\n\n"
+        "CRITICAL RULES YOU MUST FOLLOW:\n"
+        "1. Always introduce yourself as 'PatentMind AI' when greeting users.\n"
+        "2. NEVER sign off as 'Bhushan Shelke' or any personal name. NEVER write 'Regards, Bhushan Shelke'. You are PatentMind AI, not a person.\n"
+        "3. ALWAYS cite specific patent numbers (e.g., Patent #LD-260707612V1) in your answers when discussing patents or related topics.\n"
+        "4. When analyzing any topic, reference the relevant patents from the database with their full patent numbers and titles.\n"
+        "5. Provide thorough, detailed, creative, and highly informative answers.\n"
+        "6. Format your answer with clear markdown headings (##), bullet points, and numbered lists.\n"
+        "7. If you want to sign off, sign off as '— PatentMind AI'.\n\n"
+        f"PATENT DATABASE - You MUST reference these patents in your answers when relevant:\n{patents_context}\n\n"
         "Total patents indexed: 724 | Active vector store chunks: 4,350\n"
         "Top fields: AI Governance & Agentic Systems (210 patents), LLM Patent Information Extraction (185 patents)"
     )
@@ -156,6 +176,7 @@ def chat(chat_req: ChatRequest):
                 if resp.status_code == 200:
                     g_json = resp.json()
                     answer = g_json["choices"][0]["message"]["content"].strip()
+                    answer = clean_ai_response(answer)
                     if answer:
                         active_model = f"Groq Cloud ({g_model})"
                         break
@@ -268,6 +289,7 @@ async def analyze_idea(file: UploadFile = File(...)):
                 )
                 if resp.status_code == 200:
                     answer = resp.json()["choices"][0]["message"]["content"].strip()
+                    answer = clean_ai_response(answer)
                     active_model = f"Groq Cloud ({g_model})"
                     break
             except Exception as e:

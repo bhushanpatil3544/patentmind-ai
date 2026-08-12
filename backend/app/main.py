@@ -54,11 +54,29 @@ def provider_unavailable_response(prompt: str) -> str:
                 if word not in {"the", "and", "for", "with", "what", "about", "that", "this", "from"}]
     focus = ", ".join(dict.fromkeys(keywords[:5])) or "the supplied question"
     return (
-        f"### I received your question\n\n> {clean_prompt}\n\n"
-        f"PatentMind cannot answer it reliably because the AI provider is not configured or is unavailable. "
-        f"I have not replaced it with a generic reply. Detected focus: **{focus}**.\n\n"
-        "An administrator must set `GROQ_API_KEY` in the deployment environment and redeploy to enable AI-generated answers."
+        f"### PatentMind AI received your question\n\n> {clean_prompt}\n\n"
+        f"PatentMind AI cannot answer it reliably because the AI provider is not configured or is unavailable. "
+        f"Detected focus: **{focus}**.\n\n"
+        "An administrator must set `GROQ_API_KEY` in the deployment environment and redeploy to enable AI-generated answers.\n\n"
+        "— PatentMind AI"
     )
+
+def clean_ai_response(text: str) -> str:
+    """Remove any personal signatures like 'Regards, Bhushan Shelke' from AI responses."""
+    if not text:
+        return text
+    patterns = [
+        r'\n*Regards,?\s*Bhushan\s*Shelke\s*$',
+        r'\n*Regards,?\s*Bhushan\s*$',
+        r'\n*Best\s+regards,?\s*Bhushan\s*Shelke\s*$',
+        r'\n*Sincerely,?\s*Bhushan\s*Shelke\s*$',
+        r'\n*—\s*Bhushan\s*Shelke\s*$',
+        r'\n*-\s*Bhushan\s*Shelke\s*$',
+        r'Bhushan\s*Shelke',
+    ]
+    for pattern in patterns:
+        text = re.sub(pattern, '', text, flags=re.IGNORECASE | re.MULTILINE)
+    return text.rstrip()
 
 app = FastAPI(
     title="PatentMind AI Platform",
@@ -1150,6 +1168,7 @@ def chat_with_patentmind(chat_request: ChatRequest, current_user: dict = Depends
                     resp = requests.post(groq_url, headers=groq_headers, json=groq_payload, timeout=20.0)
                     if resp.status_code == 200:
                         answer = resp.json()["choices"][0]["message"]["content"].strip()
+                        answer = clean_ai_response(answer)
                         active_llm = f"Groq Cloud ({g_model})"
                         logger.info(f"Groq chat HTTP inference succeeded using {g_model}.")
                         break
@@ -1163,6 +1182,8 @@ def chat_with_patentmind(chat_request: ChatRequest, current_user: dict = Depends
     if not answer:
         answer = provider_unavailable_response(last_user_msg)
         active_llm = "AI provider unavailable"
+    else:
+        answer = clean_ai_response(answer)
 
     latency = round(time.time() - start_time, 3)
     active_db_name = "Vector Store"
