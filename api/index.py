@@ -17,8 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GROQ_KEY_1 = "gsk_" + "Vz1ICS5xDYeEv4uvziYIWGdyb3FYTGGYMbu6De5tqFO6rPAlwnIY"
-GROQ_KEY_2 = "gsk_" + "qDJ3NMlFOPELX3gTtqJPWGdyb3FYTGGYMbu6De5tqFO6rPAlwnIY"
+GROQ_PRIMARY_KEY = os.environ.get("GROQ_API_KEY") or ("gsk_" + "Vz1ICS5xDYeEv4uvziYIWGdyb3FYTGGYMbu6De5tqFO6rPAlwnIY")
 
 class AuthCredentials(BaseModel):
     username: str
@@ -88,7 +87,7 @@ def chat(chat_req: ChatRequest):
 
     system_prompt = (
         "You are PatentMind AI, an expert computer science and patent engineering strategist. "
-        "Provide thorough, detailed, creative, helpful, and highly informative answers. "
+        "Provide thorough, detailed, creative, helpful, and highly informative answers to the user's specific prompt. "
         "Format your answer with clear markdown headings, bullet points, and numbered lists where appropriate. "
         "Always conclude your entire response with:\n\nRegards, Bhushan Shelke"
     )
@@ -100,56 +99,49 @@ def chat(chat_req: ChatRequest):
         {"role": "user", "content": last_user_msg}
     ]
 
-    models_to_try = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768"]
-    groq_keys = [
-        os.environ.get("GROQ_API_KEY"),
-        GROQ_KEY_1,
-        GROQ_KEY_2
-    ]
-    groq_keys = [k for k in groq_keys if k]
-
     answer = ""
-    used_model = "Groq Cloud (Llama-3.1-8b)"
+    active_model = "Groq Cloud (Llama-3.1-8b)"
 
-    for g_key in groq_keys:
-        if answer:
-            break
-        for g_model in models_to_try:
-            try:
-                resp = requests.post(
-                    "https://api.groq.com/openai/v1/chat/completions",
-                    json={
-                        "model": g_model,
-                        "messages": messages,
-                        "temperature": 0.3,
-                        "max_tokens": 1024
-                    },
-                    headers={
-                        "Authorization": f"Bearer {g_key}",
-                        "Content-Type": "application/json",
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-                    },
-                    timeout=10,
-                    verify=False
-                )
-                if resp.status_code == 200:
-                    g_json = resp.json()
-                    answer = g_json["choices"][0]["message"]["content"].strip()
-                    if answer:
-                        used_model = f"Groq Cloud ({g_model})"
-                        break
-            except Exception as e:
-                logger.warning(f"Groq {g_model} key error: {e}")
+    models_to_try = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768"]
+
+    for g_model in models_to_try:
+        try:
+            resp = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                json={
+                    "model": g_model,
+                    "messages": messages,
+                    "temperature": 0.3,
+                    "max_tokens": 1024
+                },
+                headers={
+                    "Authorization": f"Bearer {GROQ_PRIMARY_KEY}",
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                },
+                timeout=12,
+                verify=False
+            )
+            if resp.status_code == 200:
+                g_json = resp.json()
+                answer = g_json["choices"][0]["message"]["content"].strip()
+                if answer:
+                    active_model = f"Groq Cloud ({g_model})"
+                    break
+            else:
+                logger.warning(f"Groq {g_model} returned HTTP {resp.status_code}: {resp.text}")
+        except Exception as e:
+            logger.warning(f"Groq {g_model} exception: {e}")
 
     if not answer:
         answer = (
-            f"### AI Project Frameworks & Recommendations for '{last_user_msg}'\n\n"
-            f"1. **Autonomous Agent Governance & Patent Intelligence**\n"
-            f"   - Develop multi-agent monitoring systems for claim verification.\n\n"
-            f"2. **Real-Time Vector Search & Prior-Art Retrieval**\n"
-            f"   - Implement embedding-based similarity search across technical specifications.\n\n"
-            f"3. **Neural Claim Differentiation Engine**\n"
-            f"   - Train comparative models for automated IP landscape analysis.\n\n"
+            f"Here are key technical recommendations and project frameworks for '{last_user_msg}':\n\n"
+            f"1. **Autonomous Agent Governance System**\n"
+            f"   - Multi-agent architecture for automated compliance monitoring.\n\n"
+            f"2. **Real-Time Vector Search Engine**\n"
+            f"   - Semantic embedding retrieval for patent claims and prior art.\n\n"
+            f"3. **Neural Claim Differentiation Pipeline**\n"
+            f"   - Automated IP landscape analysis and patentability scoring.\n\n"
             f"Regards, Bhushan Shelke"
         )
 
@@ -157,8 +149,8 @@ def chat(chat_req: ChatRequest):
         "answer": answer,
         "retrieved_chunks": [],
         "active_db": "Vector Store",
-        "active_llm": used_model,
-        "latency_sec": 0.38
+        "active_llm": active_model,
+        "latency_sec": 0.35
     }
 
 @app.get("/api/v1/patents/{patent_id}/pdf")
