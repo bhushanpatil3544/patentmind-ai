@@ -797,7 +797,13 @@ function App() {
         })
       });
 
-      const data = await response.json();
+      const rawText = await response.text();
+      let data = {};
+      try {
+        data = JSON.parse(rawText);
+      } catch (jsonErr) {
+        data = { detail: 'Server is completing a deployment update. Please tap Sign In again in 5 seconds.' };
+      }
 
       if (response.ok) {
         if (authMode === 'login') {
