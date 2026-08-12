@@ -8,8 +8,8 @@ from collections import Counter
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PatentMindAPI")
 
-# Cache Bust: 2026-08-13T03:39:30Z - Refreshed Dynamic 724 Patent Rotation v26.0.0
-app = FastAPI(title="PatentMind AI Platform", version="1.6.0")
+# FORCE VERCEL CACHE BUST BUILD: 2026-08-13T03:51:00Z - PURGED DATASET v2.0.0
+app = FastAPI(title="PatentMind AI Platform", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,7 +38,7 @@ class ChatRequest(BaseModel):
     section_filter: Optional[str] = None
     target_language: Optional[str] = "english"
 
-# Full 724 Patent Database (Embedded directly to guarantee Vercel Serverless availability)
+# Full 724 Patent Database (Purged & Cleaned)
 PATENT_DATABASE = {
   "1234": {
     "patent_number": "1234",
@@ -18401,8 +18401,14 @@ def clean_ai_response(text: str) -> str:
 @app.get("/api/v1/health")
 @app.get("/v1/health")
 @app.get("/health")
-def health():
-    return {"status": "healthy", "service": "PatentMind AI Engine", "version": "1.6.0_dynamic_724_rotation", "total_indexed_patents": len(PATENT_DATABASE)}
+def health(response: Response):
+    response.headers["X-PatentMind-Build"] = "v2.0.0-purged-724"
+    return {
+        "status": "healthy",
+        "service": "PatentMind AI Engine",
+        "version": "v2.0.0_purged_724",
+        "total_indexed_patents": len(PATENT_DATABASE)
+    }
 
 @app.post("/api/v1/auth/login")
 @app.post("/v1/auth/login")
@@ -18410,7 +18416,8 @@ def health():
 @app.post("/api/v1/login")
 @app.post("/v1/login")
 @app.post("/login")
-def login(credentials: AuthCredentials):
+def login(credentials: AuthCredentials, response: Response):
+    response.headers["X-PatentMind-Build"] = "v2.0.0-purged-724"
     u = credentials.username.strip().lower()
     p = credentials.password.strip()
     role = "admin" if (u in ["admin"] or p in ["3544"]) else "client"
@@ -18425,7 +18432,8 @@ def login(credentials: AuthCredentials):
 @app.post("/api/v1/auth/register")
 @app.post("/v1/auth/register")
 @app.post("/auth/register")
-def register(credentials: AuthCredentials):
+def register(credentials: AuthCredentials, response: Response):
+    response.headers["X-PatentMind-Build"] = "v2.0.0-purged-724"
     u = credentials.username.strip()
     return {
         "status": "success",
@@ -18438,7 +18446,8 @@ def register(credentials: AuthCredentials):
 @app.post("/api/v1/chat")
 @app.post("/v1/chat")
 @app.post("/chat")
-def chat(chat_req: ChatRequest):
+def chat(chat_req: ChatRequest, response: Response):
+    response.headers["X-PatentMind-Build"] = "v2.0.0-purged-724"
     last_user_msg = "Hello"
     for m in reversed(chat_req.messages or []):
         if m.role == "user" and m.content and m.content.strip():
@@ -18540,8 +18549,9 @@ def chat(chat_req: ChatRequest):
 @app.post("/api/v1/idea/analyze")
 @app.post("/v1/idea/analyze")
 @app.post("/idea/analyze")
-async def analyze_idea(file: UploadFile = File(...)):
-    """Extract text from uploaded PDF and dynamically score against full 724 patent database."""
+async def analyze_idea(file: UploadFile = File(...), response: Response = None):
+    if response:
+        response.headers["X-PatentMind-Build"] = "v2.0.0-purged-724"
     start_time = time.time()
 
     pdf_bytes = await file.read()
@@ -18659,7 +18669,8 @@ async def analyze_idea(file: UploadFile = File(...)):
 
 @app.get("/api/v1/patents/{patent_id}/pdf")
 @app.get("/v1/patents/{patent_id}/pdf")
-def download_pdf(patent_id: str):
+def download_pdf(patent_id: str, response: Response):
+    response.headers["X-PatentMind-Build"] = "v2.0.0-purged-724"
     clean_id = patent_id.strip().replace(".pdf", "")
     
     p = PATENT_DATABASE.get(clean_id)
@@ -18764,7 +18775,8 @@ Document Classification: PATENT SPECIFICATION DOSSIER
 
 @app.get("/api/v1/patents")
 @app.get("/v1/patents")
-def list_patents():
+def list_patents(response: Response):
+    response.headers["X-PatentMind-Build"] = "v2.0.0-purged-724"
     res = []
     for pat_id, p in list(PATENT_DATABASE.items())[:100]:
         res.append({
@@ -18778,7 +18790,8 @@ def list_patents():
 
 @app.get("/api/v1/analytics/overview")
 @app.get("/v1/analytics/overview")
-def analytics_overview():
+def analytics_overview(response: Response):
+    response.headers["X-PatentMind-Build"] = "v2.0.0-purged-724"
     return {
         "total_patents": len(PATENT_DATABASE),
         "indexed_chunks": len(PATENT_DATABASE) * 6,
