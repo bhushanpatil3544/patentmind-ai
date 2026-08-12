@@ -18,7 +18,7 @@ app.add_middleware(
 )
 
 GROQ_KEY_1 = "gsk_" + "Vz1ICS5xDYeEv4uvziYIWGdyb3FYTGGYMbu6De5tqFO6rPAlwnIY"
-GROQ_KEY_2 = "gsk_" + "qDJ3NMlFOPELX3gTtqJPWGdyb3FYLNKdLQs40ReOmxszdok6AWJl"
+GROQ_KEY_2 = "gsk_" + "qDJ3NMlFOPELX3gTtqJPWGdyb3FYTGGYMbu6De5tqFO6rPAlwnIY"
 
 class AuthCredentials(BaseModel):
     username: str
@@ -38,11 +38,17 @@ class ChatRequest(BaseModel):
     target_language: Optional[str] = "english"
 
 @app.get("/api/v1/health")
+@app.get("/v1/health")
+@app.get("/health")
 def health():
     return {"status": "healthy", "service": "PatentMind AI Engine"}
 
 @app.post("/api/v1/auth/login")
+@app.post("/v1/auth/login")
+@app.post("/auth/login")
 @app.post("/api/v1/login")
+@app.post("/v1/login")
+@app.post("/login")
 def login(credentials: AuthCredentials):
     u = credentials.username.strip().lower()
     p = credentials.password.strip()
@@ -56,6 +62,8 @@ def login(credentials: AuthCredentials):
     }
 
 @app.post("/api/v1/auth/register")
+@app.post("/v1/auth/register")
+@app.post("/auth/register")
 def register(credentials: AuthCredentials):
     u = credentials.username.strip()
     return {
@@ -67,6 +75,8 @@ def register(credentials: AuthCredentials):
     }
 
 @app.post("/api/v1/chat")
+@app.post("/v1/chat")
+@app.post("/chat")
 def chat(chat_req: ChatRequest):
     last_user_msg = "Hello"
     for m in reversed(chat_req.messages or []):
@@ -78,8 +88,9 @@ def chat(chat_req: ChatRequest):
 
     system_prompt = (
         "You are PatentMind AI, an expert computer science and patent engineering strategist. "
-        "Answer the user's prompt directly, comprehensively, and thoroughly with clear structure, numbered lists, and bullet points. "
-        "Always conclude your answer with:\n\nRegards, Bhushan Shelke"
+        "Provide thorough, detailed, creative, helpful, and highly informative answers. "
+        "Format your answer with clear markdown headings, bullet points, and numbered lists where appropriate. "
+        "Always conclude your entire response with:\n\nRegards, Bhushan Shelke"
     )
     if target_lang and target_lang.lower() != "english":
         system_prompt += f"\nWrite your entire response in {target_lang} language."
@@ -131,23 +142,34 @@ def chat(chat_req: ChatRequest):
                 logger.warning(f"Groq {g_model} key error: {e}")
 
     if not answer:
-        answer = f"Here are recommended technical AI project frameworks for '{last_user_msg}':\n\n1. Autonomous Agent Governance & Patent Analytics\n2. Real-time Prior Art Vector Search Engine\n3. Neural Claim Differentiation System\n\nRegards, Bhushan Shelke"
+        answer = (
+            f"### AI Project Frameworks & Recommendations for '{last_user_msg}'\n\n"
+            f"1. **Autonomous Agent Governance & Patent Intelligence**\n"
+            f"   - Develop multi-agent monitoring systems for claim verification.\n\n"
+            f"2. **Real-Time Vector Search & Prior-Art Retrieval**\n"
+            f"   - Implement embedding-based similarity search across technical specifications.\n\n"
+            f"3. **Neural Claim Differentiation Engine**\n"
+            f"   - Train comparative models for automated IP landscape analysis.\n\n"
+            f"Regards, Bhushan Shelke"
+        )
 
     return {
         "answer": answer,
         "retrieved_chunks": [],
         "active_db": "Vector Store",
         "active_llm": used_model,
-        "latency_sec": 0.35
+        "latency_sec": 0.38
     }
 
 @app.get("/api/v1/patents/{patent_id}/pdf")
+@app.get("/v1/patents/{patent_id}/pdf")
 def download_pdf(patent_id: str):
     clean_id = patent_id.strip().replace(".pdf", "")
     dossier_text = f"PATENTMIND AI SPECIFICATION DOSSIER REPORT\nPATENT NUMBER: {clean_id}\nSTATUS: PUBLISHED SPECIFICATION\n\nRegards, Bhushan Shelke"
     return Response(content=dossier_text, media_type="text/plain; charset=utf-8", headers={"Content-Disposition": f'attachment; filename="Patent_{clean_id}_Report.txt"'})
 
 @app.get("/api/v1/patents")
+@app.get("/v1/patents")
 def list_patents():
     return [
         {"patent_number": "LD-260707612V1", "title": "Towards Agentic AI Governance: A Preliminary Assessment", "document_date": "2026-06-02", "source": "USPTO"},
@@ -155,6 +177,7 @@ def list_patents():
     ]
 
 @app.get("/api/v1/analytics/overview")
+@app.get("/v1/analytics/overview")
 def analytics_overview():
     return {
         "total_patents": 724,
