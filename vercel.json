@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd frontend && npm install && npm run build && npx xcopy /E /I /Y dist ..\\\\dist 2>nul || cp -r dist ../dist",
-  "outputDirectory": "dist",
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
   "rewrites": [
     {
       "source": "/api/(.*)",
