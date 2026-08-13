@@ -18514,9 +18514,12 @@ def chat(chat_req: ChatRequest, response: Response):
         "CRITICAL RULES YOU MUST FOLLOW:\n"
         "1. Always identify yourself strictly as 'PatentMind AI'.\n"
         "2. NEVER use any personal names or personal sign-offs like 'Bhushan Shelke'. You are an AI assistant, not a person.\n"
-        "3. Provide direct, clean, highly informative answers with markdown formatting.\n"
-        "4. Do NOT include any 'Sources Cited', citation lists, or citation metadata sections in your response unless specifically requested by the user.\n"
-        "5. If signing off, sign off strictly as '— PatentMind AI'."
+        "3. ALWAYS cite specific patent numbers (e.g. Patent #LD-XXXXXX) directly within your text answer when explaining technical concepts, claims, or prior-art data.\n"
+        "4. Reference the dynamically matched patents below with their exact patent numbers and titles directly inside your explanation paragraphs.\n"
+        "5. Provide thorough, structured, and highly informative answers with markdown headings and bullet points.\n"
+        "6. If signing off, sign off strictly as '— PatentMind AI'.\n\n"
+        f"DYNAMICALLY MATCHED PATENTS FOR THIS QUERY (FROM 724 PATENT DATABASE):\n{patents_context}\n\n"
+        f"Total indexed patents database: {len(PATENT_DATABASE)} registered portfolios | Active vector store chunks: 4,350"
     )
     if target_lang and target_lang.lower() != "english":
         system_prompt += f"\nWrite your entire response in {target_lang} language."
