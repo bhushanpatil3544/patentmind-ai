@@ -1216,7 +1216,7 @@ function App() {
         setChatMessages(prev => [...prev, {
           role: 'assistant',
           content: cleanAiResponse(data.answer),
-          citations: data.retrieved_chunks || [],
+          citations: [],
           latency: data.latency_sec,
           active_llm: data.active_llm,
           active_db: data.active_db
@@ -1313,11 +1313,7 @@ function App() {
         setChatMessages(prev => [...prev, {
           role: 'assistant',
           content: `📊 **PDF Specification Analysis & Patent Comparison Complete** for **${file.name}**:\n\n${cleanAiResponse(data.ai_analysis)}`,
-          citations: matched.map(p => ({
-            metadata: { patent_number: p.patent_number, title: p.title, section: p.sections ? p.sections.join(', ') : 'Patent Match' },
-            score: p.avg_score,
-            text: p.excerpt
-          })),
+          citations: [],
           latency: data.latency_sec || 0.35,
           active_llm: data.active_llm || 'Groq Cloud (llama-3.1-8b-instant)',
           active_db: 'Vector Store'
@@ -1326,11 +1322,7 @@ function App() {
         setChatMessages(prev => [...prev, {
           role: 'assistant',
           content: `📊 **PDF Specification Analysis Complete** for **${file.name}**:\n\n### Document Summary & Patent Comparison\n- **Document Analyzed:** ${file.name}\n- **Patent Landscape Match:** Matched against indexed patent portfolios **${dynamicPatents.map(p => p.patent_number).join(', ')}**.\n- **Technical Evaluation:** The uploaded PDF specification describes novel AI system concepts with strong alignment to ${dynamicPatents[0].title}.\n- **Patent Strategy Recommendation:** Proceed with claim drafting targeting novel system architecture differentiators.\n\n— PatentMind AI`,
-          citations: dynamicPatents.map(p => ({
-            metadata: { patent_number: p.patent_number, title: p.title, section: p.sections.join(', ') },
-            score: p.avg_score,
-            text: p.excerpt
-          })),
+          citations: [],
           latency: 0.32,
           active_llm: 'PatentMind AI Engine',
           active_db: 'Vector Store'
@@ -1340,11 +1332,7 @@ function App() {
       setChatMessages(prev => [...prev, {
         role: 'assistant',
         content: `📊 **PDF Specification Analysis Complete** for **${file.name}**:\n\n### Document Summary & Patent Comparison\n- **Document Analyzed:** ${file.name}\n- **Patent Landscape Match:** Matched against indexed patent portfolios **${dynamicPatents.map(p => p.patent_number).join(', ')}**.\n- **Technical Evaluation:** The uploaded PDF specification describes novel AI system concepts with strong alignment to ${dynamicPatents[0].title}.\n- **Patent Strategy Recommendation:** Proceed with claim drafting targeting novel system architecture differentiators.\n\n— PatentMind AI`,
-        citations: dynamicPatents.map(p => ({
-          metadata: { patent_number: p.patent_number, title: p.title, section: p.sections.join(', ') },
-          score: p.avg_score,
-          text: p.excerpt
-        })),
+        citations: [],
         latency: 0.32,
         active_llm: 'PatentMind AI Engine',
         active_db: 'Vector Store'
