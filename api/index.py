@@ -18417,12 +18417,20 @@ def provider_unavailable_response(prompt: str) -> str:
     )
 
 def clean_ai_response(text: str) -> str:
-    """Remove any personal signatures like 'Bhushan Shelke' or orphaned signoffs from AI responses."""
+    """Clean AI response text to remove personal signatures, excessive ASCII divider lines, and ugly markdown clutter."""
     if not text:
         return text
     text = re.sub(r'Bhushan\s*Shelke', '', text, flags=re.IGNORECASE)
     text = re.sub(r'Bhushan', '', text, flags=re.IGNORECASE)
     text = re.sub(r'Shelke', '', text, flags=re.IGNORECASE)
+    # Strip ASCII divider lines (e.g., ======, ------, ______)
+    text = re.sub(r'^[=\-_\*]{3,}\s*$', '', text, flags=re.MULTILINE)
+    # Strip double asterisks around standalone header lines (**Header** -> Header)
+    text = re.sub(r'^\*\*(.*?)\*\*\s*$', r'\1', text, flags=re.MULTILINE)
+    # Strip leading markdown header symbols like ### Header -> Header
+    text = re.sub(r'^(#{1,6})\s*', '', text, flags=re.MULTILINE)
+    # Collapse multiple consecutive blank lines
+    text = re.sub(r'\n{3,}', '\n\n', text)
     text = re.sub(r'\n+\s*(Regards|Best regards|Sincerely|Warm regards|Thanks|Thank you|Yours truly|—|-|\*|#)\s*,?\s*$', '', text, flags=re.IGNORECASE)
     return text.strip()
 
@@ -18510,15 +18518,16 @@ def chat(chat_req: ChatRequest, response: Response):
     patents_context = "\n".join(patents_context_lines)
 
     system_prompt = (
-        "You are PatentMind AI, an intelligent patent analysis assistant built by PatentMind AI Research Labs. "
+        "You are PatentMind AI, a senior patent attorney and AI technical consultant at PatentMind AI Research Labs. "
         "CRITICAL RULES YOU MUST FOLLOW:\n"
         "1. Always identify yourself strictly as 'PatentMind AI'.\n"
         "2. NEVER use any personal names or personal sign-offs like 'Bhushan Shelke'. You are an AI assistant, not a person.\n"
-        "3. WHEN ASKED FOR PATENT SUGGESTIONS OR RECOMMENDATIONS (e.g. 'suggest patent', 'show patents', 'prior art'), ALWAYS present actual indexed patent portfolios from the 724-patent database provided below. Cite their exact patent numbers (e.g. Patent #LD-XXXXXX, #BS-XXXXXX, #GP-XXXXXX), titles, field categories, abstracts, and key claims.\n"
-        "4. DO NOT generate generic non-existent concepts (such as contact lenses or farming drones) outside the indexed patent database. Draw directly from the registered patent database records provided below.\n"
-        "5. ALWAYS cite specific patent numbers directly within your text answer when explaining technical concepts, claims, or prior-art data.\n"
-        "6. Provide thorough, structured, and highly informative answers with markdown headings and bullet points.\n"
-        "7. If signing off, sign off strictly as '— PatentMind AI'.\n\n"
+        "3. WRITE VERY REALISTIC, NATURAL, PROFESSIONAL HUMAN TEXT. Do NOT use decorative ASCII underlines (such as '========' or '--------'), do NOT use excessive markdown symbols ('**', '##', '#', '==='), and do NOT use heavy bolding on every line.\n"
+        "4. Write in clean, realistic, well-crafted paragraphs and simple, clean bullet points like a human legal expert.\n"
+        "5. WHEN ASKED FOR PATENT SUGGESTIONS OR RECOMMENDATIONS (e.g. 'suggest patent', 'show patents', 'prior art'), ALWAYS present actual indexed patent portfolios from the 724-patent database provided below. Cite their exact patent numbers (e.g. Patent #LD-XXXXXX, #BS-XXXXXX, #GP-XXXXXX), titles, field categories, abstracts, and key claims.\n"
+        "6. DO NOT generate generic non-existent concepts (such as contact lenses or farming drones) outside the indexed patent database. Draw directly from the registered patent database records provided below.\n"
+        "7. ALWAYS cite specific patent numbers directly within your text answer when explaining technical concepts, claims, or prior-art data.\n"
+        "8. If signing off, sign off strictly as '— PatentMind AI'.\n\n"
         f"DYNAMICALLY MATCHED PATENTS FOR THIS QUERY (FROM 724 PATENT DATABASE):\n{patents_context}\n\n"
         f"Total indexed patents database: {len(PATENT_DATABASE)} registered portfolios | Active vector store chunks: 4,350"
     )
