@@ -1073,8 +1073,10 @@ def search_patents(search_query: SearchQuery, current_user: dict = Depends(get_c
             active_db=result["active_db"],
             latency_sec=result["latency_sec"]
         )
-            
-    recipient_email = user_info.get("email") if user_info else None
+        return result
+    except Exception as err:
+        logger.warning(f"Error executing search: {err}")
+        return {"answer": provider_unavailable_response(search_query.query), "retrieved_chunks": [], "active_db": "N/A", "active_llm": "Unavailable", "latency_sec": 0.0}
     if not recipient_email and "@" in target:
         recipient_email = target
         
@@ -1351,15 +1353,13 @@ def chat_with_patentmind(chat_request: ChatRequest, current_user: dict = Depends
         active_llm = "AI provider unavailable"
     else:
         answer = clean_ai_response(answer)
-            active_db=active_db_name,
-            latency_sec=latency
-        )
-    except Exception as db_log_err:
-        logger.warning(f"Could not log question to database: {db_log_err}")
-    
+
+    latency = round(time.time() - start_time, 3)
+    active_db_name = "Vector Store"
+
     return {
         "answer": answer,
-        "retrieved_chunks": retrieved_chunks,
+        "retrieved_chunks": [],
         "active_db": active_db_name,
         "active_llm": active_llm,
         "latency_sec": latency,

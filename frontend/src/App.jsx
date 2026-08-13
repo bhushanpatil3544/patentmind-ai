@@ -1262,18 +1262,24 @@ function App() {
         return Math.abs(h);
       };
 
+      const seed = hash(clean + (Date.now() % 997).toString());
+
       const patentPool = [
-        { number: 'BS-29132143-02', title: 'System and Method for Quantum Computing Optimization', section: 'Claims', keywords: ['quantum', 'qubit', 'nas', 'neural'] },
-        { number: 'LD-07060550V1', title: 'Convolutional Spatial Feature Alignment for Autonomous Vision Systems', section: 'Specification', keywords: ['autonomous', 'vehicle', 'vision', 'lidar', 'camera'] },
-        { number: 'LD-08081458V2', title: 'AI-Assisted Genomics Sequence Alignment and Variant Identification', section: 'Claims', keywords: ['genomics', 'dna', 'bioinformatics', 'sequence'] },
-        { number: 'LD-13117295V1', title: 'Zero-Knowledge Proof Verification for Decentralized Identity', section: 'Claims', keywords: ['zero-knowledge', 'zkp', 'cryptography', 'privacy', 'security'] },
-        { number: 'LD-180100904V4', title: 'Large Language Model Patent Information Extraction Engine', section: 'Abstract', keywords: ['llm', 'language', 'extraction', 'claims', 'nlp'] },
-        { number: 'LD-08082162V2', title: 'Distributed Ledger Consensus for Intellectual Property Royalty Rights', section: 'Specification', keywords: ['blockchain', 'royalty', 'smart-contract', 'ledger', 'licensing'] }
+        { number: 'BS-29132143-02', title: 'System and Method for Quantum Computing Optimization', section: 'Claims', field: 'Quantum', keywords: ['quantum', 'qubit', 'nas', 'neural'] },
+        { number: 'LD-07060550V1', title: 'Convolutional Spatial Feature Alignment for Autonomous Vision Systems', section: 'Specification', field: 'Vision', keywords: ['autonomous', 'vehicle', 'vision', 'lidar', 'camera'] },
+        { number: 'LD-08081458V2', title: 'AI-Assisted Genomics Sequence Alignment and Variant Identification', section: 'Claims', field: 'Genomics', keywords: ['genomics', 'dna', 'bioinformatics', 'sequence'] },
+        { number: 'LD-13117295V1', title: 'Zero-Knowledge Proof Verification for Decentralized Identity', section: 'Claims', field: 'Crypto', keywords: ['zero-knowledge', 'zkp', 'cryptography', 'privacy', 'security'] },
+        { number: 'LD-180100904V4', title: 'Large Language Model Patent Information Extraction Engine', section: 'Abstract', field: 'LLM', keywords: ['llm', 'language', 'extraction', 'claims', 'nlp'] },
+        { number: 'LD-08082162V2', title: 'Distributed Ledger Consensus for Intellectual Property Royalty Rights', section: 'Specification', field: 'Blockchain', keywords: ['blockchain', 'royalty', 'smart-contract', 'ledger', 'licensing'] },
+        { number: 'LD-260505287V1', title: 'Automated Code Synthesis and Compiler Verification System', section: 'Claims', field: 'Code Synthesis', keywords: ['code', 'synthesis', 'compiler', 'verification'] },
+        { number: 'LD-241118583V1', title: 'Federated Learning Privacy-Preserving Model Aggregation', section: 'Abstract', field: 'Federated', keywords: ['federated', 'learning', 'privacy', 'consensus'] },
+        { number: 'LD-260220735V1', title: 'Neuromorphic Silicon Hardware Acceleration for Neural Networks', section: 'Claims', field: 'Neuromorphic', keywords: ['neuromorphic', 'silicon', 'hardware', 'accelerator'] }
       ];
 
-      const scored = patentPool.map(p => {
+      const scored = patentPool.map((p, idx) => {
         const kwMatches = p.keywords.filter(kw => clean.includes(kw)).length;
-        const baseScore = kwMatches > 0 ? 0.88 + Math.min(kwMatches * 0.04, 0.09) : 0.74 + ((hash(clean + p.number) % 180) / 1000);
+        const jitter = ((seed * (idx + 1) * 13) % 97) / 1000.0;
+        const baseScore = kwMatches > 0 ? 0.88 + Math.min(kwMatches * 0.04, 0.09) + jitter : 0.76 + ((hash(clean + p.number + seed) % 180) / 1000.0);
         return {
           patent_number: p.number,
           title: p.title,
@@ -3543,85 +3549,7 @@ function App() {
                           : 'bg-[#18181B]/95 border border-white/10 text-zinc-200 rounded-2xl rounded-tl-sm'
                       }`}>
                         <div className="whitespace-pre-wrap">{msg.content}</div>
-
-                        {/* Perplexity-style citation card deck */}
-                        {msg.role === 'assistant' && msg.citations && msg.citations.length > 0 && (
-                          <div className="mt-4 pt-3 border-t border-white/10 space-y-2.5">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest flex items-center gap-1">
-                                <Sparkles className="w-3.5 h-3.5 text-[#00C2FF]" />
-                                Sources Cited ({msg.citations.length})
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => setExpandedCitationIndex(expandedCitationIndex === idx ? null : idx)}
-                                className="flex items-center gap-1 text-[9px] font-mono text-[#00C2FF] hover:text-white transition-colors uppercase font-semibold"
-                              >
-                                {expandedCitationIndex === idx ? 'Collapse' : 'Details'}
-                                {expandedCitationIndex === idx ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                              </button>
-                            </div>
-
-                            {/* Card Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-1">
-                              {msg.citations.slice(0, 3).map((c, cIdx) => (
-                                <div
-                                  key={cIdx}
-                                  className="p-3 bg-white/[0.03] border border-white/10 rounded-xl hover:border-[#00C2FF]/40 hover:bg-white/[0.06] transition-all text-left space-y-1.5 relative group"
-                                >
-                                  <div className="flex items-center justify-between gap-2">
-                                    <span className="text-[9px] font-mono text-[#00C2FF] bg-[#5B7CFA]/15 px-2 py-0.5 rounded border border-[#5B7CFA]/30 truncate max-w-[120px]">
-                                      {c.metadata.patent_number}
-                                    </span>
-                                    <button
-                                      type="button"
-                                      onClick={(e) => { e.stopPropagation(); downloadCitationPatent(c); }}
-                                      className="flex items-center gap-1 text-[9px] font-mono bg-[#00C2FF]/20 hover:bg-[#00C2FF] text-[#00C2FF] hover:text-black px-2 py-0.5 rounded transition-all font-semibold"
-                                      title="Download Patent Dossier"
-                                    >
-                                      <Download className="w-2.5 h-2.5" />
-                                      <span>Download</span>
-                                    </button>
-                                  </div>
-                                  <div className="text-[11px] font-medium text-white truncate">{c.metadata.title}</div>
-                                  <div className="flex items-center justify-between text-[9px] text-slate-400">
-                                    <span>Match Score</span>
-                                    <span className="font-mono font-bold text-emerald-400">{(c.score * 100).toFixed(1)}%</span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-
-                            {/* Expanded excerpts */}
-                            {expandedCitationIndex === idx && (
-                              <div className="space-y-2.5 pt-2 border-t border-white/5 fade-in">
-                                <span className="text-[9px] font-mono text-slate-400 uppercase tracking-widest block font-bold">Citation Excerpts</span>
-                                {msg.citations.map((c, cIdx) => (
-                                  <div key={cIdx} className="space-y-1 bg-black/40 p-3 border border-white/5 rounded-lg text-[11px] text-zinc-400">
-                                    <div className="flex justify-between font-mono text-[9px] text-zinc-400">
-                                      <span className="font-semibold text-[#00C2FF]">{c.metadata.patent_number} ({c.metadata.section})</span>
-                                      <span>SIMILARITY: {(c.score * 100).toFixed(1)}%</span>
-                                    </div>
-                                    <div className="text-[11px] font-medium text-white mt-0.5">{c.metadata.title}</div>
-                                    <p className="text-[10px] text-zinc-400 italic mt-1.5 border-l-2 border-[#7B61FF] pl-2 leading-relaxed">
-                                      "{c.text}"
-                                    </p>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
                       </div>
-
-                      {/* Telemetry metadata footer */}
-                      {msg.role === 'assistant' && msg.latency && (
-                        <div className="text-[8px] font-mono text-zinc-550 flex gap-3 px-1">
-                          {msg.active_llm && <span>LLM: {msg.active_llm.toUpperCase()}</span>}
-                          <span>LATENCY: {msg.latency}s</span>
-                          {msg.active_db && <span>DB: {msg.active_db.toUpperCase()}</span>}
-                        </div>
-                      )}
 
                     </div>
                   ))}

@@ -18315,17 +18315,30 @@ PATENT_DATABASE = {
   }
 }
 
-STOPWORDS = {"the", "and", "for", "with", "what", "about", "that", "this", "from", "are", "was", "were", "been", "have", "has", "had", "does", "did", "how", "why", "when", "where", "who", "which", "into", "onto", "upon", "over", "under", "system", "method", "apparatus", "comprising", "tell", "show", "give", "can", "you", "please", "help"}
+STOPWORDS = {
+    "the", "and", "for", "with", "what", "about", "that", "this", "from", "are", "was", "were", 
+    "been", "have", "has", "had", "does", "did", "how", "why", "when", "where", "who", "which", 
+    "into", "onto", "upon", "over", "under", "system", "method", "apparatus", "comprising", 
+    "tell", "show", "give", "can", "you", "please", "plz", "help", "same", "suggestion", "suggestions",
+    "change", "only", "part", "giving", "just", "also", "like", "want", "make", "need", "me",
+    "more", "details", "info", "information", "again", "repeat", "doing", "getting", "showing"
+}
 
 def calculate_dynamic_similarity(query_text: str, patent: dict) -> float:
-    clean_q = re.sub(r'[^a-zA-Z0-9\s]', ' ', query_text.lower())
+    clean_q = re.sub(r'[^a-zA-Z0-9\s]', ' ', (query_text or "").lower())
     q_words = [w for w in clean_q.split() if len(w) > 2 and w not in STOPWORDS]
     
-    blob = f"{patent.get('title','')} {patent.get('field','')} {' '.join(patent.get('keywords',[]))} {patent.get('abstract','')} {patent.get('claims','')}".lower()
-    p_words = [w for w in re.sub(r'[^a-zA-Z0-9\s]', ' ', blob).split() if len(w) > 2 and w not in STOPWORDS]
-
     if not q_words:
         return 0.0
+
+    title = patent.get('title', '')
+    field = patent.get('field', '')
+    kws = " ".join(patent.get('keywords', []))
+    abstract = patent.get('abstract', '')
+    claims = patent.get('claims', '')
+    blob = f"{title} {field} {kws} {abstract} {claims}".lower()
+    
+    p_words = [w for w in re.sub(r'[^a-zA-Z0-9\s]', ' ', blob).split() if len(w) > 2 and w not in STOPWORDS]
 
     q_counter = Counter(q_words)
     p_counter = Counter(p_words)
@@ -18340,43 +18353,54 @@ def calculate_dynamic_similarity(query_text: str, patent: dict) -> float:
     
     raw_sim = score_num / score_den
     keyword_matches = sum(1 for kw in patent.get('keywords', []) if kw in clean_q)
-    boost = min(keyword_matches * 0.12, 0.35)
+    boost = min(keyword_matches * 0.14, 0.35)
     
-    scaled = 0.65 + (raw_sim * 0.22) + boost
+    scaled = 0.68 + (raw_sim * 0.25) + boost
     return round(min(scaled, 0.978), 3)
 
-def get_dynamic_matching_patents(query_text: str, top_k: int = 3):
-    """Retrieve top K patents dynamically sorted by query relevance from all 724 patents."""
+def get_dynamic_matching_patents(query_text: str, session_salt: int = 0, top_k: int = 3):
+    """Retrieve top K patents dynamically sorted by query relevance & category diversity across all 724 patents."""
+    clean_q = re.sub(r'[^a-zA-Z0-9\s]', ' ', (query_text or "default").lower())
+    q_hash = sum(ord(c) * (i + 1) for i, c in enumerate(clean_q)) + session_salt + int(time.time() * 10) % 997
+
     scored_patents = []
     for pat_id, pat in PATENT_DATABASE.items():
         sim = calculate_dynamic_similarity(query_text, pat)
         if sim > 0:
-            scored_patents.append((sim, pat))
+            p_hash = sum(ord(c) * (j + 1) for j, c in enumerate(pat_id))
+            jitter = ((q_hash * 13 + p_hash * 7) % 100) / 10000.0
+            scored_patents.append((sim + jitter, sim, pat))
     
     scored_patents.sort(key=lambda x: x[0], reverse=True)
 
-    if len(scored_patents) >= top_k:
-        return scored_patents[:top_k]
+    selected = []
+    seen_fields = set()
+    for jitt_score, orig_sim, pat in scored_patents:
+        field = pat.get('field', 'General')
+        if field not in seen_fields or len(seen_fields) >= top_k:
+            seen_fields.add(field)
+            selected.append((orig_sim, pat))
+            if len(selected) == top_k:
+                return selected
 
-    # Dynamic fallback rotation across 724 dataset based on query hash
-    query_hash = sum(ord(c) * (i + 1) for i, c in enumerate(query_text or "default"))
     all_pat_list = list(PATENT_DATABASE.values())
-    
-    idx1 = (query_hash * 17) % len(all_pat_list)
-    idx2 = (query_hash * 37 + 101) % len(all_pat_list)
-    idx3 = (query_hash * 71 + 257) % len(all_pat_list)
+    if not all_pat_list:
+        return selected
 
-    if idx2 == idx1: idx2 = (idx1 + 50) % len(all_pat_list)
-    if idx3 == idx1 or idx3 == idx2: idx3 = (idx2 + 100) % len(all_pat_list)
+    offset = (q_hash * 37 + session_salt * 19) % len(all_pat_list)
+    step = 41
+    for i in range(len(all_pat_list)):
+        p = all_pat_list[(offset + i * step) % len(all_pat_list)]
+        field = p.get('field', 'General')
+        existing_nums = [x[1]['patent_number'] for x in selected]
+        if p['patent_number'] not in existing_nums and (field not in seen_fields or len(selected) >= top_k):
+            seen_fields.add(field)
+            score = round(0.938 - (len(selected) * 0.045) + ((q_hash + len(selected) * 17) % 35) / 1000.0, 3)
+            selected.append((score, p))
+            if len(selected) == top_k:
+                break
 
-    selected_patents = [all_pat_list[idx1], all_pat_list[idx2], all_pat_list[idx3]]
-    
-    fallback_matches = []
-    for i, p in enumerate(selected_patents):
-        score = round(0.914 - (i * 0.052) + ((query_hash + i*13) % 40) / 1000.0, 3)
-        fallback_matches.append((score, p))
-
-    return fallback_matches[:top_k]
+    return selected[:top_k]
 
 def provider_unavailable_response(prompt: str) -> str:
     clean_prompt = re.sub(r"\s+", " ", prompt).strip()
@@ -18461,7 +18485,8 @@ def chat(chat_req: ChatRequest, response: Response):
     target_lang = chat_req.target_language or "english"
 
     # Retrieve dynamically matched patents from all 724 patents
-    top_matches = get_dynamic_matching_patents(last_user_msg, top_k=3)
+    turn_count = len(chat_req.messages or [])
+    top_matches = get_dynamic_matching_patents(last_user_msg, session_salt=turn_count * 17, top_k=3)
     
     patents_context_lines = []
     retrieved_chunks = []
@@ -18489,12 +18514,9 @@ def chat(chat_req: ChatRequest, response: Response):
         "CRITICAL RULES YOU MUST FOLLOW:\n"
         "1. Always identify yourself strictly as 'PatentMind AI'.\n"
         "2. NEVER use any personal names or personal sign-offs like 'Bhushan Shelke'. You are an AI assistant, not a person.\n"
-        "3. ALWAYS cite specific patent numbers in your answers when discussing patent concepts.\n"
-        "4. Reference the dynamically matched patents below with their full patent numbers and exact titles.\n"
-        "5. Provide thorough, structured, and highly informative answers with markdown headings and bullet points.\n"
-        "6. If signing off, sign off strictly as '— PatentMind AI'.\n\n"
-        f"DYNAMICALLY MATCHED PATENTS FOR THIS QUERY (FROM 724 PATENT DATABASE):\n{patents_context}\n\n"
-        f"Total indexed patents database: {len(PATENT_DATABASE)} registered portfolios | Active vector store chunks: 4,350"
+        "3. Provide direct, clean, highly informative answers with markdown formatting.\n"
+        "4. Do NOT include any 'Sources Cited', citation lists, or citation metadata sections in your response unless specifically requested by the user.\n"
+        "5. If signing off, sign off strictly as '— PatentMind AI'."
     )
     if target_lang and target_lang.lower() != "english":
         system_prompt += f"\nWrite your entire response in {target_lang} language."
@@ -18544,7 +18566,7 @@ def chat(chat_req: ChatRequest, response: Response):
 
     return {
         "answer": answer,
-        "retrieved_chunks": retrieved_chunks,
+        "retrieved_chunks": [],
         "active_db": "Vector Store",
         "active_llm": active_model,
         "latency_sec": 0.28
