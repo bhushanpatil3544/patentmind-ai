@@ -18358,17 +18358,20 @@ def calculate_dynamic_similarity(query_text: str, patent: dict) -> float:
     scaled = 0.68 + (raw_sim * 0.25) + boost
     return round(min(scaled, 0.978), 3)
 
-def get_dynamic_matching_patents(query_text: str, session_salt: int = 0, top_k: int = 3):
-    """Retrieve top K patents dynamically sorted by query relevance & category diversity across all 724 patents."""
+def get_dynamic_matching_patents(query_text: str, session_salt: int = 0, exclude_patents: list = None, top_k: int = 3):
+    """Retrieve top K patents dynamically sorted by query relevance & category diversity across all 724 patents, excluding recently cited patents."""
+    exclude_set = set(exclude_patents or [])
     clean_q = re.sub(r'[^a-zA-Z0-9\s]', ' ', (query_text or "default").lower())
-    q_hash = sum(ord(c) * (i + 1) for i, c in enumerate(clean_q)) + session_salt + int(time.time() * 10) % 997
+    seed = sum(ord(c) * (i + 1) for i, c in enumerate(clean_q)) + (session_salt * 31) + int(time.time() * 100) % 997
 
     scored_patents = []
     for pat_id, pat in PATENT_DATABASE.items():
+        if pat['patent_number'] in exclude_set:
+            continue
         sim = calculate_dynamic_similarity(query_text, pat)
         if sim > 0:
             p_hash = sum(ord(c) * (j + 1) for j, c in enumerate(pat_id))
-            jitter = ((q_hash * 13 + p_hash * 7) % 100) / 10000.0
+            jitter = ((seed * 17 + p_hash * 13) % 500) / 10000.0
             scored_patents.append((sim + jitter, sim, pat))
     
     scored_patents.sort(key=lambda x: x[0], reverse=True)
@@ -18383,19 +18386,19 @@ def get_dynamic_matching_patents(query_text: str, session_salt: int = 0, top_k: 
             if len(selected) == top_k:
                 return selected
 
-    all_pat_list = list(PATENT_DATABASE.values())
+    all_pat_list = [p for p in PATENT_DATABASE.values() if p['patent_number'] not in exclude_set]
     if not all_pat_list:
-        return selected
+        all_pat_list = list(PATENT_DATABASE.values())
 
-    offset = (q_hash * 37 + session_salt * 19) % len(all_pat_list)
-    step = 41
+    offset = (seed * 43) % len(all_pat_list)
+    step = 37
     for i in range(len(all_pat_list)):
         p = all_pat_list[(offset + i * step) % len(all_pat_list)]
         field = p.get('field', 'General')
         existing_nums = [x[1]['patent_number'] for x in selected]
         if p['patent_number'] not in existing_nums and (field not in seen_fields or len(selected) >= top_k):
             seen_fields.add(field)
-            score = round(0.938 - (len(selected) * 0.045) + ((q_hash + len(selected) * 17) % 35) / 1000.0, 3)
+            score = round(0.938 - (len(selected) * 0.045) + ((seed + len(selected) * 17) % 35) / 1000.0, 3)
             selected.append((score, p))
             if len(selected) == top_k:
                 break
@@ -18492,9 +18495,21 @@ def chat(chat_req: ChatRequest, response: Response):
 
     target_lang = chat_req.target_language or "english"
 
+    # Extract previously cited patent numbers from message history to ensure dynamic non-repetition
+    seen_patents = []
+    for m in (chat_req.messages or []):
+        if m.content:
+            p_found = re.findall(r'(?:LD|BS|GP)-[A-Za-z0-9-]+', m.content)
+            seen_patents.extend(p_found)
+
     # Retrieve dynamically matched patents from all 724 patents
     turn_count = len(chat_req.messages or [])
-    top_matches = get_dynamic_matching_patents(last_user_msg, session_salt=turn_count * 17, top_k=3)
+    top_matches = get_dynamic_matching_patents(
+        last_user_msg, 
+        session_salt=turn_count * 23 + int(time.time() * 10) % 100, 
+        exclude_patents=seen_patents, 
+        top_k=3
+    )
     
     patents_context_lines = []
     retrieved_chunks = []
