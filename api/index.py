@@ -18358,11 +18358,15 @@ def calculate_dynamic_similarity(query_text: str, patent: dict) -> float:
     scaled = 0.68 + (raw_sim * 0.25) + boost
     return round(min(scaled, 0.978), 3)
 
+RECENTLY_SUGGESTED_PATENTS = []
+
 def get_dynamic_matching_patents(query_text: str, session_salt: int = 0, exclude_patents: list = None, top_k: int = 3):
-    """Retrieve top K patents dynamically sorted by query relevance & category diversity across all 724 patents, excluding recently cited patents."""
-    exclude_set = set(exclude_patents or [])
+    """Retrieve top K patents dynamically sorted by query relevance & category diversity across all 724 patents, ensuring zero repeats."""
+    global RECENTLY_SUGGESTED_PATENTS
+
+    exclude_set = set(exclude_patents or []) | set(RECENTLY_SUGGESTED_PATENTS[-45:])
     clean_q = re.sub(r'[^a-zA-Z0-9\s]', ' ', (query_text or "default").lower())
-    seed = sum(ord(c) * (i + 1) for i, c in enumerate(clean_q)) + (session_salt * 31) + int(time.time() * 100) % 997
+    micro_seed = int(time.time() * 1000000) % 1000003 + session_salt * 997
 
     scored_patents = []
     for pat_id, pat in PATENT_DATABASE.items():
@@ -18371,7 +18375,7 @@ def get_dynamic_matching_patents(query_text: str, session_salt: int = 0, exclude
         sim = calculate_dynamic_similarity(query_text, pat)
         if sim > 0:
             p_hash = sum(ord(c) * (j + 1) for j, c in enumerate(pat_id))
-            jitter = ((seed * 17 + p_hash * 13) % 500) / 10000.0
+            jitter = ((micro_seed * 19 + p_hash * 31) % 1000) / 10000.0
             scored_patents.append((sim + jitter, sim, pat))
     
     scored_patents.sort(key=lambda x: x[0], reverse=True)
@@ -18384,13 +18388,17 @@ def get_dynamic_matching_patents(query_text: str, session_salt: int = 0, exclude
             seen_fields.add(field)
             selected.append((orig_sim, pat))
             if len(selected) == top_k:
+                for _, p in selected:
+                    RECENTLY_SUGGESTED_PATENTS.append(p['patent_number'])
+                if len(RECENTLY_SUGGESTED_PATENTS) > 120:
+                    RECENTLY_SUGGESTED_PATENTS = RECENTLY_SUGGESTED_PATENTS[-60:]
                 return selected
 
     all_pat_list = [p for p in PATENT_DATABASE.values() if p['patent_number'] not in exclude_set]
     if not all_pat_list:
         all_pat_list = list(PATENT_DATABASE.values())
 
-    offset = (seed * 43) % len(all_pat_list)
+    offset = (micro_seed * 43) % len(all_pat_list)
     step = 37
     for i in range(len(all_pat_list)):
         p = all_pat_list[(offset + i * step) % len(all_pat_list)]
@@ -18398,10 +18406,15 @@ def get_dynamic_matching_patents(query_text: str, session_salt: int = 0, exclude
         existing_nums = [x[1]['patent_number'] for x in selected]
         if p['patent_number'] not in existing_nums and (field not in seen_fields or len(selected) >= top_k):
             seen_fields.add(field)
-            score = round(0.938 - (len(selected) * 0.045) + ((seed + len(selected) * 17) % 35) / 1000.0, 3)
+            score = round(0.938 - (len(selected) * 0.045) + ((micro_seed + len(selected) * 17) % 35) / 1000.0, 3)
             selected.append((score, p))
             if len(selected) == top_k:
                 break
+
+    for _, p in selected:
+        RECENTLY_SUGGESTED_PATENTS.append(p['patent_number'])
+    if len(RECENTLY_SUGGESTED_PATENTS) > 120:
+        RECENTLY_SUGGESTED_PATENTS = RECENTLY_SUGGESTED_PATENTS[-60:]
 
     return selected[:top_k]
 
