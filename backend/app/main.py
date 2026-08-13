@@ -1072,6 +1072,7 @@ def search_patents(search_query: SearchQuery, current_user: dict = Depends(get_c
             active_llm=result["active_llm"],
             active_db=result["active_db"],
             latency_sec=result["latency_sec"]
+        )
             
     recipient_email = user_info.get("email") if user_info else None
     if not recipient_email and "@" in target:

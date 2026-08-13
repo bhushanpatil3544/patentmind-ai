@@ -1,0 +1,11 @@
+.git
+.venv
+node_modules
+frontend/node_modules
+backend/storage
+backend/chroma_db
+chroma_db
+storage
+scratch
+*.pyc
+__pycache__
